@@ -6,8 +6,9 @@ public class Bits32 {
     private Bits32(){}
 
     public static void main(String[] args) {
-        int x=-780879113;
-        System.out.println(x);
+        long x=((long)1<<35)-1;
+        x=x>>>35;
+        System.out.println(Integer.toBinaryString((int)x));
 
     }
 
@@ -20,25 +21,16 @@ public class Bits32 {
     public static int mask(int start, int size){
         Preconditions.checkArgument(start>=0 && start<=Integer.SIZE);
         Preconditions.checkArgument(start+size<=Integer.SIZE  && size>=0);
-        if(size==32) {
-            return (mask(0,31)<<1 | 0b1)<<start;
-        }
-        int mask = (1<<size)-1;
-        return mask<<start;
+        long mask=((long)1<<size)-1;
+        return (int)mask<<start;
     }
 
     public static int extract(int bits, int start, int size){
         Preconditions.checkArgument(start>=0 && start<=Integer.SIZE);
         Preconditions.checkArgument(start+size<=Integer.SIZE  && size>=0);
-        int fromStart= bits >>> start;
-        int fromSize= bits >>> (start+size);
-        
-        if(size>=31) {
-            fromSize=bits >>> 30;
-            fromSize=fromSize>>> (size-30);
-        }
-     
-        return fromStart^(fromSize<<size);
+        long fromStart= (long)bits >>> start;
+        long fromSize= (long) bits >>> (start+size);
+        return (int)(fromStart^(fromSize<<size));
 
     }
 
