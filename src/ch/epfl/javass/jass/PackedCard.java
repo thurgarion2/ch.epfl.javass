@@ -5,17 +5,17 @@ import ch.epfl.javass.bits.Bits32;
 public final class PackedCard {
     private PackedCard(){}
 
-    private static final int INVALID = 127;
+    private static final int INVALID = 0b111111;
 
     public static boolean isValid(int pkCard){
-        boolean isValid = true;
+        if(Bits32.extract(pkCard, 6, Integer.SIZE-6)!=0)
+            return false;
+        
         int rank = Bits32.extract(pkCard, 0,4);
-        int bitS = Bits32.extract(pkCard, 0,6);
         if(rank < 0 || rank >8)
-            isValid =false;
-        if(bitS >= INVALID)
-            isValid = false;
-        return isValid;
+           return false;
+       
+        return true;
     }
 
     public static int pack(Card.Color c, Card.Rank r){
