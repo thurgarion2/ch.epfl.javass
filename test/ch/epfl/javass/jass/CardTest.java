@@ -199,8 +199,10 @@ public final class CardTest {
     void pointsSumTo152() {
         for (Card.Color trump: Card.Color.values()) {
             int totalPoints = 0;
-            for (Card card: getAllCards())
+            for (Card card: getAllCards()) 
                 totalPoints += card.points(trump);
+               
+            
             assertEquals(152, totalPoints);
         }
     }

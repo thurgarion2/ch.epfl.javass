@@ -35,30 +35,39 @@ public class Card {
     }
 
     public enum Rank{
-        SIX("6",0),
-        SEVEN("7",1),
-        EIGHT("8",2),
-        NINE("9",7),
-        TEN("10",3),
-        JACK("J",8),
-        QUEEN("Q",4),
-        KING("K",5),
-        ACE("A",6);
+        SIX("6",0,0,0),
+        SEVEN("7",1,0,0),
+        EIGHT("8",2,0,0),
+        NINE("9",7,14,0),
+        TEN("10",3,10,10),
+        JACK("J",8,20,2),
+        QUEEN("Q",4,3,3),
+        KING("K",5,4,4),
+        ACE("A",6,11,11);
 
         public final static List<Rank> ALL = Collections.unmodifiableList(Arrays.asList(values()));
         public final static int COUNT = ALL.size();
 
         private String symbol;
         private int trumpOrdinal;
-        private Rank(String s, int trumpOrdinal) {
+        private int normalPoints;
+        private int trumpPoints;
+        
+        private Rank(String s, int trumpOrdinal, int trumpPoints, int normalPoints) {
             this.trumpOrdinal=trumpOrdinal;
             this.symbol=s;
+            this.trumpPoints=trumpPoints;
+            this.normalPoints=normalPoints;
         }
 
         @Override
         public String toString(){return symbol;}
 
-        public int trumpOrdinal(){return ALL.indexOf(this);}
+        public int trumpOrdinal(){return trumpOrdinal;}
+        
+        public int trumpPoints() {return this.trumpPoints;}
+        
+        public int normalPoints() {return this.normalPoints;}
 
     }
 

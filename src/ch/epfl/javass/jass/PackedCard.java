@@ -19,105 +19,88 @@ public final class PackedCard {
     }
 
     public static int pack(Card.Color c, Card.Rank r){
-            int indexRank = Card.Rank.ALL.indexOf(r);
-            int indexColor = Card.Color.ALL.indexOf(c);
+            int indexRank = r.ordinal();
+            int indexColor = c.ordinal();
             int pkCard = Bits32.pack(indexRank, 4, indexColor, 2);
             assert isValid(pkCard);
         return pkCard;
     }
+    
+    private static int colorIndex(int pkCard){
+        assert isValid(pkCard);
+        return  Bits32.extract(pkCard, 4,2);
+    }
 
     public static Card.Color color(int pkCard){
         assert isValid(pkCard);
-        int colorInt = Bits32.extract(pkCard, 4,2);
-        Card.Color color = Card.Color.ALL.get(colorInt);
-        return color;
+        return  Card.Color.ALL.get(colorIndex(pkCard));
+    }
+    
+    private static int rankIndex(int pkCard){
+        assert isValid(pkCard);
+        return Bits32.extract(pkCard, 0,4);
     }
 
     public static Card.Rank rank(int pkCard){
         assert isValid(pkCard);
-        int rankInt = Bits32.extract(pkCard, 0,4);
-        Card.Rank rank = Card.Rank.ALL.get(rankInt);
-        return rank;
+        return Card.Rank.ALL.get(rankIndex(pkCard));
+    }
+    
+    
+    private static int rankIndexWithTrump(int pkCard, int trump) {
+        assert isValid(pkCard);
+        if(colorIndex(pkCard)==trump) {
+            return Card.Rank.ALL.get(rankIndex(pkCard)).trumpOrdinal();
+        }else {
+            return rankIndex(pkCard);
+        }
     }
 
 
     public static boolean isBetter(Card.Color trump, int pkCardL, int pkCardR){
         assert isValid(pkCardL);
         assert isValid(pkCardR);
-        Card.Color colorL = color(pkCardL);
-        Card.Rank rankL = rank(pkCardL);
-        Card.Color colorR = color(pkCardR);
-        Card.Rank rankR = rank(pkCardR);
-        //check if the two are trump
-        if(colorL.equals(trump) && colorR.equals(trump)){
-            if(rankL.trumpOrdinal() > rankR.trumpOrdinal())
-                return true;
-            return false;
-        //check if one of them is trump
-        }else if (colorL.equals(trump) || colorR.equals(trump)){
-            if(colorL.equals(trump))
-                return true;
-            return false;
-        //check if they are comparable
-        }else if (colorL.equals(colorR)){
-            if(rankL.ordinal() > rankR.ordinal())
-                return true;
+        
+        //check if card are comparable
+        if( !isValid(pkCardL) || !isValid(pkCardR) || pkCardL==pkCardR) {
             return false;
         }
-        //if the program reach this point, the cards are not comparable
-        return false;
-    }
-
-    /**
-     * @param //rank of a card r
-     * @return true if rank is under 10 else false
-     */
-    private static boolean checkU10(Card.Rank r){
-        if(Card.Rank.ALL.indexOf(r) < 5)
+        
+        int indexColorL=colorIndex(pkCardL);
+        int indexColorR=colorIndex(pkCardR);
+        
+        //get indexRankAccordingToTrump
+        int indexRankL=rankIndexWithTrump (pkCardL, trump.ordinal());
+        int indexRankR=rankIndexWithTrump (pkCardR, trump.ordinal());
+        
+        //check of same color
+        if(indexColorL==indexColorR) {
+            return indexRankL>indexRankR;
+        }
+        
+        //check first is trump other not comparable
+        if(indexColorL==trump.ordinal()) {
             return true;
+        }
+        
+       
         return false;
     }
 
-    /**
-     * @param //Card.Rank r
-     * @return true if r is not 9 or J, false otherwise
-     */
-    private static boolean checkNot9OrJ(Card.Rank r){
-        if(r.equals(Card.Rank.NINE) || r.equals(Card.Rank.JACK))
-            return false;
-        return true;
-    }
 
     public static int points(Card.Color trump, int pkCard){
         assert isValid(pkCard);
-        Card.Color color = color(pkCard);
-        Card.Rank rank = rank(pkCard);
-        int value = -1;
-        if(checkNot9OrJ(rank)){
-            if(checkU10(rank)){
-                value = 0;
-            }else{
-                switch(rank){
-                case TEN: value = 10; break;
-                case QUEEN: value = 3; break;
-                case KING: value = 4; break;
-                case ACE: value = 11; break;
-                }
-            }
-        }else{
-            if(trump.equals(color)){
-                switch (rank){
-                case NINE: value = 14; break;
-                case JACK: value = 20; break;
-                }
-            }else{
-                switch (rank){
-                case NINE: value = 0; break;
-                case JACK: value = 2; break;
-                }
-            }
+        
+        int indexColor=colorIndex(pkCard);     
+        //get indexRankAccordingToTrump
+        int indexRank=rankIndex(pkCard);
+        
+        //check if trump
+        if(indexColor==trump.ordinal()) {
+            return Card.Rank.ALL.get(indexRank).trumpPoints();
         }
-        return value;
+       
+        return Card.Rank.ALL.get(indexRank).normalPoints();
     }
 
 
