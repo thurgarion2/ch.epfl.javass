@@ -9,10 +9,15 @@ import java.util.List;
  * @author erwan serandour (296100)
  *
  */
+
 public class Card {
     private int card;
- 
-
+    
+    
+    
+    /**
+     * @param packedCard
+     */
     private Card(int packedCard){
         card=packedCard;
     };
