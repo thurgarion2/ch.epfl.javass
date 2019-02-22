@@ -1,20 +1,21 @@
 package ch.epfl.javass;
 
 /**
- * check preconditions and leave exception according to the result
+ * vérifie les préconditions et lève des exceptions en focntion du résultat
  * 
  * @author erwan serandour (296100)
  *
  */
 public final class Preconditions {
-  
+
     private Preconditions() {
     }
 
     /**
-     * leave an exception according to b
+     * lève une exception en fontion de b
      * 
      * @param b
+     *            un booléen
      * 
      * @throws IllegalArgumentException
      *             si b est vrai
@@ -27,13 +28,13 @@ public final class Preconditions {
     }
 
     /**
-     * check wheter the index is in the range
+     * vérifie si index est dans l'intervalle
      * 
      * @param index
-     *            l'index dans l'intervalle
+     *            l'index
      * @param size
-     *            la taille du tableau
-     * @return l'index si compatible
+     *            la taille de l'intervalle
+     * @return l'index si dans l'intervalle
      * 
      * @throws IndexOutOfBoundsException
      *             si l'index est hors de l'intervalle
