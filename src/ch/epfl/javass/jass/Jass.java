@@ -1,5 +1,9 @@
 package ch.epfl.javass.jass;
 
+/**
+ * @author esera
+ *
+ */
 public interface Jass {
     public static final int HAND_SIZE = 9 ;
     public static final int TRICKS_PER_TURN = 9 ;
