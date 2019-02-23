@@ -6,6 +6,10 @@ public final class Bits64 {
     private Bits64() {
     }
     
+    public static void main(String[]args) {
+        System.out.println(10L>>>68);
+    }
+    
     private static void checkSize(long bits, int size) {
         Preconditions.checkArgument(size > 0 && size < Long.SIZE);
         long mask = mask(size, Long.SIZE - size);
@@ -19,7 +23,7 @@ public final class Bits64 {
         if(size==Long.SIZE) {
             return (mask(0,Long.SIZE-1)<<1)|0b1;
         }
-        long mask = ((long) 1 << size) - 1;
+        long mask = ( 1L << size) - 1;
         return mask << start;
     }
     
@@ -28,6 +32,10 @@ public final class Bits64 {
         Preconditions.checkArgument(start + size <= Long.SIZE && size >= 0);
         long fromStart =  bits >>> start;
         long fromSize = bits >>> (start + size);
+            
+        if(size+start==Long.SIZE) {
+            fromSize = 0L;
+        }
         return  (fromStart ^ (fromSize << size));
 
     }
