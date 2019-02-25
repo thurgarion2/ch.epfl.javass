@@ -170,7 +170,7 @@ public final class PackedScore {
         
         int turnTricks=turnTricks( pkScore,  winningTeam)+1;
         int turnPoints =turnPoints( pkScore,  winningTeam)+trickPoints;
-        int totalPoints =totalPoints( pkScore, winningTeam);
+        int totalPoints =gamePoints( pkScore, winningTeam);
         
         if(turnTricks==Jass.TRICKS_PER_TURN) {
             turnPoints+=Jass.MATCH_ADDITIONAL_POINTS;
