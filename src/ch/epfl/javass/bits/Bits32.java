@@ -17,9 +17,9 @@ public final class Bits32 {
     /**
      * vérifie si le nombre n'occcupe pas plus de valeur que sa taille (cf pack)
      * 
-     * @param bits
+     * bits
      *            le nombre
-     * @param size
+     * size
      *            la taille
      */
     private static void checkSize(int bits, int size) {
@@ -68,10 +68,7 @@ public final class Bits32 {
     public static int extract(int bits, int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
         Preconditions.checkArgument(start + size <= Integer.SIZE && size >= 0);
-        long fromStart = (long) bits >>> start;
-        long fromSize = (long) bits >>> (start + size);
-        return (int) (fromStart ^ (fromSize << size));
-
+        return (bits&mask(start,size))>>>start;
     }
 
     /**

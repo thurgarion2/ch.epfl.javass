@@ -3,6 +3,13 @@ package ch.epfl.javass.jass;
 import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.bits.Bits64;
 
+/**
+ * plusieurs méthodes utiles pour représenter un score dans un seul long
+ * 
+ * @author erwan serandour (296100)
+ *
+ */
+
 public final class PackedScore {
     public static final long INITIAL=0;
     
@@ -27,7 +34,16 @@ public final class PackedScore {
         
         return true;
     }
-    
+
+    /**
+     * retourne vraie si les champ de pkScore contiennent des valeurs valides
+     * (pli<=9,point<=257,le totale des points<=2000)
+     * 
+     * @param pkScore
+     *            le score empaqueté dans un long
+     * @return vraie si les champ de pkScore contiennent des valeurs
+     *         valides (pli<=9,point<=257,le totale des points<=2000)
+     */
     public static boolean isValid(long pkScore) {
         int B0To31=(int)Bits64.extract(pkScore, 0, Integer.SIZE);
         int B32To63=(int)Bits64.extract(pkScore, 32, Integer.SIZE);
@@ -42,12 +58,34 @@ public final class PackedScore {
         
     }
     
+    /**
+     * retourne un score empaqueté dans un long
+     * 
+     * @param turnTricks1
+     *            le nombre de pli de l'équipe 1
+     * @param turnPoints1
+     *            le nombre de points (durant le tour) de l'équipe 1
+     * @param gamePoints1
+     *            le nombre de points (durant la partie) de l'équipe 1
+     * @param turnTricks2
+     *            le nombre de pli de l'équipe 2
+     * @param turnPoints2
+     *            le nombre de points (durant le tour) de l'équipe 2
+     * @param gamePoints2
+     *            le nombre de points (durant la partie) de l'équipe 1
+     * @return un score empaqueté dans un long
+     */
     public static long pack(int turnTricks1, int turnPoints1, int gamePoints1, int turnTricks2, int turnPoints2, int gamePoints2) {
        long B0To31= oneTeamScorePk( turnTricks1,  turnPoints1,  gamePoints1);
        long B32To63= oneTeamScorePk( turnTricks2,  turnPoints2,  gamePoints2);
        return Bits64.pack(B0To31, Integer.SIZE,B32To63, Integer.SIZE);
     }
     
+    /**
+     * @param pkScore
+     * @param t
+     * @return
+     */
     private static int extractPkTeam(long pkScore, TeamId t) {
         assert isValid( pkScore);
         if(t==TeamId.TEAM_1) {

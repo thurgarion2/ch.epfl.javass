@@ -21,7 +21,7 @@ public final class Score {
 		score = packed;
 	}
 	
-	public static final Score INTIAL = ofPacked(PackedScore.INITIAL);
+	public static final Score INITIAL = ofPacked(PackedScore.INITIAL);
 	
 	public static Score ofPacked(long packed) throws IllegalArgumentException{
 		Preconditions.checkArgument(PackedScore.isValid(packed));
