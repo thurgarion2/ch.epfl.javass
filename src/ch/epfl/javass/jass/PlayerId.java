@@ -13,9 +13,15 @@ import java.util.List;
 
 public enum PlayerId {
 	PLAYER_1(), PLAYER_2(), PLAYER_3(), PLAYER_4();
-
+	
+	/**
+	 * liste de chaque joueur membre de l'énumeration
+	 */
 	public static final List<PlayerId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
-
+	
+	/**
+	 * compte du nombre de joueur(s)
+	 */
 	public static final int COUNT = ALL.size();
 
 	/**
