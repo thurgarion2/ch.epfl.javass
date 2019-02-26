@@ -10,26 +10,35 @@ import ch.epfl.javass.bits.Bits64;
  *
  */
 
-/**
- * @author esera
- *
- */
+
 public final class PackedScore {
     public static final long INITIAL=0;
+    
+    private static final int BITSIZEOFTRICKS=4;
+    private static final int BITSIZEOFTURN=9;
+    private static final int BITSIZEOFGAME=11;
+    
+    private static final int STARTOFTURN=BITSIZEOFTRICKS;
+    private static final int STARTOFGAME=STARTOFTURN+BITSIZEOFTURN;
+    
+    private static final int MAXTRICKPERTURN = Jass.TRICKS_PER_TURN;
+    private static final int MAXPOINTPERTURN =257;
+    private static final int MAXPOINTPERGAME =2000;
    
     
     private PackedScore() {}
     
+    
     private static boolean isValid(int pkScore) {
-        if(Bits32.extract(pkScore, 0, 4)>9) {
+        if(Bits32.extract(pkScore, 0, BITSIZEOFTRICKS)>MAXTRICKPERTURN) {
             return false;
         }
         
-        if(Bits32.extract(pkScore, 4, 9)>257) {
+        if(Bits32.extract(pkScore, STARTOFTURN, BITSIZEOFTURN)>MAXPOINTPERTURN) {
             return false;
         }
-        
-        if(Bits32.extract(pkScore, 13, 11)>2000) {
+       
+        if(Bits32.extract(pkScore, STARTOFGAME, BITSIZEOFGAME)>MAXPOINTPERGAME) {
             return false;
         }
         
@@ -59,7 +68,7 @@ public final class PackedScore {
         assert (turnTricks>=0 && turnTricks<=9);
         assert (turnPoints>=0 && turnPoints<=257);
         assert (gamePoints>=0 && gamePoints<=2000);
-        return Bits32.pack(turnTricks, 4, turnPoints,9, gamePoints, 11);
+        return Bits32.pack(turnTricks, BITSIZEOFTRICKS, turnPoints,BITSIZEOFTURN, gamePoints, BITSIZEOFGAME);
         
     }
     
@@ -106,7 +115,7 @@ public final class PackedScore {
      */
     public static int turnTricks(long pkScore, TeamId t) {
         assert isValid( pkScore);
-        return Bits32.extract(extractPkTeam( pkScore, t), 0, 4);
+        return Bits32.extract(extractPkTeam( pkScore, t), 0, BITSIZEOFTRICKS);
     }
 
     /**
@@ -120,7 +129,7 @@ public final class PackedScore {
      */
     public static int turnPoints(long pkScore, TeamId t) {
         assert isValid( pkScore);
-        return Bits32.extract(extractPkTeam( pkScore, t), 4, 9);
+        return Bits32.extract(extractPkTeam( pkScore, t), STARTOFTURN, BITSIZEOFTURN);
     }
     /**
      * retourne le nombre de de point (durant la partie) gagné d'une équipe donnée
@@ -133,7 +142,7 @@ public final class PackedScore {
      */
     public static int gamePoints(long pkScore, TeamId t) {
         assert isValid( pkScore);
-        return Bits32.extract(extractPkTeam( pkScore, t), 13, 11);
+        return Bits32.extract(extractPkTeam( pkScore, t), STARTOFGAME, BITSIZEOFGAME);
     }
     
     /**

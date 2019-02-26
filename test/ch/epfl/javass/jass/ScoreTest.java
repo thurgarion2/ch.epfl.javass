@@ -62,6 +62,7 @@ public class ScoreTest {
             for(int a=100; a<=200; a++) {
                 for(int b=0; b<=9; b++) {
                     int b1=b, a1=a,i1=i;
+                    
                     assertThrows(IllegalArgumentException.class, () -> {
                         Score.ofPacked(PackedScore.pack(b1,a1,i1,b1,a1,i1));
                     });
@@ -96,10 +97,10 @@ public class ScoreTest {
     void equalsWorksWithDifferantScore() {
         for(int i=0; i<100; i++) {
             for(int a=0; a<100; a++) {
-                for(int b=0; b<=9; b++) {
+                for(int b=0; b<=8; b++) {
                     Score s1=Score.ofPacked(PackedScore.pack(b,a,i, b,a,i));
                     Score s2=Score.ofPacked(PackedScore.pack(b+1,a+1,i, b,a,i));
-                    assertTrue(s1.equals(s2));
+                    assertEquals(false,s1.equals(s2));
                 }
             }
         }
