@@ -111,7 +111,7 @@ public final class Score {
 
 	@Override
 	public int hashCode() {
-		return s.hashCode();
+		return Long.hashCode(score);
 	}
 
 	@Override
