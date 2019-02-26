@@ -11,10 +11,17 @@ import java.util.List;
  *
  */
 public enum TeamId {
+	
 	TEAM_1(), TEAM_2();
-
+	
+	/**
+	 * liste de chaque équipe membre de l'énumeration
+	 */
 	public static final List<TeamId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
 
+	/**
+	 * compte du nombre d'équipe(s)
+	 */
 	public static final int COUNT = ALL.size();
 
 	/**
