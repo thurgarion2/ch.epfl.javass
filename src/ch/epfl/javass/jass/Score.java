@@ -100,13 +100,15 @@ public final class Score {
 	
 	@Override
 	public boolean equals(Object o) {
-		if(o.getClass() == this.getClass()) {
+	    if(o== null) {
+	        return false;
+	    }
+	    
+		if(o.getClass() != this.getClass()) {
 			return false;
 		}
-		if(this.score == ((Score) o).score) {
-			return true;
-		}
-		return false;
+		
+		return this.score == ((Score) o).score;
 	}
 
 	@Override

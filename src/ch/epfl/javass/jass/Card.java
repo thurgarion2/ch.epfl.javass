@@ -11,7 +11,7 @@ import java.util.List;
  *
  */
 
-public class Card {
+public final class Card {
     private int card;
 
     private Card(int packedCard) {
@@ -232,8 +232,9 @@ public class Card {
 
     @Override
     public boolean equals(Object thatO) {
-        if (thatO.getClass() != this.getClass())
+        if (thatO.getClass() != this.getClass()) {
             return false;
+        }
         Card other = (Card) thatO;
         return this.card == other.card;
     }
