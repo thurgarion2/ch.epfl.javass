@@ -24,10 +24,13 @@ public enum PlayerId {
 	 */
 	public static final int COUNT = ALL.size();
 
-	/**
-	 * @return le nom de l'équipe à laquelle apparitent le joueur sur qui la méthode
-	 *         est appelée
-	 */
+    /**
+     * retourne le nom de l'équipe à laquelle apparitent le joueur sur qui la
+     * méthode est appelée
+     * 
+     * @return le nom de l'équipe à laquelle apparitent le joueur sur qui la
+     *         méthode est appelée
+     */
 	public TeamId team() {
 		if (this.equals(PLAYER_1) || this.equals(PLAYER_3))
 			return TeamId.TEAM_1;

@@ -20,26 +20,16 @@ public final class PackedCardSet {
 
     private PackedCardSet() {
     }
-
-    private static boolean isValideForSingleColor(int pkCardSet) {
-        return (Bits64.mask(CARDPERCOLOR, Long.SIZE-CARDPERCOLOR)&pkCardSet)==0;
-    }
     
-    
-    private static int extractColor(long pkCardSet, int color) {
-        assert (color<=4 && color>=0);
-        int start=color*16;
-        return (int)Bits64.extract(pkCardSet, start, 16);
+    public static void main(String[] args) {
+        long x=SUBSETCOLOROF[1]|SUBSETCOLOROF[3];
+        System.out.println(toString(x));
+       
     }
-   
+ 
     
     public static boolean isValide(long pkCardSet) {
-        for(int i=0; i<4; i++) {
-            if(!isValideForSingleColor(extractColor(pkCardSet,i))) {
-                return false;
-            }
-        }
-        return true;
+        return (pkCardSet&(~ALL_CARDS))==0L;
     }
     
     public static long trumpAbove(int pkCard) {
@@ -58,35 +48,20 @@ public final class PackedCardSet {
         return Long.bitCount(pkCardSet);
     }
     
+    
     public static int get(long pkCardSet, int index) {
         assert isValide(pkCardSet);
         assert index>=0 && index<size(pkCardSet);
-        
-       
-        
-        for(int color=0; color<4; color++) {
-            int pkColorSet=extractColor(pkCardSet, color);
-            int cardRank=0;
-            
-            if(pkColorSet%2==0) {
-                pkColorSet|=0b1;
-                cardRank+=1+Long.numberOfTrailingZeros(pkColorSet);
-                pkColorSet>>>=cardRank;
-            }
-            
-            while(index!=0 && pkColorSet!=0) {
-                cardRank+=1+Long.numberOfTrailingZeros(pkColorSet);
-                int nextOne=1+Long.numberOfTrailingZeros(pkColorSet);
-                pkColorSet>>>=nextOne;
-                index--;
-            }
-            
-            if(index==0 && pkColorSet!=0) {
-                return PackedCard.pack(Card.Color.ALL.get(color), Card.Rank.ALL.get(cardRank));
-            }
+                
+        for(int i=0; i<index; i++) {
+            pkCardSet^=Long.lowestOneBit(pkCardSet);
         }
         
-        return 0;
+        int numberOfZero=Long.numberOfTrailingZeros(pkCardSet);
+        int color =numberOfZero/16;
+        int rank =numberOfZero-color*16;
+        
+        return PackedCard.pack(Card.Color.ALL.get(color),Card.Rank.ALL.get(rank));
         
     }
     
@@ -104,7 +79,7 @@ public final class PackedCardSet {
     public static long remove(long pkCardSet, int pkCard) {
         assert isValide(pkCardSet);
         assert PackedCard.isValid(pkCard);
-        return  pkCardSet&(~Bits64.mask(cardIndex(pkCard),1));
+        return  pkCardSet&(~(1L<<cardIndex(pkCard)));
     }
     
     public static boolean contains(long pkCardSet, int pkCard) {

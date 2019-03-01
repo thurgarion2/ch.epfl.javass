@@ -48,7 +48,7 @@ public final class Score {
 	/**
 	 * 
 	 * @param TeamId t
-	 * @return le nombre de plis du tour courant au format eniter (int) de l'équipe passée en paramètre
+	 * @return le nombre de plis du tour courant au format entier (int) de l'équipe passée en paramètre
 	 */
 	public int turnTricks(TeamId t) {
 		return PackedScore.turnTricks(score, t);
