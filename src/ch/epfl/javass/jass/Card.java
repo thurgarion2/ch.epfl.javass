@@ -26,22 +26,22 @@ public final class Card {
      */
     public enum Color {
         /**
-         * @attr SPADE pique
+         * pique
          *
          */
         SPADE("\u2660"),
         /**
-         * @attr HEART coeur
+         * coeur
          *
          */
         HEART("\u2661"),
         /**
-         * @attr DIAMOND carreau
+         * carreau
          *
          */
         DIAMOND("\u2662"),
         /**
-         * @attr CLUB trèfle
+         * trèfle
          *
          */
         CLUB("\u2663");
@@ -53,14 +53,14 @@ public final class Card {
         }
 
         /**
-         * @attr ALL liste contenant toutes les couleurs
+         * ALL liste contenant toutes les couleurs
          *
          */
         public static final List<Color> ALL = Collections
                 .unmodifiableList(Arrays.asList(values()));
 
         /**
-         * @attr COUNT nombre de couleurs
+         * COUNT nombre de couleurs
          *
          */
         public static final int COUNT = ALL.size();
@@ -79,65 +79,63 @@ public final class Card {
      */
     public enum Rank {
         /**
-         * @attr SIX six
+         * le six
          */
         SIX("6", 0),
         /**
-         * @attr SEVEN sept
+         * le sept
          */
         SEVEN("7", 1),
         /**
-         * @attr EIGHT huit
+         * le huit
          */
         EIGHT("8", 2),
         /**
-         * @attr NINE neuf
+         * le neuf
          */
         NINE("9", 7),
         /**
-         * @attr TEN dix
+         * le dix
          */
         TEN("10", 3),
         /**
-         * @attr JACK valet
+         * le valet
          */
         JACK("J", 8),
         /**
-         * @attr QUEEN dame
+         * la dame
          */
         QUEEN("Q", 4),
         /**
-         * @attr KING roi
+         * le roi
          */
         KING("K", 5),
         /**
-         * @attr ACE ace
+         * l'ace
          */
         ACE("A", 6);
 
         /**
-         * @attr ALL liste contenant tous les rangs
+         * ALL liste contenant tous les rangs
          *
          */
         public final static List<Rank> ALL = Collections
                 .unmodifiableList(Arrays.asList(values()));
         /**
-         * @attr COUNT nombre de rang
+         * le nombre de rang
          *
          */
         public final static int COUNT = ALL.size();
 
         private String symbol;
         private int trumpOrdinal;
-       
 
         private Rank(String s, int trumpOrdinal) {
             this.trumpOrdinal = trumpOrdinal;
             this.symbol = s;
-            
+
         }
 
-      
         @Override
         public String toString() {
             return symbol;
@@ -149,7 +147,6 @@ public final class Card {
         public int trumpOrdinal() {
             return trumpOrdinal;
         }
-
 
     }
 

@@ -16,7 +16,6 @@ public final class Bits64 {
     }
     
     
-    
     private static void checkSize(long bits, int size) {
         Preconditions.checkArgument(size > 0 && size < Long.SIZE);
         long mask = mask(size, Long.SIZE - size);
