@@ -160,7 +160,7 @@ public final class Card {
      * @return retourne une carte de couleur et de rang donné
      */
     public static Card of(Color c, Rank r) {
-        return new Card(PackedCard.pack(c, r));
+        return  ofPacked(PackedCard.pack(c, r));
     }
 
     /**
@@ -172,6 +172,9 @@ public final class Card {
      * 
      */
     public static Card ofPacked(int packed) {
+        if(!PackedCard.isValid(packed)) {
+            throw new IllegalArgumentException();
+        }
         return new Card(packed);
     }
 
