@@ -81,7 +81,8 @@ public final class PackedCardSet {
     public static long trumpAbove(int pkCard) {
         assert PackedCard.isValid(pkCard);
         int color = PackedCard.color(pkCard).ordinal();
-        return (TRUMPABOVE[PackedCard.rank(pkCard).ordinal()] << (color * 16));
+        int rank = PackedCard.rank(pkCard).ordinal();
+        return TRUMPABOVE[color][rank];
     }
 
     /**
