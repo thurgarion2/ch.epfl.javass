@@ -75,6 +75,28 @@ public class CardSet {
 	public CardSet substeOfColor(Card.Color color) {
 		return new CardSet(PackedCardSet.subsetOfColor(cardSet, color));
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o == null) {
+			return false;
+		}
+		if(o.getClass() != this.getClass()) {
+			return false;
+		}
+		CardSet other = (CardSet) o;
+		return this.cardSet == other.cardSet;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Long.hashCode(cardSet);
+	}
+	
+	@Override
+	public String toString() {
+		return PackedCardSet.toString(cardSet);
+	}
 }
 	
 	
