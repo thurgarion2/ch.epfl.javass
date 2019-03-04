@@ -1,7 +1,9 @@
 package ch.epfl.javass.jass;
 
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.LinkedList;
@@ -40,12 +42,13 @@ public class CardSetTest {
     
     @Test
     void ofWorksWithNoCard() {
+        System.out.println(CardSet.of(new LinkedList<Card>()));
         assertTrue(CardSet.EMPTY.equals(CardSet.of(new LinkedList<Card>()))); 
     }
     
     @Test
     void ofWorksWithAllCards() {
-        assertTrue(CardSet.ALLL_CARDS.equals(CardSet.of(allCards()))); 
+        assertTrue(CardSet.ALL_CARDS.equals(CardSet.of(allCards()))); 
     }
     
     @Test
@@ -101,7 +104,7 @@ public class CardSetTest {
         List <Card> cards = new LinkedList<>();
         for(Card c : all) {
             cards.add(c);
-            assertFalse(CardSet.of(cards));
+            assertFalse(CardSet.of(cards).isEmpty());
         }
     }
     
@@ -178,7 +181,7 @@ public class CardSetTest {
         List<Card> all = allCards();
         List <Card> cards = new LinkedList<>();
         for(Card c : all) {
-            CardSet set =CardSet.of(cards).complement;
+            CardSet set =CardSet.of(cards).complement();
             for(Card each : all) {
                 if(!cards.contains(each)) {
                     assertTrue(set.contains(each));

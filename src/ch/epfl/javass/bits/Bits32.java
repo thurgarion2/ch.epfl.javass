@@ -45,7 +45,7 @@ public final class Bits32 {
     public static int mask(int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
         Preconditions.checkArgument(start + size <= Integer.SIZE && size >= 0);
-        long mask = ((long) 1 << size) - 1;
+        long mask = (1L << size) - 1;
         return (int) mask << start;
     }
 

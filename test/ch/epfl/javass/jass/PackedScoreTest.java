@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister.Pack;
+
 
 class PackedScoreTest {
 

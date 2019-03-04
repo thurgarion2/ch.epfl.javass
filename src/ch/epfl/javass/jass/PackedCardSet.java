@@ -39,18 +39,18 @@ public final class PackedCardSet {
     
     private static long[][] trumpAbove(){
         long[][]trumpAbove= new long[Card.Color.COUNT][Card.Rank.COUNT];
-        for(int color=0; color<Card.Color.COUNT; color++) {
-            for(int rank=0; rank<Card.Rank.COUNT; rank++) {
+        for(int card=0; card<size(ALL_CARDS); card++) {
                 long aboveRank=0L;
-                int pkCard=PackedCard.pack(Card.Color.ALL.get(color),Card.Rank.ALL.get(rank));
+                int pkCard=get(ALL_CARDS,card);
                 for(int index=0; index<size(ALL_CARDS); index++) {
                     int pkCardCompare=get(ALL_CARDS,index);
-                    if(PackedCard.isBetter(Card.Color.ALL.get(color), pkCardCompare, pkCard)) {
+                    if(PackedCard.isBetter(PackedCard.color(pkCard), pkCardCompare, pkCard)) {
                         add(aboveRank,pkCardCompare);
                     }
                 }
+                int color =PackedCard.color(pkCard).ordinal();
+                int rank = PackedCard.rank(pkCard).ordinal();
                 trumpAbove[color][rank]=aboveRank;
-            }
         }
         return trumpAbove;
     }

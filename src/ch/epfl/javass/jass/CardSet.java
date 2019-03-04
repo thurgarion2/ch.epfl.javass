@@ -10,13 +10,13 @@ public class CardSet {
 		this.cardSet = cardSet;
 	}
 	
-	public static final long EMPTY = 0L;
-	public static final long ALL_CARDS = PackedCardSet.ALL_CARDS;
+	public static final CardSet EMPTY =ofPacked(PackedCardSet.EMPTY);
+	public static final CardSet ALL_CARDS = ofPacked(PackedCardSet.ALL_CARDS);
 	
 	public static CardSet of(List<Card> cards) {
-		long cardsSet = EMPTY;
-		for(int i =0; i < cards.size(); ++i) {
-			PackedCardSet.add(cardsSet, cards.get(i).packed());
+		long cardsSet =PackedCardSet.EMPTY;
+		for(Card c : cards) {
+			PackedCardSet.add(cardsSet,c.packed());
 		}
 		return new CardSet(cardsSet);
 	}
@@ -72,7 +72,7 @@ public class CardSet {
 		return new CardSet(PackedCardSet.difference(cardSet, that.packed()));
 	}
 	
-	public CardSet substeOfColor(Card.Color color) {
+	public CardSet subsetOfColor(Card.Color color) {
 		return new CardSet(PackedCardSet.subsetOfColor(cardSet, color));
 	}
 }
