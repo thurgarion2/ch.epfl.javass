@@ -42,7 +42,6 @@ public class CardSetTest {
     
     @Test
     void ofWorksWithNoCard() {
-        System.out.println(CardSet.of(new LinkedList<Card>()));
         assertTrue(CardSet.EMPTY.equals(CardSet.of(new LinkedList<Card>()))); 
     }
     

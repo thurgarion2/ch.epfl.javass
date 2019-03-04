@@ -12,9 +12,9 @@ import java.util.StringJoiner;
 import ch.epfl.javass.bits.Bits64;
 
 public final class PackedCardSet {
-    private static final int CARDPERCOLOR = 9;
-
-    private static final long[][] TRUMPABOVE=trumpAbove() ;
+  
+    private static final long[] rien= {0b1_1111_1110,0b1_1111_1100,0b1_1111_1000,0b0_0010_0000,0b1_1110_1000
+            ,0L,0b1_1010_1000,0b1_0010_1000,0b0_0010_1000};
 
     private final static long SUBSETCOLOROF[] = subsetOfColor();
 
@@ -28,8 +28,13 @@ public final class PackedCardSet {
      */
     public static final long ALL_CARDS = SUBSETCOLOROF[0] | SUBSETCOLOROF[1]
             | SUBSETCOLOROF[2] | SUBSETCOLOROF[3];
+    
+    private static final long[][] TRUMPABOVE=trumpAbove();
+    private static final int CARDPERCOLOR = 9;
+    
 
     private PackedCardSet() {
+      
     }
     
     private static long[] subsetOfColor() {
@@ -45,12 +50,13 @@ public final class PackedCardSet {
                 for(int index=0; index<size(ALL_CARDS); index++) {
                     int pkCardCompare=get(ALL_CARDS,index);
                     if(PackedCard.isBetter(PackedCard.color(pkCard), pkCardCompare, pkCard)) {
-                        add(aboveRank,pkCardCompare);
+                        aboveRank=add(aboveRank,pkCardCompare);
                     }
                 }
                 int color =PackedCard.color(pkCard).ordinal();
                 int rank = PackedCard.rank(pkCard).ordinal();
                 trumpAbove[color][rank]=aboveRank;
+                System.out.println(toString( trumpAbove[color][rank]));
         }
         return trumpAbove;
     }
