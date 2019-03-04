@@ -229,6 +229,9 @@ public final class Card {
 
     @Override
     public boolean equals(Object thatO) {
+        if(thatO==null) {
+            return false;
+        }
         if (thatO.getClass() != this.getClass()) {
             return false;
         }

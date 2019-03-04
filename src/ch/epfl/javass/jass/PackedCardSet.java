@@ -44,7 +44,7 @@ public final class PackedCardSet {
      * @return vrai ssi la valeur donnée représente un ensemble de cartes
      *         empaqueté valide, ( si aucun des 28 bits inutilisés ne vaut 1)
      */
-    public static boolean isValide(long pkCardSet) {
+    public static boolean isValid(long pkCardSet) {
         return (pkCardSet & (~ALL_CARDS)) == 0L;
     }
 
@@ -86,7 +86,7 @@ public final class PackedCardSet {
      * @return vrai ssi l'ensemble de cartes empaqueté donné est vide
      */
     public static boolean isEmpty(long pkCardSet) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         return pkCardSet == 0L;
     }
 
@@ -99,7 +99,7 @@ public final class PackedCardSet {
      *         carte qu'il contient)
      */
     public static int size(long pkCardSet) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         return Long.bitCount(pkCardSet);
     }
 
@@ -115,7 +115,7 @@ public final class PackedCardSet {
      *         cartes empaqueté donné
      */
     public static int get(long pkCardSet, int index) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         assert index >= 0 && index < size(pkCardSet);
 
         for (int i = 0; i < index; i++) {
@@ -149,7 +149,7 @@ public final class PackedCardSet {
      *         donnée a été ajoutée
      */
     public static long add(long pkCardSet, int pkCard) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         assert PackedCard.isValid(pkCard);
         return pkCardSet | (1L << cardIndex(pkCard));
     }
@@ -166,7 +166,7 @@ public final class PackedCardSet {
      *         donnée a été supprimée
      */
     public static long remove(long pkCardSet, int pkCard) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         assert PackedCard.isValid(pkCard);
         return pkCardSet & (~(1L << cardIndex(pkCard)));
     }
@@ -183,7 +183,7 @@ public final class PackedCardSet {
      *         empaquetée donnée
      */
     public static boolean contains(long pkCardSet, int pkCard) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         assert PackedCard.isValid(pkCard);
         return (pkCardSet & (1L << cardIndex(pkCard))) != 0;
     }
@@ -196,7 +196,7 @@ public final class PackedCardSet {
      * @return le complément de l'ensemble de cartes empaqueté donné
      */
     public static long complement(long pkCardSet) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         return (~pkCardSet) & ALL_CARDS;
     }
 
@@ -210,8 +210,8 @@ public final class PackedCardSet {
      * @return retourne l'union des deux ensembles de cartes empaquetés donnés
      */
     public static long union(long pkCardSet1, long pkCardSet2) {
-        assert isValide(pkCardSet1);
-        assert isValide(pkCardSet2);
+        assert isValid(pkCardSet1);
+        assert isValid(pkCardSet2);
         return pkCardSet1 | pkCardSet2;
     }
 
@@ -226,8 +226,8 @@ public final class PackedCardSet {
      *         donnés
      */
     public static long intersection(long pkCardSet1, long pkCardSet2) {
-        assert isValide(pkCardSet1);
-        assert isValide(pkCardSet2);
+        assert isValid(pkCardSet1);
+        assert isValid(pkCardSet2);
         return pkCardSet1 & pkCardSet2;
     }
 
@@ -243,8 +243,8 @@ public final class PackedCardSet {
      *         et le second
      */
     public static long difference(long pkCardSet1, long pkCardSet2) {
-        assert isValide(pkCardSet1);
-        assert isValide(pkCardSet2);
+        assert isValid(pkCardSet1);
+        assert isValid(pkCardSet2);
         return pkCardSet1 & ~(pkCardSet2 & pkCardSet1);
     }
 
@@ -260,7 +260,7 @@ public final class PackedCardSet {
      *         constitué uniquement des cartes de la couleur donnée
      */
     public static long subsetOfColor(long pkCardSet, Card.Color color) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         return pkCardSet & SUBSETCOLOROF[color.ordinal()];
     }
 
@@ -274,7 +274,7 @@ public final class PackedCardSet {
      *         donné
      */
     public static String toString(long pkCardSet) {
-        assert isValide(pkCardSet);
+        assert isValid(pkCardSet);
         StringJoiner out = new StringJoiner(",", "{", "}");
         int size = size(pkCardSet);
         for (int i = 0; i < size; i++) {
