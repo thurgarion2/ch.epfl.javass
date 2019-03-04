@@ -95,7 +95,7 @@ public final class PackedCardSet {
      */
     public static long singleton(int pkCard) {
         assert PackedCard.isValid(pkCard);
-        return add(0L, pkCard);
+        return add(EMPTY, pkCard);
     }
 
     /**
@@ -107,7 +107,7 @@ public final class PackedCardSet {
      */
     public static boolean isEmpty(long pkCardSet) {
         assert isValid(pkCardSet);
-        return pkCardSet == 0L;
+        return pkCardSet == EMPTY;
     }
 
     /**
