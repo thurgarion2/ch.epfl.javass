@@ -14,12 +14,9 @@ import ch.epfl.javass.bits.Bits64;
 public final class PackedCardSet {
     private static final int CARDPERCOLOR = 9;
 
-    private static final long[] TRUMPABOVE = { 0b1_1111_1110, 0b1_1111_1100,
-            0b1_1111_1000, 0b0_0010_0000, 0b1_1110_1000, 0, 0b1_1010_1000,
-            0b1_0010_1000, 0b0_0010_1000 };
+    private static final long[][] TRUMPABOVE=trumpAbove() ;
 
-    private final static long SUBSETCOLOROF[] = { Bits64.mask(0, 9),
-            Bits64.mask(16, 9), Bits64.mask(32, 9), Bits64.mask(48, 9) };
+    private final static long SUBSETCOLOROF[] = subsetOfColor();
 
     /**
      * l'ensemble de cartes vide
@@ -33,6 +30,29 @@ public final class PackedCardSet {
             | SUBSETCOLOROF[2] | SUBSETCOLOROF[3];
 
     private PackedCardSet() {
+    }
+    
+    private static long[] subsetOfColor() {
+        long[] out = { Bits64.mask(0, 9), Bits64.mask(16, 9), Bits64.mask(32, 9), Bits64.mask(48, 9) };
+        return out;
+    }
+    
+    private static long[][] trumpAbove(){
+        long[][]trumpAbove= new long[Card.Color.COUNT][Card.Rank.COUNT];
+        for(int color=0; color<Card.Color.COUNT; color++) {
+            for(int rank=0; rank<Card.Rank.COUNT; rank++) {
+                long aboveRank=0L;
+                int pkCard=PackedCard.pack(Card.Color.ALL.get(color),Card.Rank.ALL.get(rank));
+                for(int index=0; index<size(ALL_CARDS); index++) {
+                    int pkCardCompare=get(ALL_CARDS,index);
+                    if(PackedCard.isBetter(Card.Color.ALL.get(color), pkCardCompare, pkCard)) {
+                        add(aboveRank,pkCardCompare);
+                    }
+                }
+                trumpAbove[color][rank]=aboveRank;
+            }
+        }
+        return trumpAbove;
     }
 
     /**
@@ -61,7 +81,7 @@ public final class PackedCardSet {
     public static long trumpAbove(int pkCard) {
         assert PackedCard.isValid(pkCard);
         int color = PackedCard.color(pkCard).ordinal();
-        return TRUMPABOVE[PackedCard.rank(pkCard).ordinal()] << (color * 16);
+        return (TRUMPABOVE[PackedCard.rank(pkCard).ordinal()] << (color * 16));
     }
 
     /**
@@ -124,7 +144,7 @@ public final class PackedCardSet {
 
         int numberOfZero = Long.numberOfTrailingZeros(pkCardSet);
         int color = numberOfZero / 16;
-        int rank = numberOfZero - color * 16;
+        int rank = numberOfZero % 16;
 
         return PackedCard.pack(Card.Color.ALL.get(color),
                 Card.Rank.ALL.get(rank));
