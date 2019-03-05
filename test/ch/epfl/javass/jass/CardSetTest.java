@@ -208,11 +208,13 @@ public class CardSetTest {
         List<Card> all = allCards();
         List <Card> cards = new LinkedList<>();
         for(Card c : all) {
+            cards.add(c);
             CardSet set1= CardSet.of(cards);
             CardSet set2= CardSet.of(cards);
-            set2.remove(c);
+            set2=set2.remove(c);
+            System.out.println(set1.toString());
+            System.out.println(set2.toString());
             assertFalse(set1.equals(set2));
-            cards.add(c);
         }
     }
     

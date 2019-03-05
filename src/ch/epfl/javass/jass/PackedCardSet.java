@@ -56,7 +56,7 @@ public final class PackedCardSet {
                 int color =PackedCard.color(pkCard).ordinal();
                 int rank = PackedCard.rank(pkCard).ordinal();
                 trumpAbove[color][rank]=aboveRank;
-                System.out.println(toString( trumpAbove[color][rank]));
+            
         }
         return trumpAbove;
     }

@@ -16,7 +16,7 @@ public class CardSet {
 	public static CardSet of(List<Card> cards) {
 		long cardsSet =PackedCardSet.EMPTY;
 		for(Card c : cards) {
-			PackedCardSet.add(cardsSet,c.packed());
+		    cardsSet=PackedCardSet.add(cardsSet,c.packed());
 		}
 		return new CardSet(cardsSet);
 	}
