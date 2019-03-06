@@ -1,6 +1,5 @@
 package ch.epfl.javass.jass;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
 
 import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.bits.Bits64;

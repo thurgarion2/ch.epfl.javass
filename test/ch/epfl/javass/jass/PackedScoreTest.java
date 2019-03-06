@@ -16,14 +16,12 @@ class PackedScoreTest {
 		score = 0b0100;
 		assertTrue(PackedScore.isValid(score));
 		
-		//points tour
-		score = 0b10_0000_0000_0000;
-		assertFalse(PackedScore.isValid(score));
+		
 		score= 0b1_0000_0000_0000;
 		assertTrue(PackedScore.isValid(score));
 		
 		//points ggame
-		score = 0b1000_0000_0000_0000_0000_0000;
+		score = 0b1_0000_0000_0000_0000_0000_0000;
 		assertFalse(PackedScore.isValid(score));
 		score = 0b1000_0000_0000_0000_0000;
 		assertTrue(PackedScore.isValid(score));

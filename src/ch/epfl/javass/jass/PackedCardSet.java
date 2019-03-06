@@ -13,9 +13,6 @@ import ch.epfl.javass.bits.Bits64;
 
 public final class PackedCardSet {
   
-    private static final long[] rien= {0b1_1111_1110,0b1_1111_1100,0b1_1111_1000,0b0_0010_0000,0b1_1110_1000
-            ,0L,0b1_1010_1000,0b1_0010_1000,0b0_0010_1000};
-
     private final static long SUBSETCOLOROF[] = subsetOfColor();
 
     /**

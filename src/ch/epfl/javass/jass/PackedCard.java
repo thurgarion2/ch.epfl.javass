@@ -12,7 +12,7 @@ public final class PackedCard {
     private PackedCard() {
     }
 
-    private static final int INVALID = 0b111111;
+    public static final int INVALID = 0b111111;
     private static final int trumpPoints[] = { 0, 0, 0, 14, 10, 20, 3, 4, 11 };
     private static final int normalPoints[] = { 0, 0, 0, 0, 10, 2, 3, 4, 11 };
 
@@ -25,12 +25,14 @@ public final class PackedCard {
      *         si le format entier de la carte est invalide
      */
     public static boolean isValid(int pkCard) {
-        if (Bits32.extract(pkCard, 6, Integer.SIZE - 6) != 0)
+        if (Bits32.extract(pkCard, 6, Integer.SIZE - 6) != 0) {
             return false;
-
+        }
+        
         int rank = Bits32.extract(pkCard, 0, 4);
-        if (rank < 0 || rank > 8)
+        if (rank < 0 || rank > 8) {
             return false;
+        }
 
         return true;
     }
@@ -153,13 +155,11 @@ public final class PackedCard {
         assert isValid(pkCard);
 
         int indexColor = colorIndex(pkCard);
-        int indexRank = rankIndexWithTrump(pkCard, trump.ordinal());
-
+        int indexRank = rank(pkCard).ordinal();
         // si atout
         if (indexColor == trump.ordinal()) {
             return trumpPoints[indexRank];
         }
-
         return normalPoints[indexRank];
     }
 

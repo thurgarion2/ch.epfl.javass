@@ -212,8 +212,6 @@ public class CardSetTest {
             CardSet set1= CardSet.of(cards);
             CardSet set2= CardSet.of(cards);
             set2=set2.remove(c);
-            System.out.println(set1.toString());
-            System.out.println(set2.toString());
             assertFalse(set1.equals(set2));
         }
     }
