@@ -2,8 +2,8 @@ package ch.epfl.javass.jass;
 
 import ch.epfl.javass.jass.Card.Color;
 
-public class Trick {
-	public static final int INVALID = 0xFF;
+public final class Trick {
+	public static final Trick INVALID =ofPacked(PackedTrick.INVALID);
 	
 	private final int pkTrick;
 	

@@ -2,7 +2,7 @@ package ch.epfl.javass.jass;
 
 import java.util.List;
 
-public class CardSet {
+public final class CardSet {
 	
 	private final long cardSet;
 	

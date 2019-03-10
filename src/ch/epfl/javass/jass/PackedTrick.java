@@ -21,8 +21,8 @@ public final class PackedTrick {
     private static int FOURINVALIDCARD = Bits32.mask(0, 24);
     
     public static void main(String[] args) {
-        System.out.println(Integer.toBinaryString(firstEmpty(Color.SPADE, PlayerId.PLAYER_1)));
-        System.out.println(isEmpty(firstEmpty(Color.SPADE, PlayerId.PLAYER_1)));
+      
+      
     }
 
     private PackedTrick() {
@@ -44,7 +44,7 @@ public final class PackedTrick {
             return false;
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             int pkCard = cardsAt(pkTrick, i);
 
             if (pkCard != PackedCard.INVALID && !PackedCard.isValid(pkCard)) {
@@ -225,7 +225,7 @@ public final class PackedTrick {
     public static int withAddedCard(int pkTrick, int pkCard) {
         assert isValid(pkTrick);
         assert PackedCard.isValid(pkCard);
-        assert size(pkTrick) < 3;
+        assert size(pkTrick) < 4;
         //le pli avec que des 0 à la place de la prochaine carte
         int pkTrickClear = pkTrick & ~(Bits32.mask(6 * size(pkTrick), 6));
         return pkTrickClear | (pkCard << (6 * size(pkTrick)));
@@ -267,10 +267,10 @@ public final class PackedTrick {
         Color color = baseColor(pkTrick);
         Color trump = trump(pkTrick);
         int winningCard = card(pkTrick, indexOfwinningCard(pkTrick));
-        // add all cards of baseColor
+        // ajoute toutes les cartes de la couleur de base
         long playableCards = PackedCardSet.subsetOfColor(pkHand, color);
 
-        // all cards playable
+        //toutes les cartes de l'atout jouable
         long above;
         if (PackedCard.color(winningCard) == trump) {
             above = PackedCardSet.intersection(
@@ -280,10 +280,17 @@ public final class PackedTrick {
         }
 
         if (PackedCardSet.isEmpty(playableCards)) {
-            // all cards minus all cards of trump not playable
+            // toute la main moins les cartes de l'atout non jouable
             long under = PackedCardSet.complement(above);
             under = PackedCardSet.subsetOfColor(under, trump);
-            return PackedCardSet.difference(pkHand, under);
+            playableCards=PackedCardSet.difference(pkHand, under);
+            
+            //test si seulement sous couper est possible
+            if(PackedCardSet.isEmpty(playableCards)) {
+                return pkHand;
+            }
+            
+            return playableCards;
         }
 
         int jack = PackedCard.pack(trump, Rank.JACK);
