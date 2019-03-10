@@ -101,8 +101,8 @@ public final class PackedCard {
     }
 
     /**
-     * regarde si la première carte est meilleure que la seconde les cartes sont
-     * au format entier
+     * regarde si la première carte est meilleure que la seconde (les cartes sont
+     * au format entier)
      * 
      * @param trump
      *            couleur de l'atout

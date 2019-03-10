@@ -19,6 +19,11 @@ public final class PackedTrick {
     public static int INVALID = Bits32.mask(0, 32);
     // four invalideCrads
     private static int FOURINVALIDCARD = Bits32.mask(0, 24);
+    
+    public static void main(String[] args) {
+        System.out.println(Integer.toBinaryString(firstEmpty(Color.SPADE, PlayerId.PLAYER_1)));
+        System.out.println(isEmpty(firstEmpty(Color.SPADE, PlayerId.PLAYER_1)));
+    }
 
     private PackedTrick() {
     }
@@ -38,16 +43,19 @@ public final class PackedTrick {
         if (index(pkTrick) > 8) {
             return false;
         }
+
         for (int i = 0; i < 3; i++) {
             int pkCard = cardsAt(pkTrick, i);
 
             if (pkCard != PackedCard.INVALID && !PackedCard.isValid(pkCard)) {
                 return false;
             }
-
-            if (Bits32.extract(pkTrick, 0, i * 6) == Bits32.mask(0, i * 6)
-                    && i != 0) {
-                return false;
+            
+            if(pkCard != PackedCard.INVALID && i!=0) {
+                int last=Bits32.extract(pkTrick, i*6-6, 6);
+                if(last==PackedCard.INVALID) {
+                    return false;
+                }
             }
         }
         return true;
@@ -57,7 +65,7 @@ public final class PackedTrick {
             PlayerId firstPlayer) {
         int color = trump.ordinal();
         int indexPlayer = firstPlayer.ordinal();
-        int cardsAndIndex = Bits32.pack(FOURINVALIDCARD, 24, 0, 2);
+        int cardsAndIndex = Bits32.pack(FOURINVALIDCARD, 24, index, 4);
         return Bits32.pack(cardsAndIndex, 28, indexPlayer, 2, color, 2);
     }
 
@@ -187,7 +195,6 @@ public final class PackedTrick {
      * @return l'index du pli
      */
     public static int index(int pkTrick) {
-        assert isValid(pkTrick);
         return Bits32.extract(pkTrick, 24, 4);
     }
 
@@ -233,7 +240,7 @@ public final class PackedTrick {
      */
     public static Color baseColor(int pkTrick) {
         assert isValid(pkTrick);
-        assert isEmpty(pkTrick);
+        assert !isEmpty(pkTrick);
         return PackedCard.color(card(pkTrick, 0));
     }
 
@@ -252,6 +259,11 @@ public final class PackedTrick {
     public static long playableCards(int pkTrick, long pkHand) {
         assert isValid(pkTrick);
         assert PackedCardSet.isValid(pkHand);
+        
+        if(isEmpty(pkTrick)) {
+            return pkHand;
+        }
+       
         Color color = baseColor(pkTrick);
         Color trump = trump(pkTrick);
         int winningCard = card(pkTrick, indexOfwinningCard(pkTrick));
