@@ -3,13 +3,14 @@ package ch.epfl.javass.jass;
 import ch.epfl.javass.jass.Card.Color;
 
 public final class Trick {
-	public static final Trick INVALID =ofPacked(PackedTrick.INVALID);
+	public static final Trick INVALID =new Trick(PackedTrick.INVALID);
 	
 	private final int pkTrick;
 	
 	private Trick(int pkTrick) {
 		this.pkTrick = pkTrick;
 	}
+	
 	
 	public static Trick firstEmpty(Color trump, PlayerId firstPlayer) {
 		return new Trick(PackedTrick.firstEmpty(trump, firstPlayer));
@@ -23,7 +24,7 @@ public final class Trick {
 	}
 	
 	public int packed() {
-		return this.packed();
+		return  this.pkTrick;
 	}
 	
 	public Trick nextEmpty() throws IllegalStateException {
@@ -122,7 +123,7 @@ public final class Trick {
 
     @Override
     public String toString() {
-        return PackedCard.toString(this.packed());
+        return PackedTrick.toString(this.packed());
     }
 }
 
