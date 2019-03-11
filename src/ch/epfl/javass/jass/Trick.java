@@ -6,9 +6,11 @@ public final class Trick {
 	/**
 	 * plis invalide 
 	 */
-	public static final Trick INVALID =ofPacked(PackedTrick.INVALID);
+	public static final Trick INVALID = new Trick(PackedTrick.INVALID);
 	
 	private final int pkTrick;
+	
+
 	
 	private Trick(int pkTrick) {
 		this.pkTrick = pkTrick;
@@ -39,7 +41,7 @@ public final class Trick {
 	 * @return la version empaquetée d'un Trick 
 	 */
 	public int packed() {
-		return this.packed();
+		return this.pkTrick;
 	}
 	
 	/**
