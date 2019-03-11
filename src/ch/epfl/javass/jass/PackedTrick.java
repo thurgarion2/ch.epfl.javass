@@ -20,11 +20,6 @@ public final class PackedTrick {
     // four invalideCrads
     private static int FOURINVALIDCARD = Bits32.mask(0, 24);
     
-    public static void main(String[] args) {
-      
-      
-    }
-
     private PackedTrick() {
     }
 
@@ -183,7 +178,7 @@ public final class PackedTrick {
      */
     public static PlayerId player(int pkTrick, int index) {
         assert isValid(pkTrick);
-        assert index < 4;
+        assert index < 4 && index>=0;
         return PlayerId.ALL.get((indexFirstPalyer(pkTrick) + index) % 4);
     }
 
@@ -292,7 +287,7 @@ public final class PackedTrick {
             
             return playableCards;
         }
-
+        //teste ssi le valet peut être jouer en atout
         int jack = PackedCard.pack(trump, Rank.JACK);
         if (PackedCardSet.size(playableCards) == 1 && trump == color
                 && PackedCardSet.get(playableCards, 0) == jack) {
@@ -339,6 +334,7 @@ public final class PackedTrick {
      */
     public static PlayerId winningPlayer(int pkTrick) {
         assert isValid(pkTrick);
+        assert !isEmpty(pkTrick);
         return player(pkTrick, indexOfwinningCard(pkTrick));
     }
 
