@@ -52,7 +52,7 @@ public final class TurnState {
     }
     
     public boolean isTerminal() {
-        return PackedTrick.isLast(trick)&&PackedTrick.isFull(trick);
+        return PackedTrick.INVALID==trick;
     }
     
     public PlayerId nextPlayer() {
@@ -61,5 +61,31 @@ public final class TurnState {
         }
         return PackedTrick.player(trick, PackedTrick.size(trick));
     }
-   
+    
+    public TurnState withNewCardPlayed(Card card) {
+        if (PackedTrick.isFull(trick)) {
+            throw new IllegalStateException();
+        }
+        long nextUnplayedCards = PackedCardSet.remove(unplayedCards,
+                card.packed());
+        return new TurnState(score, nextUnplayedCards,
+                PackedTrick.withAddedCard(trick, card.packed()));
+    }
+    
+    public TurnState withTrickCollected() {
+        if (!PackedTrick.isFull(trick)) {
+            throw new IllegalStateException();
+        }
+        return new TurnState(score, PackedCardSet.ALL_CARDS,
+                PackedTrick.nextEmpty(trick));
+    }
+    
+    public TurnState withNewCardPlayedAndTrickCollected(Card card) {
+        TurnState next=withNewCardPlayed(card);
+        if(PackedTrick.isFull(next.trick)) {
+            return next.withTrickCollected();
+        }
+        return next;
+    }
+
 }
