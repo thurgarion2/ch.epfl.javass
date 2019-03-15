@@ -1,5 +1,6 @@
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.jass.Card.Color;
 
 public final class Trick {
@@ -106,9 +107,7 @@ public final class Trick {
      *             si l'index est invalide (0 <= index < 4)
      */
     public PlayerId player(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index >= 4) {
-            throw new IndexOutOfBoundsException();
-        }
+        Preconditions.checkIndex(index,4);
         return PackedTrick.player(this.pkTrick, index);
     }
 
@@ -120,9 +119,7 @@ public final class Trick {
      *             si l index est invalide (0 <= index < taille du pli)
      */
     public Card card(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index >= this.size()) {
-            throw new IndexOutOfBoundsException();
-        }
+        Preconditions.checkIndex(index,this.size());
         return Card.ofPacked(PackedTrick.card(this.pkTrick, index));
     }
 

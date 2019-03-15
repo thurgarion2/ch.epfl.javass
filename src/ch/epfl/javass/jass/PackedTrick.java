@@ -1,6 +1,6 @@
 package ch.epfl.javass.jass;
 
-import java.util.StringJoiner;
+
 
 import ch.epfl.javass.bits.Bits32;
 import ch.epfl.javass.jass.Card.Color;
@@ -352,8 +352,8 @@ public final class PackedTrick {
             set = PackedCardSet.add(set, card(pkTrick, i));
         }
         String otherInfo = "Atout : " + trump(pkTrick).toString();
-        otherInfo += " Player : " + player(pkTrick, 0).toString();
-        otherInfo += " Index : " + index(pkTrick);
+        otherInfo += "  Player : " + player(pkTrick, 0).toString();
+        otherInfo += "  Index : " + index(pkTrick);
         return otherInfo + " " + PackedCardSet.toString(set);
     }
 
