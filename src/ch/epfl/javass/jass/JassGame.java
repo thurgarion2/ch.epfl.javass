@@ -16,6 +16,7 @@ public final class JassGame{
 	private Random trumpRng;
 	private Score score;
 	private PlayerId lastPlayer; 
+	private TurnState turnState;
 	private int currentTrick;
 	
 	public JassGame(long rngSeed, Map<PlayerId, Player> players, Map<PlayerId, String> playerNames){
@@ -34,12 +35,6 @@ public final class JassGame{
 			return true;
 		}
 		return false;
-	}
-	
-	private Card.Color trump() {
-		List<Card.Color> colors = Card.Color.ALL;
-		Collections.shuffle(colors, trumpRng);
-		return colors.get(0);
 	}
 	
 	private void deck() {
@@ -77,7 +72,6 @@ public final class JassGame{
 		boolean checkp1 = false;
 		boolean checkp2 = false;
 		boolean checkp3 = false;
-		boolean checkp4 = false;
 		List<Card> handP1 = hands.get(PlayerId.PLAYER_1);
 		for(Card c : handP1) {
 			if((new Card(PackedCard.pack(Card.Color.CLUB, Card.Rank.SEVEN)).equals(c))){
@@ -96,23 +90,27 @@ public final class JassGame{
 				checkp3 = true;
 			}
 		}
-		List<Card> handP4 = hands.get(PlayerId.PLAYER_1);
-		for(Card c : handP4) {
-			if((new Card(PackedCard.pack(Card.Color.CLUB, Card.Rank.SEVEN)).equals(c))){
-				checkp4 = true;
-			}
-		}
 		if(checkp1 || checkp2) {
 			if(checkp1) {
+				lastPlayer = PlayerId.PLAYER_1;
 				return PlayerId.PLAYER_1;
 			}
+			lastPlayer = PlayerId.PLAYER_2;
 			return PlayerId.PLAYER_2;
 		}else {
 			if(checkp3) {
+				lastPlayer = PlayerId.PLAYER_3;
 				return PlayerId.PLAYER_3;
 			}
+			lastPlayer = PlayerId.PLAYER_4;
 			return PlayerId.PLAYER_4;
 		}
+	}
+	
+	private Card.Color trump() {
+		List<Card.Color> colors = Card.Color.ALL;
+		Collections.shuffle(colors, trumpRng);
+		return colors.get(0);
 	}
 	
 	private void beginRound(Card.Color trump, PlayerId firstPlayer) {
@@ -122,9 +120,18 @@ public final class JassGame{
 		this.currentTrick = PackedTrick.firstEmpty(trump, firstPlayer);
 	}
 	
+	private void play(PlayerId player) {}
+	
 	public void advanceToEndOfNextTrick() {
-		if(!PackedTrick.isValid(currentTrick) || PackedTrick.index(currentTrick) == 9) {
-			this.beginRound(this.trump(), this.firstPlayer());
+		if(this.isGameOver()) {
+			return ;
 		}
+		Card.Color trump = this.trump();
+		PlayerId firstPlayer = this.firstPlayer();
+		if(!PackedTrick.isValid(currentTrick) || PackedTrick.index(currentTrick) == 9) {
+			this.beginRound(trump, firstPlayer);
+			this.turnState = TurnState.initial(trump, score, firstPlayer);
+		}
+		
 	}
 }
