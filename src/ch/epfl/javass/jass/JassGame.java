@@ -7,27 +7,34 @@ import java.util.Map;
 import java.util.Random;
 
 public final class JassGame{
+    //la carte qui définit le premier joueur
+    private final static Card BEGIN = Card.of(Card.Color.DIAMOND,Card.Rank.SEVEN);
 	
 	private Map<PlayerId, Player> players;
 	private Map<PlayerId, String> playerNames;
-	private Map<PlayerId, List<Card>> hands;
-	private List<Card> deck;
+	
+	private Map<PlayerId, CardSet> hands;
+	
 	private Random shuffleRng;
 	private Random trumpRng;
+	
 	private Score score;
-	private PlayerId lastPlayer; 
+	
+	private PlayerId firstPlayer; 
 	private TurnState turnState;
-	private int currentTrick;
+	
 	
 	public JassGame(long rngSeed, Map<PlayerId, Player> players, Map<PlayerId, String> playerNames){
 		Random rng = new Random(rngSeed);
 		this.shuffleRng = new Random(rng.nextLong());
 		this.trumpRng = new Random(rng.nextLong());
+		
 		this.players = Collections.unmodifiableMap(players);
 		this.playerNames = Collections.unmodifiableMap(playerNames);
+		
 		this.score = Score.INITIAL;
-		this.currentTrick = PackedTrick.INVALID;
-		this.lastPlayer = null;
+		//commence le premier tour
+		beginNewTurn();
 	}
 	
 	public boolean isGameOver() {
@@ -37,87 +44,48 @@ public final class JassGame{
 		return false;
 	}
 	
-	private void deck() {
-		for(Card.Rank r : Card.Rank.ALL) {
-			for(Card.Color c : Card.Color.ALL) {
-				deck.add(new Card(PackedCard.pack(c, r)));
-			}
+	private void distribution(List<Card> shuffle) {
+		for(PlayerId id : PlayerId.ALL) {
+		    int index=id.ordinal();
+		    CardSet hand = CardSet.of(shuffle.subList(Math.min(0,(index-1)*9),index*9));
+		    hands.put(id, hand);
 		}
 	}
 	
-	private void distribution() {
-		List<Card> hand = new LinkedList<>();
-		for(int i = 0; i < 8 ;++i) {
-			hand.add(deck.get(i));
-		}
-		hands.put(PlayerId.ALL.get(0), hand);
-		hand.clear();
-		for(int i = 0; i < 8 ;++i) {
-			hand.add(deck.get(i+9));
-		}
-		hands.put(PlayerId.ALL.get(1), hand);
-		hand.clear();
-		for(int i = 0; i < 8 ;++i) {
-			hand.add(deck.get(i+18));
-		}
-		hands.put(PlayerId.ALL.get(2), hand);
-		hand.clear();
-		for(int i = 0; i < 8 ;++i) {
-			hand.add(deck.get(i+27));
-		}
-		hands.put(PlayerId.ALL.get(3), hand);
+	private PlayerId firstPlayerStartOfGame() {
+	    for(PlayerId id : PlayerId.ALL) {
+	        if( hands.get(id).contains(BEGIN)) {
+	            return id;
+	        }
+	    }
+	    return PlayerId.PLAYER_1;
 	}
 	
-	private PlayerId firstPlayer() {
-		boolean checkp1 = false;
-		boolean checkp2 = false;
-		boolean checkp3 = false;
-		List<Card> handP1 = hands.get(PlayerId.PLAYER_1);
-		for(Card c : handP1) {
-			if((new Card(PackedCard.pack(Card.Color.CLUB, Card.Rank.SEVEN)).equals(c))){
-				checkp1 = true;
-			}
-		}
-		List<Card> handP2 = hands.get(PlayerId.PLAYER_1);
-		for(Card c : handP2) {
-			if((new Card(PackedCard.pack(Card.Color.CLUB, Card.Rank.SEVEN)).equals(c))){
-				checkp2 = true;
-			}
-		}
-		List<Card> handP3 = hands.get(PlayerId.PLAYER_1);
-		for(Card c : handP3) {
-			if((new Card(PackedCard.pack(Card.Color.CLUB, Card.Rank.SEVEN)).equals(c))){
-				checkp3 = true;
-			}
-		}
-		if(checkp1 || checkp2) {
-			if(checkp1) {
-				lastPlayer = PlayerId.PLAYER_1;
-				return PlayerId.PLAYER_1;
-			}
-			lastPlayer = PlayerId.PLAYER_2;
-			return PlayerId.PLAYER_2;
-		}else {
-			if(checkp3) {
-				lastPlayer = PlayerId.PLAYER_3;
-				return PlayerId.PLAYER_3;
-			}
-			lastPlayer = PlayerId.PLAYER_4;
-			return PlayerId.PLAYER_4;
-		}
+
+	private PlayerId firstPlayerToStartTurn() {
+	    //teste si premier tour
+        if(firstPlayer==null) {
+            return firstPlayerStartOfGame();
+        }
+        return PlayerId.ALL.get((firstPlayer.ordinal()+1)%4);
 	}
 	
-	private Card.Color trump() {
-		List<Card.Color> colors = Card.Color.ALL;
-		Collections.shuffle(colors, trumpRng);
-		return colors.get(0);
+	private Card.Color newTrump() {
+		int indexTrump= this.trumpRng.nextInt(3);
+		return Card.Color.ALL.get(indexTrump);
 	}
 	
-	private void beginRound(Card.Color trump, PlayerId firstPlayer) {
-		deck();
-		Collections.shuffle(deck, shuffleRng);
-		distribution();
-		this.currentTrick = PackedTrick.firstEmpty(trump, firstPlayer);
+	private void beginNewTurn() {
+	    List<Card> allCards = new LinkedList();
+	    for(int i=0; i<CardSet.ALL_CARDS.size(); i++) {
+	        allCards.add(CardSet.ALL_CARDS.get(i));
+	    }
+	    
+	    Collections.shuffle(allCards, shuffleRng);
+		distribution(allCards);
+		
+		turnState=TurnState.initial(newTrump(), score, firstPlayerToStartTurn());
+		
 	}
 	
 	private void play(PlayerId player) {}
@@ -126,11 +94,11 @@ public final class JassGame{
 		if(this.isGameOver()) {
 			return ;
 		}
-		Card.Color trump = this.trump();
-		PlayerId firstPlayer = this.firstPlayer();
-		if(!PackedTrick.isValid(currentTrick) || PackedTrick.index(currentTrick) == 9) {
-			this.beginRound(trump, firstPlayer);
-			this.turnState = TurnState.initial(trump, score, firstPlayer);
+	    //fin du tour
+		if(turnState.isTerminal()) {
+		    beginNewTurn();
+		}else {
+		    
 		}
 		
 	}
