@@ -9,7 +9,7 @@ import ch.epfl.javass.jass.Card.Rank;
 /**
  * plusieurs méthodes utiles pour empaqueté un pli dans un int
  * 
- * @author esera erwan serandour (296100)
+ * @author  erwan serandour (296100)
  *
  */
 public final class PackedTrick {

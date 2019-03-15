@@ -3,6 +3,11 @@ package ch.epfl.javass.jass;
 import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.jass.Card.Color;
 
+/**
+ * 
+ * @author Jean-Daniel Rouveyrol (301480)
+ *
+ */
 public final class Trick {
     /**
      * plis invalide

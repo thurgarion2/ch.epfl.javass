@@ -14,7 +14,7 @@ import java.util.List;
 public final class Card {
     private int card;
 
-    private Card(int packedCard) {
+    public Card(int packedCard) {
         card = packedCard;
     };
 
