@@ -1,6 +1,7 @@
 package ch.epfl.javass.jass;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public final class JassGame{
 		Random rng = new Random(rngSeed);
 		this.shuffleRng = new Random(rng.nextLong());
 		this.trumpRng = new Random(rng.nextLong());
-		
+		this.hands = new HashMap<>();
 		this.players = Collections.unmodifiableMap(players);
 		this.playerNames = Collections.unmodifiableMap(playerNames);
 		
@@ -47,8 +48,9 @@ public final class JassGame{
 	private void distribution(List<Card> shuffle) {
 		for(PlayerId id : PlayerId.ALL) {
 		    int index=id.ordinal();
-		    CardSet hand = CardSet.of(shuffle.subList(Math.min(0,(index-1)*9),index*9));
+		    CardSet hand = CardSet.of(shuffle.subList(index*9,(index+1)*9));
 		    hands.put(id, hand);
+		    players.get(id).updateHand(hand);
 		}
 	}
 	
@@ -67,12 +69,20 @@ public final class JassGame{
         if(firstPlayer==null) {
             return firstPlayerStartOfGame();
         }
-        return PlayerId.ALL.get((firstPlayer.ordinal()+1)%4);
+        firstPlayer = PlayerId.ALL.get((firstPlayer.ordinal()+1)%4);
+        System.out.println("par fisrtplayetostartturn ok");
+        return firstPlayer; 
 	}
 	
 	private Card.Color newTrump() {
 		int indexTrump= this.trumpRng.nextInt(4);
-		return Card.Color.ALL.get(indexTrump);
+		Card.Color trump = Card.Color.ALL.get(indexTrump);
+		for(PlayerId id : players.keySet()) {
+			players.get(id).setTrump(trump);
+		}
+		
+		System.out.println("par trump ok");
+		return trump;
 	}
 	
 	private void beginNewTurn() {
@@ -81,28 +91,50 @@ public final class JassGame{
 	        allCards.add(CardSet.ALL_CARDS.get(i));
 	    }
 	    
+	    System.out.println("par ici 1");
+	    
 	    Collections.shuffle(allCards, shuffleRng);
 		distribution(allCards);
 		
+		System.out.println("par ici 2");
+		
 		turnState=TurnState.initial(newTrump(), score, firstPlayerToStartTurn());
 		
+		System.out.println("par ici");
 	}
 	
-	private void play(PlayerId player) {
+	private void collect() {
+		turnState.withTrickCollected();
+	}
+	
+	private void play(PlayerId playerId) {
+		Player player = players.get(playerId);
+		CardSet hand = hands.get(playerId);
+		List<Card> toPlay = new LinkedList<>();
+		toPlay.add(player.cardToPlay(turnState, hand));
+		
+		turnState.withNewCardPlayed(toPlay.get(0));
+
+		player.updateHand(hand.difference(CardSet.of(toPlay)));
 		
 	}
 	
+	
 	public void advanceToEndOfNextTrick() {
-		if(this.isGameOver()) {
+		if(isGameOver()) {
 			return ;
 		}
 	    //fin du tour
-		if(turnState.isTerminal()) {
+		if(turnState.isTerminal()) {		
 		    beginNewTurn();
-		}else {
-		    
+		}
+		//collecte le trick précédant
+		if(turnState.trick().isFull()) {
+			collect();
 		}
 		
-		
+		while(!turnState.trick().isFull()) {
+		   	play(turnState.nextPlayer());    
+		}
 	}
 }
