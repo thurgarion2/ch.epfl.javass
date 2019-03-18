@@ -120,7 +120,9 @@ public final class JassGame{
 		this.currentTrick = PackedTrick.firstEmpty(trump, firstPlayer);
 	}
 	
-	private void play(PlayerId player) {}
+	private void play(PlayerId player) {
+		
+	}
 	
 	public void advanceToEndOfNextTrick() {
 		if(this.isGameOver()) {
@@ -132,6 +134,7 @@ public final class JassGame{
 			this.beginRound(trump, firstPlayer);
 			this.turnState = TurnState.initial(trump, score, firstPlayer);
 		}
+		
 		
 	}
 }
