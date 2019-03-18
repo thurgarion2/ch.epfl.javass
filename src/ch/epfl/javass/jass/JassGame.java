@@ -88,7 +88,9 @@ public final class JassGame{
 		
 	}
 	
-	private void play(PlayerId player) {}
+	private void play(PlayerId player) {
+		
+	}
 	
 	public void advanceToEndOfNextTrick() {
 		if(this.isGameOver()) {
@@ -100,6 +102,7 @@ public final class JassGame{
 		}else {
 		    
 		}
+		
 		
 	}
 }
