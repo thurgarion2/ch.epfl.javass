@@ -51,6 +51,8 @@ public class TrickTest {
     private static Trick empty() {
         return Trick.firstEmpty(Card.Color.CLUB, PlayerId.PLAYER_1);
     }
+    
+   
 
     @Test
     void invalidIsGood() {
