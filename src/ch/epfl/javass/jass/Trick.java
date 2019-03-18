@@ -208,6 +208,6 @@ public final class Trick {
 
     @Override
     public String toString() {
-        return PackedCard.toString(this.packed());
+        return PackedTrick.toString(this.packed());
     }
 }

@@ -1,6 +1,8 @@
 package ch.epfl.javass.jass;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import ch.epfl.javass.jass.Card.Color;
 
@@ -22,23 +24,33 @@ public final class PrintingPlayer implements Player {
   @Override
   public void setPlayers(PlayerId ownId,
           Map<PlayerId, String> playerNames) {
+      
+      System.out.println("Les joueurs sont : ");
+      for(String each : playerNames.values()) {
+          System.out.println(each);
+      }
+      System.out.println("je suis : "+playerNames.get(ownId));
       this.underlyingPlayer.setPlayers(ownId, playerNames);
   }
   
   @Override
   public void  updateHand(CardSet newHand) {
+      System.out.println("Ma nouvelle main : "+newHand);
       this.underlyingPlayer.updateHand(newHand);
   }
   @Override
   public void setTrump(Color trump) {
+      System.out.println("Atout : "+trump);
       this.underlyingPlayer.setTrump(trump);
   }
   @Override
   public void updateTrick(Trick newTrick) {
+      System.out.println(newTrick);
       this.underlyingPlayer.updateTrick(newTrick);
   }
   @Override
   public void updateScore(Score score) {
+      System.out.println("Scores: "+score);
       this.underlyingPlayer.updateScore(score);
   }
   @Override

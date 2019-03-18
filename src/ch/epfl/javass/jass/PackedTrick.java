@@ -354,7 +354,7 @@ public final class PackedTrick {
         String otherInfo = "Atout : " + trump(pkTrick).toString();
         otherInfo += "  Player : " + player(pkTrick, 0).toString();
         otherInfo += "  Index : " + index(pkTrick);
-        return otherInfo + " " + PackedCardSet.toString(set);
+        return (otherInfo + " " + PackedCardSet.toString(set));
     }
 
 }
