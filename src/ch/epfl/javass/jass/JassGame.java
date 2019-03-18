@@ -38,7 +38,7 @@ public final class JassGame{
 	}
 	
 	public boolean isGameOver() {
-		if(score.gamePoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS || score.gamePoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS) {
+		if(score.totalPoints(TeamId.TEAM_1) >= Jass.WINNING_POINTS || score.totalPoints(TeamId.TEAM_2) >= Jass.WINNING_POINTS) {
 			return true;
 		}
 		return false;
@@ -71,7 +71,7 @@ public final class JassGame{
 	}
 	
 	private Card.Color newTrump() {
-		int indexTrump= this.trumpRng.nextInt(3);
+		int indexTrump= this.trumpRng.nextInt(4);
 		return Card.Color.ALL.get(indexTrump);
 	}
 	

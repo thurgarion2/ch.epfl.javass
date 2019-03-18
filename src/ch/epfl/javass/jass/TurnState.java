@@ -40,7 +40,7 @@ public final class TurnState {
     }
 
     /**
-     * retourne l'état dont les composantes (empaquetées) sont celles données
+     * retourne l'état d'un tour dont les composantes (empaquetées) sont celles données
      * 
      * @param pkScore
      *            le score courant empqueté
@@ -143,7 +143,7 @@ public final class TurnState {
     }
 
     /**
-     * retourne l'état correspondant après que le prochain joueur ait joué la
+     * retourne l'état correspondant après que le prochain joueur aie joué la
      * carte donnée
      * 
      * @param card
@@ -166,7 +166,7 @@ public final class TurnState {
     /**
      * retourne l'état correspondant après que le pli courant ait été ramassé
      * 
-     * @return l'état correspondant après que le pli courant ait été ramassé
+     * @return l'état correspondant après que le pli courant aie été ramassé
      * @throws si
      *             le pli courant n'est pas plein
      */
@@ -174,7 +174,10 @@ public final class TurnState {
         if (!PackedTrick.isFull(trick)) {
             throw new IllegalStateException();
         }
-        return new TurnState(score, PackedCardSet.ALL_CARDS,
+        TeamId winning = PackedTrick.winningPlayer(trick).team();
+        long nextScore = PackedScore.withAdditionalTrick(score, winning,
+                PackedTrick.points(trick));
+        return new TurnState(nextScore, unplayedCards,
                 PackedTrick.nextEmpty(trick));
     }
 

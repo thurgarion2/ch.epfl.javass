@@ -157,14 +157,14 @@ public final class PackedScore {
 
     /**
      * retourne le nombre de point gagné au totale durant la partie d'une équipe
-     * donnée
+     * donnée (ceux du tour + partie)
      * 
      * @param pkScore
      *            le score empaqueté (valide)
      * @param t
      *            l'équipe
      * @return le nombre de point gagné au totale durant la partie d'une équipe
-     *         donnée
+     *         donnée (ceux du tour + partie)
      */
     public static int totalPoints(long pkScore, TeamId t) {
         assert isValid(pkScore);

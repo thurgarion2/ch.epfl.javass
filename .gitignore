@@ -3,6 +3,7 @@
 /.idea
 *.idea
 /bin
+/doc
 *.class
 *.classpath
 *.project
