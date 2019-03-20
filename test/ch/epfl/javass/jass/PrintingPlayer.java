@@ -55,6 +55,7 @@ public final class PrintingPlayer implements Player {
   }
   @Override
   public void setWinningTeam(TeamId winningTeam) {
+      System.out.println("L'équipe gagnante est : "+winningTeam);
       this.underlyingPlayer.setWinningTeam(winningTeam);
   }
 }
