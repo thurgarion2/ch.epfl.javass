@@ -9,27 +9,29 @@ import ch.epfl.javass.bits.Bits64;
  *
  */
 
-// faire la copie de tout ce qui est donné dehors
+
 public final class Score {
 
     private long score;
 
-    // à n'utiliser le constructeur que dans ofPAcked - gestion des exceptions
+    
     private Score(long packed) {
         score = packed;
     }
 
     /**
-     * score initiale
+     * score initial
      */
     public static final Score INITIAL = ofPacked(PackedScore.INITIAL);
 
     /**
-     * seul moyen de créer un Score depuis l'extérieur
+     * créer un Score à partir d'une version empaquetée
      * 
-     * @param packed
-     * @return un Score;
-     * @throws IllegalArgumentException
+     * @param packed - score empaqueté
+     * 
+     * @return Score
+     * 
+     * @throws IllegalArgumentException si la version empauetée n'est pas valide
      */
     public static Score ofPacked(long packed) throws IllegalArgumentException {
         Preconditions.checkArgument(PackedScore.isValid(packed));
@@ -37,19 +39,17 @@ public final class Score {
     }
 
     /**
-     * 
-     * @return le score empacté
+  	 *
+     * @return le score sous forme empaquetée
      */
     public long packed() {
         return score;
     }
 
     /**
+     * @param TeamId t - identifiant d'une équipe
      * 
-     * @param TeamId
-     *            t
-     * @return le nombre de plis du tour courant au format entier (int) de
-     *         l'équipe passée en paramètre
+     * @return le nombre de plis du tour courant de l'équipe passée en argument
      */
     public int turnTricks(TeamId t) {
         return PackedScore.turnTricks(score, t);
@@ -57,25 +57,28 @@ public final class Score {
 
     /**
      * 
-     * @param TeamId
-     *            t
-     * @return le nombre de points du tour courant au format entier (int) de
-     *         l'équipe passée en paramètre
+     * @param TeamId t - identifiant d'une équipe
+     * 
+     * @return le nombre de points du tour courant de l'équipe passée en argument
      */
     public int turnPoints(TeamId t) {
         return PackedScore.turnPoints(score, t);
     }
 
     /**
+     * @param TeamId t - identifiant d'une équipe
      * 
-     * @param TeamId
-     *            t
-     * @return le nombre de points total de l'équipe passée en paramètre
+     * @return le nombre de points total de l'équipe passée en argument
      */
     public int gamePoints(TeamId t) {
         return PackedScore.gamePoints(score, t);
     }
 
+    /**
+     * @param TeamId t - identifiant d'une équipe
+     * 
+     * @return le nombre de points total de l'équipe passée en argument
+     */
     public int totalPoints(TeamId t) {
         return PackedScore.totalPoints(score, t);
     }
@@ -83,17 +86,19 @@ public final class Score {
     /**
      * met à jour les points en fonction de l'équipe gagnante et du dernier plis
      * 
-     * @param TeamId
-     *            winningTeam
-     * @param int
-     *            trickPoints
+     * @param TeamId winningTeam - équipe ayant gagné le pli
+     * 
+     * @param int trickPoints - nobmre de point du pli
+     * 
      * @return un nouveau Score
-     * @throws IllegalArgumentException
+     * 
+     * @throws IllegalArgumentException si le nombre de point du pli est invalide, c-t-d. qu'il est strictement plus petit que 0
      */
     public Score withAdditionalTrick(TeamId winningTeam, int trickPoints)
             throws IllegalArgumentException {
-        if (trickPoints < 0)
+        if (trickPoints < 0) {
             throw new IllegalArgumentException();
+        }
         return ofPacked(PackedScore.withAdditionalTrick(score, winningTeam,
                 trickPoints));
     }

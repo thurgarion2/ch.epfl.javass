@@ -3,6 +3,13 @@ package ch.epfl.javass.jass;
 import java.util.Map;
 import ch.epfl.javass.jass.Card.Color;
 
+/**
+ * force un joueur donné dans le constructeur à jouer les cartes dans un temps minimum.
+ * 
+ * @author Jean-Daniel Rouveyrol(301480)
+ *
+ */
+
 public final class PacedPlayer implements Player {
 	
 	private Player underlyingPlayer;

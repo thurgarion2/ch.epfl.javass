@@ -25,7 +25,6 @@ public enum TeamId {
 	public static final int COUNT = ALL.size();
 
     /**
-     * retourne l'identifiant de l'autre équipe
      * 
      * @return l'identifiant de l'autre équipe
      */
