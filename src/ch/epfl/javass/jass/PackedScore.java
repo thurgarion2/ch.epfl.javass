@@ -9,7 +9,11 @@ import ch.epfl.javass.bits.Bits64;
  * @author erwan serandour (296100)
  *
  */
-
+//2 équipes 2 fois 32 bits
+//pour une équipe, bits : 0 à 3 nb Plis gagné
+//bits : 4 à 12 points du tour
+//bits : 12 à 23 points de la partie
+//bits : 24 32 des zéro
 public final class PackedScore {
     /**
      * le score initiale
@@ -81,13 +85,13 @@ public final class PackedScore {
      * retourne un score empaqueté dans un long
      * 
      * @param turnTricks1
-     *            le nombre de pli de l'équipe 1
+     *            le nombre de pli gagné par l'équipe 1
      * @param turnPoints1
      *            le nombre de points (durant le tour) de l'équipe 1
      * @param gamePoints1
      *            le nombre de points (durant la partie) de l'équipe 1
      * @param turnTricks2
-     *            le nombre de pli de l'équipe 2
+     *            le nombre de pli gagné par l'équipe 2
      * @param turnPoints2
      *            le nombre de points (durant le tour) de l'équipe 2
      * @param gamePoints2
@@ -110,13 +114,13 @@ public final class PackedScore {
     }
 
     /**
-     * retourne le nombre de pli gagné d'une équipe donnée
+     * retourne le nombre de pli gagné par l'équipe donnée
      * 
      * @param pkScore
      *            le score empaqueté (valide)
      * @param t
      *            l'équipe
-     * @return le nombre de pli gagné d'une équipe donnée
+     * @return le nombre de pli gagné par l'équipe donnée
      */
     public static int turnTricks(long pkScore, TeamId t) {
         assert isValid(pkScore);
@@ -124,13 +128,13 @@ public final class PackedScore {
     }
 
     /**
-     * retourne le nombre de de point (durant le tour) gagné d'une équipe donnée
+     * retourne le nombre de points (durant le tour) gagné par l'équipe donnée
      * 
      * @param pkScore
      *            le score empaqueté (valide)
      * @param t
      *            l'équipe
-     * @return le nombre de de point (durant le tour) gagné d'une équipe donnée
+     * @return le nombre de point (durant le tour) gagné par l'équipe donnée
      */
     public static int turnPoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
@@ -139,15 +143,15 @@ public final class PackedScore {
     }
 
     /**
-     * retourne le nombre de de point (durant la partie) gagné d'une équipe
-     * donnée
+     * retourne le nombre de points (durant la partie) gagné par l'équipe donnée
+     * 
      * 
      * @param pkScore
      *            le score empaqueté (valide)
      * @param t
      *            l'équipe
-     * @return le nombre de de point (durant la partie) gagné d'une équipe
-     *         donnée
+     * @return le nombre de points (durant la partie) gagné par l'équipe donnée
+     * 
      */
     public static int gamePoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
@@ -156,14 +160,14 @@ public final class PackedScore {
     }
 
     /**
-     * retourne le nombre de point gagné au totale durant la partie d'une équipe
-     * donnée (ceux du tour + partie)
+     * retourne le nombre de points gagné au totale durant la partie par
+     * l'équipe donnée (ceux du tour + partie)
      * 
      * @param pkScore
      *            le score empaqueté (valide)
      * @param t
      *            l'équipe
-     * @return le nombre de point gagné au totale durant la partie d'une équipe
+     * @return le nombre de points gagné au totale durant la partie par l'équipe
      *         donnée (ceux du tour + partie)
      */
     public static int totalPoints(long pkScore, TeamId t) {
@@ -181,7 +185,7 @@ public final class PackedScore {
      * @param trickPoints
      *            le nombre de points supplémentaire pour l'équipe gagnante
      * @return un score empqueté avec les champs mis à jour en tenant compte que
-     *         k'équipe gagante à gagner trickPoints
+     *         l'équipe gagante à gagner trickPoints
      */
     public static long withAdditionalTrick(long pkScore, TeamId winningTeam,
             int trickPoints) {
@@ -228,7 +232,7 @@ public final class PackedScore {
     }
 
     /**
-     * retourne une chaine de caractère représantant le score (débuggage)
+     * retourne une chaine de caractère représantant le score
      * 
      * @param pkScore
      *            le score empaqueté

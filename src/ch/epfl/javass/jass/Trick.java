@@ -146,7 +146,8 @@ public final class Trick {
     /**
      * ajoute une carte à un pli
      * 
-     * @param Card c - carte à ajouter 
+     * @param Card c 
+     * carte à ajouter 
      * 
      * @return retourne un pli identique à celui donné, mais auquel la carte donnée a été ajouté
      *         

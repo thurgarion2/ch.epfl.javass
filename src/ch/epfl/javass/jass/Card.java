@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import ch.epfl.javass.Preconditions;
+
 /**
- * represante n'importe qu'elle carte du jeu du jass
+ * représante n'importe qu'elle carte du jeu du jass
  * 
  * @author erwan serandour (296100)
  *
@@ -19,7 +21,7 @@ public final class Card {
     };
 
     /**
-     * enumeration des couleurs
+     * défini les couleurs du jeux du jass
      * 
      * @author erwan serandour (296100)
      *
@@ -53,14 +55,14 @@ public final class Card {
         }
 
         /**
-         * ALL liste contenant toutes les couleurs
+         * liste contenant toutes les couleurs
          *
          */
         public static final List<Color> ALL = Collections
                 .unmodifiableList(Arrays.asList(values()));
 
         /**
-         * COUNT nombre de couleurs
+         * nombre de couleurs dans le jass
          *
          */
         public static final int COUNT = ALL.size();
@@ -72,7 +74,7 @@ public final class Card {
     }
 
     /**
-     * enumaration des rangs
+     * définit les rangs du jass
      * 
      * @author erwan serandour (296100)
      *
@@ -116,13 +118,13 @@ public final class Card {
         ACE("A", 6);
 
         /**
-         * ALL liste contenant tous les rangs
+         * liste contenant tous les rangs
          *
          */
         public final static List<Rank> ALL = Collections
                 .unmodifiableList(Arrays.asList(values()));
         /**
-         * le nombre de rang
+         * le nombre de rang au jass
          *
          */
         public final static int COUNT = ALL.size();
@@ -142,7 +144,9 @@ public final class Card {
         }
 
         /**
-         * @return retourne l'ordre dans l'atout
+         * retourne la position du rang dans l'atout
+         * 
+         * @return la position du rang dans l'atout
          */
         public int trumpOrdinal() {
             return trumpOrdinal;
@@ -157,10 +161,10 @@ public final class Card {
      *            couleur de la carte
      * @param r
      *            rang de la carte
-     * @return retourne une carte de couleur et de rang donné
+     * @return une carte de couleur et de rang donné
      */
     public static Card of(Color c, Rank r) {
-        return  ofPacked(PackedCard.pack(c, r));
+        return ofPacked(PackedCard.pack(c, r));
     }
 
     /**
@@ -172,9 +176,7 @@ public final class Card {
      * 
      */
     public static Card ofPacked(int packed) {
-        if(!PackedCard.isValid(packed)) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(PackedCard.isValid(packed));
         return new Card(packed);
     }
 
@@ -232,7 +234,7 @@ public final class Card {
 
     @Override
     public boolean equals(Object thatO) {
-        if(thatO==null) {
+        if (thatO == null) {
             return false;
         }
         if (thatO.getClass() != this.getClass()) {

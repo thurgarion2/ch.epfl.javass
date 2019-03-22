@@ -2,7 +2,12 @@ package ch.epfl.javass.jass;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * plusieurs méthodes utiles pour empaqueté un pli dans un int
+ * 
+ * @author erwan serandour (296100)
+ *
+ */
 public final class RandomJassGame {
     public static void main(String[] args) {
       Map<PlayerId, Player> players = new HashMap<>();

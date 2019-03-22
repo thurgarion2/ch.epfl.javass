@@ -3,7 +3,7 @@ package ch.epfl.javass.bits;
 import ch.epfl.javass.Preconditions;
 
 /**
- * plusieurs méthodes utiles pour traiter avec des entier(int) sous forme
+ * plusieurs méthodes utiles pour traiter avec des entier (int) sous forme
  * binaire
  * 
  * @author erwan serandour (296100)
@@ -17,10 +17,7 @@ public final class Bits32 {
     /**
      * vérifie si le nombre n'occcupe pas plus de valeur que sa taille (cf pack)
      * 
-     * bits
-     *            le nombre
-     * size
-     *            la taille
+     * bits le nombre size la taille
      */
     private static void checkSize(int bits, int size) {
         Preconditions.checkArgument(size > 0 && size < Integer.SIZE);
@@ -68,7 +65,7 @@ public final class Bits32 {
     public static int extract(int bits, int start, int size) {
         Preconditions.checkArgument(start >= 0 && start <= Integer.SIZE);
         Preconditions.checkArgument(start + size <= Integer.SIZE && size >= 0);
-        return (bits&mask(start,size))>>>start;
+        return (bits & mask(start, size)) >>> start;
     }
 
     /**
@@ -155,21 +152,30 @@ public final class Bits32 {
      *            le nombre de bit occupé par v3 (doit être plus grand ou égale
      *            à la taille de v3)
      * @param v4
-     *            même que v2 à partire de s1+s2+s3
+     *            le nombre (int) qui occupe les s4 bits de poids faible à
+     *            partire de s1+s2+s3
      * @param s4
-     *            même que s1
+     *            le nombre de bit occupé par v4 (doit être plus grand ou égale
+     *            à la taille de v4)
      * @param v5
-     *            même que v2 à partire de s1+s2+s3+s4
+     *            le nombre (int) qui occupe les s5 bits de poids faible à
+     *            partire de s1+s2+s3+s4
      * @param s5
-     *            même que s1
+     *            le nombre de bit occupé par v5 (doit être plus grand ou égale
+     *            à la taille de v5)
      * @param v6
-     *            même que v2 à partire de s1+s2+s3+s4+s5
+     *            le nombre (int) qui occupe les s6 bits de poids faible à
+     *            partire de s1+s2+s3+s4+s5
      * @param s6
-     *            même que s1
+     *            le nombre de bit occupé par v6 (doit être plus grand ou égale
+     *            à la taille de v6)
      * @param v7
-     *            même que v2 à partire de s1+s2+s3+s4+s5+s6
+     *            le nombre (int) qui occupe les s7 bits de poids faible à
+     *            partire de s1+s2+s3+s4+s5+s6
      * @param s7
-     *            même que s1
+     *            le nombre de bit occupé par v7 (doit être plus grand ou égale
+     *            à la taille de v7)
+     * 
      * @return retourne les valeurs v1 et v2 et v3 et v4 et v6 et v7 empaquetées
      *         dans un entier de type int
      * @throws IllegalArgumentException

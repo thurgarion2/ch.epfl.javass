@@ -11,8 +11,19 @@ import java.util.StringJoiner;
 
 import ch.epfl.javass.bits.Bits64;
 
+/**
+ * plusieurs méthodes utiles pour empaqueté un ensemble de cartes dans un int
+ * 
+ * @author erwan serandour (296100)
+ *
+ */
+//les 9 premiers bits représentent les 9 première cartes
+//bits: 0 à 15 le pique
+//bits: 16 à 31 le coeur
+//bits: 32 à 47 le carreau
+//bits: 48 à 61 le trèfle
 public final class PackedCardSet {
-  
+
     private final static long SUBSETCOLOROF[] = subsetOfColor();
 
     /**
@@ -26,34 +37,36 @@ public final class PackedCardSet {
     public static final long ALL_CARDS = SUBSETCOLOROF[0] | SUBSETCOLOROF[1]
             | SUBSETCOLOROF[2] | SUBSETCOLOROF[3];
     
-    private static final long[][] TRUMPABOVE=trumpAbove();
+    //pour chaque carte toutes l'ensemble des cartes d'atout au dessus
+    private static final long[][] TRUMPABOVE = trumpAbove();
     private static final int CARDPERCOLOR = 9;
     
 
     private PackedCardSet() {
-      
     }
-    
+
     private static long[] subsetOfColor() {
-        long[] out = { Bits64.mask(0, 9), Bits64.mask(16, 9), Bits64.mask(32, 9), Bits64.mask(48, 9) };
+        long[] out = { Bits64.mask(0, 9), Bits64.mask(16, 9),
+                Bits64.mask(32, 9), Bits64.mask(48, 9) };
         return out;
     }
-    
-    private static long[][] trumpAbove(){
-        long[][]trumpAbove= new long[Card.Color.COUNT][Card.Rank.COUNT];
-        for(int card=0; card<size(ALL_CARDS); card++) {
-                long aboveRank=0L;
-                int pkCard=get(ALL_CARDS,card);
-                for(int index=0; index<size(ALL_CARDS); index++) {
-                    int pkCardCompare=get(ALL_CARDS,index);
-                    if(PackedCard.isBetter(PackedCard.color(pkCard), pkCardCompare, pkCard)) {
-                        aboveRank=add(aboveRank,pkCardCompare);
-                    }
+    //génère pour chaque carte toutes l'ensemble des cartes d'atout au dessus
+    private static long[][] trumpAbove() {
+        long[][] trumpAbove = new long[Card.Color.COUNT][Card.Rank.COUNT];
+        for (int card = 0; card < size(ALL_CARDS); card++) {
+            long aboveRank = 0L;
+            int pkCard = get(ALL_CARDS, card);
+            for (int index = 0; index < size(ALL_CARDS); index++) {
+                int pkCardCompare = get(ALL_CARDS, index);
+                if (PackedCard.isBetter(PackedCard.color(pkCard), pkCardCompare,
+                        pkCard)) {
+                    aboveRank = add(aboveRank, pkCardCompare);
                 }
-                int color =PackedCard.color(pkCard).ordinal();
-                int rank = PackedCard.rank(pkCard).ordinal();
-                trumpAbove[color][rank]=aboveRank;
-            
+            }
+            int color = PackedCard.color(pkCard).ordinal();
+            int rank = PackedCard.rank(pkCard).ordinal();
+            trumpAbove[color][rank] = aboveRank;
+
         }
         return trumpAbove;
     }
@@ -63,11 +76,12 @@ public final class PackedCardSet {
      * empaqueté valide
      * 
      * @param pkCardSet
-     *            l'ensemble de carte empqueté
+     *            l'ensemble de cartes empqueté
      * @return vrai ssi la valeur donnée représente un ensemble de cartes
-     *         empaqueté valide, ( si aucun des 28 bits inutilisés ne vaut 1)
+     *         empaqueté valide
      */
     public static boolean isValid(long pkCardSet) {
+        //teste si tout les bits qui ne représente pas une carte sont à sero
         return (pkCardSet & (~ALL_CARDS)) == 0L;
     }
 
@@ -103,7 +117,7 @@ public final class PackedCardSet {
     }
 
     /**
-     * etourne vrai ssi l'ensemble de cartes empaqueté donné est vide
+     * retourne vrai ssi l'ensemble de cartes empaqueté donné est vide
      * 
      * @param pkCardSet
      *            l'ensemble des cartes empaquetées
@@ -141,11 +155,12 @@ public final class PackedCardSet {
     public static int get(long pkCardSet, int index) {
         assert isValid(pkCardSet);
         assert index >= 0 && index < size(pkCardSet);
-
+        //nettoye le long de toutes les cartes précédant la carte d'index
         for (int i = 0; i < index; i++) {
             pkCardSet ^= Long.lowestOneBit(pkCardSet);
         }
-
+        //la couleur dépant du nombre de zéro (0-15 pique..)
+        //le rang dépant du nombre de zéro après le début de la couleur
         int numberOfZero = Long.numberOfTrailingZeros(pkCardSet);
         int color = numberOfZero / 16;
         int rank = numberOfZero % 16;
@@ -154,7 +169,7 @@ public final class PackedCardSet {
                 Card.Rank.ALL.get(rank));
 
     }
-
+    //retourne l'index d'une carte dans le l'ensemble de carte
     private static int cardIndex(int pkCard) {
         assert PackedCard.isValid(pkCard);
         return PackedCard.color(pkCard).ordinal() * 16
