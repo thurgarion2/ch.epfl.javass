@@ -1,7 +1,6 @@
 package ch.epfl.javass.jass;
 
 import java.util.Map;
-
 import ch.epfl.javass.jass.Card.Color;
 
 /**
@@ -14,20 +13,23 @@ import ch.epfl.javass.jass.Card.Color;
 public final class PacedPlayer implements Player {
 	
 	private Player underlyingPlayer;
+	//en milli seconde
 	private double minTime;
 	
 	public PacedPlayer(Player underlyingPlayer, double minTime) {
 		this.underlyingPlayer = underlyingPlayer;
-		this.minTime = minTime;
+		this.minTime = minTime*1000;
 	}
 	
 	@Override
 	public Card cardToPlay(TurnState state, CardSet hand) {
 		double initTime = System.currentTimeMillis();
 		Card result = this.underlyingPlayer.cardToPlay(state, hand);
-		if(initTime - System.currentTimeMillis() < minTime/(double)1000.0) {
+		
+		double deltaTime =System.currentTimeMillis()-initTime;
+		if(deltaTime < minTime) {
 			try{
-				Thread.sleep((long) (initTime - System.currentTimeMillis()));
+				Thread.sleep((long) (minTime-deltaTime));
 			} catch (InterruptedException e) {}
 		}
 		return result;
@@ -60,7 +62,6 @@ public final class PacedPlayer implements Player {
 	
 	@Override
 	public void setWinningTeam(TeamId winningTeam) {
-		// TODO Auto-generated method stub
 		Player.super.setWinningTeam(winningTeam);
 	}
 
