@@ -55,7 +55,8 @@ public final class JassGame {
         }
         return false;
     }
-
+    
+    //créer une List<Card> représentant le jeu complet à partir de ALL_CARDS de CardSet
     private List<Card> deck() {
         List<Card> deck = new LinkedList();
         for (int i = 0; i < CardSet.ALL_CARDS.size(); i++) {
@@ -64,6 +65,7 @@ public final class JassGame {
         return deck;
     }
 
+    //mélange puis assigne les cartes du jeu à chaque joueur
     private void distribution() {
         List<Card> deck = deck();
         Collections.shuffle(deck, shuffleRng);
@@ -76,6 +78,7 @@ public final class JassGame {
         }
     }
 
+    //détermine le premier joueur au début de la oertie (en fct du 7 de carreau)
     private PlayerId firstPlayerStartOfGame() {
         for (PlayerId id : PlayerId.ALL) {
             if (hands.get(id).contains(BEGIN)) {
@@ -85,10 +88,12 @@ public final class JassGame {
         return PlayerId.PLAYER_1;
     }
 
+    //détermine le premier joueur au début d'un tour
     private PlayerId firstPlayerToStartTurn() {
         return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % 4);
     }
 
+    //détermine le nouvel atout
     private Card.Color newTrump() {
         int indexTrump = this.trumpRng.nextInt(4);
         Card.Color trump = Card.Color.ALL.get(indexTrump);
@@ -172,14 +177,14 @@ public final class JassGame {
         // collecte le trick précédant
         if (turnState.trick().isFull()) {
             collect();
-            //teste si le dernier pli de la partie
+            //teste si le pli collecté met fin à la partie 
             if(isGameOver()) {
                 endGame();
                 return;
             }
         }
         
-        // fin du tour
+        //vérifie si il faut commencer un nouveau tour ou pas
         if (turnState.isTerminal()) {
             beginNewTurn();
         }
