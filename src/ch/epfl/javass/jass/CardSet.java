@@ -3,6 +3,7 @@ package ch.epfl.javass.jass;
 import java.util.List;
 
 /**
+ * modélise un ensmble de carte
  * 
  * @author Jean-Daniel Rouveyrol(301480)
  *
@@ -27,11 +28,13 @@ public final class CardSet {
 	
 	/**
 	 * créé un ensemble de carte à partir d'une liste de carte;
+	 * 
 	 * @param List<Card> cards
+	 * 
 	 * @return CardSet "new" cardsSet
 	 */
 	public static CardSet of(List<Card> cards) {
-		long cardsSet =PackedCardSet.EMPTY;
+		long cardsSet = PackedCardSet.EMPTY;
 		for(Card c : cards) {
 		    cardsSet=PackedCardSet.add(cardsSet,c.packed());
 		}
@@ -40,9 +43,12 @@ public final class CardSet {
 	
 	/**
 	 * créé un ensemble de carte à partir d'une version empaquetée
+	 * 
 	 * @param long packed
+	 * 
 	 * @return CardSet "new" cardsSet
-	 * @throws IllegalArgumentException
+	 * 
+	 * @throws IllegalArgumentException si la version empaquetée passée en argument est invalide 
 	 */
 	public static CardSet ofPacked(long packed) throws IllegalArgumentException{
 		if(!PackedCardSet.isValid(packed)) {
@@ -53,6 +59,7 @@ public final class CardSet {
 	
 	/**
 	 * créé une version empaquetée de l'ensemble de carte
+	 * 
 	 * @return long pkCardSet
 	 */
 	public long packed() {
@@ -61,6 +68,7 @@ public final class CardSet {
 	
 	/**
 	 * vérifie que l'ensemble de cartes est vide 
+	 * 
 	 * @return true si l'ensemble de cartes est vide 
 	 * 		   faux si l'ensemble de cartes est plein
 	 */
@@ -69,7 +77,8 @@ public final class CardSet {
 	}
 	
 	/**
-	 * donne le nombre de carte de l'ensemble de cartes
+	 * donne le nombre de cartes dans l'ensemble de cartes ("la taille")
+	 * 
 	 * @return int size 
 	 */
 	public int size() {
@@ -78,8 +87,10 @@ public final class CardSet {
 	
 	/**
 	 * retourne la version empaquetée de la carte d'index donné de l'ensemble de
-     * cartes donné (comme si c'était un set normale)
+     * cartes donné (comme si c'était un ensemble normal)
+     * 
 	 * @param index
+	 * 
 	 * @return int index
 	 */
 	public Card get(int index) {
@@ -89,7 +100,8 @@ public final class CardSet {
 	/**
      * retourne l'ensemble de cartes donné auquel la carte donnée a été ajoutée
      * 
-     * @param Card card la carte à ajouter
+     * @param Card card - la carte à ajouter
+     * 
      * @return un nouvel ensemble basé sur l'ensemble de cartes donné auquel la carte donnée a été ajoutée
      */
 	public CardSet add(Card card) {
@@ -97,20 +109,22 @@ public final class CardSet {
 	}
 	
 	/**
-	 * enlève la carte donnée à l'ensemble de cartes
-	 * @param Card card  la carte a enlevé
-	 * @return
+	 * enlève la carte donnée à l'ensemble de cartes donné
+	 * 
+	 * @param Card card - la carte a enlever
+	 * 
+	 * @return un nouvel ensemble basésur l'ensemble de cartes donné auquel la carte donnéee a été retirée
 	 */
 	public CardSet remove(Card card) {
 		return new CardSet(PackedCardSet.remove(cardSet, card.packed()));
 	}
 	
 	/**
-	 * vérifie si une carte appartient à l'ensemble de cartes 
+	 * vérifie si une carte appartient à l'ensemble de cartes donné
 	 * 
-	 * @param Card card la carte témoin
+	 * @param Card card - la carte "témoin"
 	 * 
-	 * @return true si la carte témoin appartient à l'enemble 
+	 * @return true si la carte passée en argument appartient à l'enemble 
 	 * 		   false sinon
 	 */
 	public boolean contains(Card card) {
@@ -118,8 +132,7 @@ public final class CardSet {
 	}
 	
 	/**
-	 * définit l'ensemble comlémentaire, l'ensemble des cartes qui ne sont pas 
-	 * contenues dans le premier ensemble
+	 * définit l'ensemble de cartes comlémentaire, l'ensemble des cartes qui n'appartiennent pas au premier ensemble
 	 *  
 	 * @return un nouvel ensemble - complémentaire au premier
 	 */
@@ -128,8 +141,10 @@ public final class CardSet {
 	}
 	
 	/**
-	 * définit l'ensemble de cartes contenant toutes les cartes de deux ensembles
+	 * définit l'ensemble de cartes contenant toutes les cartes de deux ensembles 
+	 * 
 	 * @param CardSet that le deuxième ensemble de cartes
+	 * 
 	 * @return un nouvel ensemble de cartes qui contient toutes les cartes appartenant aux deux ensembles
 	 */
 	public CardSet union(CardSet that){
@@ -137,17 +152,21 @@ public final class CardSet {
 	}
 	
 	/**
-	 * définit l'ensemble de cartes contenant les cartes apparaissant dans les deux ensembles 
-	 * @param CardSet that le deuxième ensemble de cartes
-	 * @return un nouvel ensemblde de cartes correspondant à l'intersection des deux ensembles 
+	 * définit l'ensemble de cartes contenant les cartes apparaissant dans deux ensembles 
+	 * 
+	 * @param CardSet that - le deuxième ensemble de cartes
+	 * 
+	 * @return un nouvel ensemble de cartes correspondant à l'intersection des deux ensembles 
 	 */
 	public CardSet intersection(CardSet that) {
 		return new CardSet(PackedCardSet.intersection(cardSet, that.packed()));
 	}
 	
 	/**
-	 * suprime les éléments de l'ensemble qui sont dans l'enemble passé en argument 
-	 * @param CardSet that le deuxième ensemble de cartes 
+	 * suprime les éléments de l'ensemble de cartes qui appartiennent à l'enemble passé en argument 
+	 * 
+	 * @param CardSet that - le deuxième ensemble de cartes 
+	 * 
 	 * @return un nouvel ensemble de cartes qui est le premier sans les élément de celui passé en argument 
 	 */
 	public CardSet difference(CardSet that) {
@@ -155,13 +174,11 @@ public final class CardSet {
 	}
 	
 	/**
-	 * retourne le sous-ensemble de l'ensemble de cartes donné
-     * constitué uniquement des cartes de la couleur donnée
+	 * retourne le sous-ensemble de l'ensemble de cartes donné constitué uniquement des cartes de la couleur donnée
      * 
-     * @param Card.Color color la couleur
+     * @param Card.Color color - la couleur
      * 
-     * @return le sous-ensemble de l'ensemble de cartes donné
-     *         constitué uniquement des cartes de la couleur donnée
+     * @return le sous-ensemble de l'ensemble de cartes donné constitué uniquement des cartes de la couleur donnée
 	 */
 	public CardSet subsetOfColor(Card.Color color) {
 		return new CardSet(PackedCardSet.subsetOfColor(cardSet, color));

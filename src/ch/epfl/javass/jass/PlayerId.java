@@ -15,21 +15,18 @@ public enum PlayerId {
 	PLAYER_1(), PLAYER_2(), PLAYER_3(), PLAYER_4();
 	
 	/**
-	 * liste de chaque joueur membre de l'énumeration
+	 * liste de chaque joueur membre de l'énumeration - constante
 	 */
 	public static final List<PlayerId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
 	
 	/**
-	 * compte du nombre de joueur(s)
+	 * compte du nombre de joueur(s) - constante
 	 */
 	public static final int COUNT = ALL.size();
 
     /**
-     * retourne le nom de l'équipe à laquelle apparitent le joueur sur qui la
-     * méthode est appelée
      * 
-     * @return le nom de l'équipe à laquelle apparitent le joueur sur qui la
-     *         méthode est appelée
+     * @return le nom de l'équipe à laquelle appartient le joueur sur lequel la  méthode est appelée
      */
 	public TeamId team() {
 		if (this.equals(PLAYER_1) || this.equals(PLAYER_3))
