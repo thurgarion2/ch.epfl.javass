@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * modélise un ensmble de carte
  * 
- * @author Jean-Daniel Rouveyrol(301480)
+ * @author Jean.Daniel Rouveyrol(301480)
  *
  */
 public final class CardSet {
@@ -29,7 +29,7 @@ public final class CardSet {
 	/**
 	 * créé un ensemble de carte à partir d'une liste de carte;
 	 * 
-	 * @param List<Card> cards
+	 * @param  cards liste de cartes
 	 * 
 	 * @return CardSet "new" cardsSet
 	 */
@@ -44,7 +44,7 @@ public final class CardSet {
 	/**
 	 * créé un ensemble de carte à partir d'une version empaquetée
 	 * 
-	 * @param long packed
+	 * @param packed version empaquetée
 	 * 
 	 * @return CardSet "new" cardsSet
 	 * 
@@ -79,7 +79,7 @@ public final class CardSet {
 	/**
 	 * donne le nombre de cartes dans l'ensemble de cartes ("la taille")
 	 * 
-	 * @return int size 
+	 * @return size 
 	 */
 	public int size() {
 		return PackedCardSet.size(cardSet);
@@ -91,7 +91,7 @@ public final class CardSet {
      * 
 	 * @param index
 	 * 
-	 * @return int index
+	 * @return index
 	 */
 	public Card get(int index) {
 		return Card.ofPacked(PackedCardSet.get(cardSet, index));
@@ -100,7 +100,7 @@ public final class CardSet {
 	/**
      * retourne l'ensemble de cartes donné auquel la carte donnée a été ajoutée
      * 
-     * @param Card card - la carte à ajouter
+     * @param card  la carte à ajouter
      * 
      * @return un nouvel ensemble basé sur l'ensemble de cartes donné auquel la carte donnée a été ajoutée
      */
@@ -111,7 +111,7 @@ public final class CardSet {
 	/**
 	 * enlève la carte donnée à l'ensemble de cartes donné
 	 * 
-	 * @param Card card - la carte a enlever
+	 * @param card la carte a enlever
 	 * 
 	 * @return un nouvel ensemble basésur l'ensemble de cartes donné auquel la carte donnéee a été retirée
 	 */
@@ -122,7 +122,7 @@ public final class CardSet {
 	/**
 	 * vérifie si une carte appartient à l'ensemble de cartes donné
 	 * 
-	 * @param Card card - la carte "témoin"
+	 * @param card la carte "témoin"
 	 * 
 	 * @return true si la carte passée en argument appartient à l'enemble 
 	 * 		   false sinon
@@ -143,7 +143,7 @@ public final class CardSet {
 	/**
 	 * définit l'ensemble de cartes contenant toutes les cartes de deux ensembles 
 	 * 
-	 * @param CardSet that le deuxième ensemble de cartes
+	 * @param that le deuxième ensemble de cartes
 	 * 
 	 * @return un nouvel ensemble de cartes qui contient toutes les cartes appartenant aux deux ensembles
 	 */
@@ -154,7 +154,7 @@ public final class CardSet {
 	/**
 	 * définit l'ensemble de cartes contenant les cartes apparaissant dans deux ensembles 
 	 * 
-	 * @param CardSet that - le deuxième ensemble de cartes
+	 * @param  that le deuxième ensemble de cartes
 	 * 
 	 * @return un nouvel ensemble de cartes correspondant à l'intersection des deux ensembles 
 	 */
@@ -165,7 +165,7 @@ public final class CardSet {
 	/**
 	 * suprime les éléments de l'ensemble de cartes qui appartiennent à l'enemble passé en argument 
 	 * 
-	 * @param CardSet that - le deuxième ensemble de cartes 
+	 * @param that le deuxième ensemble de cartes 
 	 * 
 	 * @return un nouvel ensemble de cartes qui est le premier sans les élément de celui passé en argument 
 	 */
@@ -176,7 +176,7 @@ public final class CardSet {
 	/**
 	 * retourne le sous-ensemble de l'ensemble de cartes donné constitué uniquement des cartes de la couleur donnée
      * 
-     * @param Card.Color color - la couleur
+     * @param color la couleur
      * 
      * @return le sous-ensemble de l'ensemble de cartes donné constitué uniquement des cartes de la couleur donnée
 	 */

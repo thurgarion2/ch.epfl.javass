@@ -65,6 +65,7 @@ public final class MctsPlayer implements Player {
             this.handPlayer = handPlayer;
             this.id=last;
             unPlayed = playable(state,handPlayer,state.nextPlayer()==ownId);
+
             children = new Node[PackedCardSet.size(unPlayed)];
             S = 0;
             N = 0;

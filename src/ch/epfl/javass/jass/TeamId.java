@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * identifie les équipes à l'aide d'une énumaration
  * 
- * @author Jean-Daniel Rouveyrol(301480)
+ * @author Jean.Daniel Rouveyrol(301480)
  *
  */
 public enum TeamId {

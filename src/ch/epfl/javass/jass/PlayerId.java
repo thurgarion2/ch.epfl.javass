@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * contient les joueurs dans une énumération
  * 
- * @author Jean-Daniel ROuveyro (301480)
+ * @author Jean.Daniel Rouveyrol (301480)
  *
  */
 
@@ -20,7 +20,7 @@ public enum PlayerId {
 	public static final List<PlayerId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
 	
 	/**
-	 * compte du nombre de joueur(s) - constante
+	 * compte du nombre de joueur(s)
 	 */
 	public static final int COUNT = ALL.size();
 

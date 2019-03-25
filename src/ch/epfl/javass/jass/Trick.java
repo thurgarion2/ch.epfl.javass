@@ -5,12 +5,12 @@ import ch.epfl.javass.jass.Card.Color;
 
 /**
  * 
- * @author Jean-Daniel Rouveyrol (301480)
+ * @author Jean.Daniel Rouveyrol (301480)
  *
  */
 public final class Trick {
     /**
-     * plis invalide - constante
+     * plis invalide (constante)
      */
     public static final Trick INVALID = new Trick(PackedTrick.INVALID);
 
@@ -23,12 +23,13 @@ public final class Trick {
     /**
      * créer un pli vide, initaliser avec l'atout et le premier joueur
      * 
-     * @param trump
+     * @param trump 
+     * 			l'atout
      * 
      * @param firstPlayer
+     * 			le premier joueur
      * 
-     * @return un nouveau plis vide sachant l'atout et le premier joueur de type
-     *         Trick
+     * @return un nouveau plis vide sachant l'atout et le premier joueur de type Trick
      */
     public static Trick firstEmpty(Color trump, PlayerId firstPlayer) {
         return new Trick(PackedTrick.firstEmpty(trump, firstPlayer));
@@ -37,7 +38,8 @@ public final class Trick {
     /**
      * créer un Trick à partir d'un pli empaqueté
      * 
-     * @param packed - pli empaqueté
+     * @param packed
+     * 			 pli empaqueté
      * 
      * @return un nouveau Trick 
      * 
@@ -102,7 +104,7 @@ public final class Trick {
     }
 
     /**
-     * @return la couleur (Card.Color) de l'atout du pli
+     * @return la couleur de l'atout du pli
      */
     public Card.Color trump() {
         return PackedTrick.trump(this.pkTrick);
@@ -118,7 +120,8 @@ public final class Trick {
     /**
      * donne l'identifiant du joueur à l'index donné
      * 
-     * @param index - "position" du joueur dans le pli
+     * @param index 
+     * 			position du joueur dans le pli
      * 
      * @return le joueur d'index donné 
      * 
@@ -132,7 +135,8 @@ public final class Trick {
     /**
      * donne la carte de l'index donné
      * 
-     * @param index - position de la carte donné dans le pli
+     * @param index 
+     * 			position de la carte donné dans le pli
      * 
      * @return la version empaquetée de la carte du pli à l'index donné (supposée avoir été posée)
      *         
@@ -146,8 +150,8 @@ public final class Trick {
     /**
      * ajoute une carte à un pli
      * 
-     * @param Card c 
-     * carte à ajouter 
+     * @param c 
+     *			carte à ajouter 
      * 
      * @return retourne un pli identique à celui donné, mais auquel la carte donnée a été ajouté
      *         
@@ -177,7 +181,8 @@ public final class Trick {
     /**
      * détermine l'enemble de carte jouable par un joueur étant donné sa main
      * 
-     * @param CardSet hand - main d'un joueur;
+     * @param hand
+     * 			main d'un joueur
      * 
      * @return le sous-ensemble des cartes de la main hand qui peuvent être jouées comme prochaine carte du pli
      * 

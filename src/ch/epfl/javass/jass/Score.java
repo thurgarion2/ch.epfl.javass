@@ -5,7 +5,7 @@ import ch.epfl.javass.bits.Bits64;
 
 /**
  * 
- * @author Jean-Daniel Rouveyrol (301480)
+ * @author Jean.Daniel Rouveyrol (301480)
  *
  */
 
@@ -27,7 +27,8 @@ public final class Score {
     /**
      * créer un Score à partir d'une version empaquetée
      * 
-     * @param packed - score empaqueté
+     * @param packed
+     * 				score empaqueté
      * 
      * @return Score
      * 
@@ -47,7 +48,8 @@ public final class Score {
     }
 
     /**
-     * @param TeamId t - identifiant d'une équipe
+     * @param t
+     * 			identifiant d'une équipe
      * 
      * @return le nombre de plis du tour courant de l'équipe passée en argument
      */
@@ -57,7 +59,8 @@ public final class Score {
 
     /**
      * 
-     * @param TeamId t - identifiant d'une équipe
+     * @param t
+     * 			identifiant d'une équipe
      * 
      * @return le nombre de points du tour courant de l'équipe passée en argument
      */
@@ -66,7 +69,8 @@ public final class Score {
     }
 
     /**
-     * @param TeamId t - identifiant d'une équipe
+     * @param t
+				identifiant d'une équipe
      * 
      * @return le nombre de points total de l'équipe passée en argument
      */
@@ -75,7 +79,8 @@ public final class Score {
     }
 
     /**
-     * @param TeamId t - identifiant d'une équipe
+     * @param t
+     * 			identifiant d'une équipe
      * 
      * @return le nombre de points total de l'équipe passée en argument
      */
@@ -86,9 +91,11 @@ public final class Score {
     /**
      * met à jour les points en fonction de l'équipe gagnante et du dernier plis
      * 
-     * @param TeamId winningTeam - équipe ayant gagné le pli
+     * @param winningTeam
+     * 				équipe ayant gagné le pli
      * 
-     * @param int trickPoints - nobmre de point du pli
+     * @param trickPoints 
+     * 				nobmre de point du pli
      * 
      * @return un nouveau Score
      * 
