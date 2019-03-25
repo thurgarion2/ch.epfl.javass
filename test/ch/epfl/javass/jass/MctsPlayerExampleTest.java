@@ -20,7 +20,7 @@ public class MctsPlayerExampleTest {
                 .add(Card.of(Color.HEART, Rank.NINE))
                 .add(Card.of(Color.HEART, Rank.TEN))
                 .add(Card.of(Color.HEART, Rank.JACK));
-        player.cardToPlay(state, hand);
+        System.out.println(player.cardToPlay(state, hand));
     }
 
 }
