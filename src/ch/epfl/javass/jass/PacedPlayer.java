@@ -62,7 +62,7 @@ public final class PacedPlayer implements Player {
 	
 	@Override
 	public void setWinningTeam(TeamId winningTeam) {
-		Player.super.setWinningTeam(winningTeam);
+	    underlyingPlayer.setWinningTeam(winningTeam);
 	}
 
 }
