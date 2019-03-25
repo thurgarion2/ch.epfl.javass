@@ -35,14 +35,13 @@ public final class MctsPlayer implements Player {
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
         Node root = new Node(state, hand.packed(), null);
+        root.addAllPossibleChildren();
         for (int i = 1; i < iterations; i++) {
             Node mostPromising = root.mostPromisingNode();
             //teste si toutes les possibilitées ont étées explorées
-            if (mostPromising.score() < 0) {
-                return root.bestCardFromChildren();
-            }
             Node next = mostPromising.nextChildren();
             next.genrerateTurnWithUpdateTree();
+        
         }
         return root.bestCardFromChildren();
     }
@@ -81,6 +80,10 @@ public final class MctsPlayer implements Player {
         }
 
         public Node nextChildren() {
+            //test si toutes les cartes ont été jouées
+            if(PackedCardSet.isEmpty(unPlayed)) {
+                return this;
+            }
             //prend la première carte non jouée
             int c = PackedCardSet.get(unPlayed, 0);
             unPlayed = PackedCardSet.remove(unPlayed, c);
@@ -94,7 +97,18 @@ public final class MctsPlayer implements Player {
         }
 
         private double value() {
-            return N == 0 ? Double.MAX_VALUE : S / (double) N;
+            return N == 0 ? Double.POSITIVE_INFINITY : S / (double) N;
+        }
+        
+        public double score() {
+            //teste si racine
+            if(parent==null) {
+                return Double.NEGATIVE_INFINITY;
+            }
+            if (N == 0) {
+                return Double.POSITIVE_INFINITY;
+            }
+            return value() + C * Math.sqrt(2.0 * Math.log(parent.N) / (double) N);
         }
 
         private long playable(TurnState state, long hand) {
@@ -106,30 +120,32 @@ public final class MctsPlayer implements Player {
             long unplayedTurn = state.packedUnplayedCards();
             return PackedCardSet.difference(unplayedTurn, handPlayer);
         }
-
-        public double score() {
-            //- infini si toutes les cartes ont étées jouées
-            if (PackedCardSet.size(unPlayed) <= 0) {
-                return -Double.MAX_VALUE;
+        
+        public void addAllPossibleChildren() {
+            while(!PackedCardSet.isEmpty(unPlayed)) {
+                Node nextChild=this.nextChildren();
+                nextChild.genrerateTurnWithUpdateTree();
             }
-            if (N == 0 || parent == null) {
-                return Double.MAX_VALUE;
-            }
-            return value() + C * Math.sqrt(2 * Math.log(parent.N) / (double) N);
         }
-
+        
         public Node mostPromisingNode() {
             Node best = this;
             for (int i = 0; i < size; i++) {
-                Node child = children[i].mostPromisingNode();
+                Node child = children[i];
                 best = best.score() < child.score() ? child : best;
             }
-            return best;
+            //meilleur noeud
+            if(best==this) {
+                return this;
+            }
+            return best.mostPromisingNode();
         }
 
         public Card bestCardFromChildren() {
             int max = 0;
+            System.out.println(children[0].value()+" "+children[0].N);
             for (int i = 1; i < size; i++) {
+                System.out.println(children[i].value()+" "+children[i].N);
                 if (children[i].value() > children[max].value()) {
                     max = i;
                 }
@@ -140,11 +156,14 @@ public final class MctsPlayer implements Player {
         }
 
         public void genrerateTurnWithUpdateTree() {
-            N++;
-            S = randomGame();
-            if (parent != null) {
-                update(S, id.team());
+            //test si toutes les cartes ont été jouées
+            if(PackedCardSet.isEmpty(unPlayed)) {
+                update((int)this.value(), id.team());   
+                return;
             }
+            int score = randomGame();
+        
+            update(score, id.team());   
         }
 
         private void update(int points, TeamId team) {
@@ -154,6 +173,7 @@ public final class MctsPlayer implements Player {
             if (parent != null) {
                 parent.update(points, team);
             }
+          
         }
 
         private int randomGame() {
@@ -172,5 +192,7 @@ public final class MctsPlayer implements Player {
             }
             return simulate.score().turnPoints(id.team());
         }
+        
+        
     }
 }
