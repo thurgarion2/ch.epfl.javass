@@ -5,7 +5,7 @@ import ch.epfl.javass.bits.Bits32;
 /**
  * modélise une carte empaquetée
  * 
- * @author Jean-Daniel Rouveyrol(301480)
+ * @author Jean.Daniel Rouveyrol(301480)
  */
 
 public final class PackedCard {
@@ -21,8 +21,8 @@ public final class PackedCard {
     /**
      * véfifie que l'entier représentant la carte est correctement formé
      * 
-     * @param pkCard
-     *            la carte empaquetée
+     * @param pkCard 
+     * 				 la carte empaquetée
      * 
      * @return true, si le format entier de la carte est valide false, si le
      *         format entier de la carte est invalide
@@ -93,7 +93,8 @@ public final class PackedCard {
      * @param pkCard
      *            carte empaquetée
      * 
-     * @return rang de la carte
+     * @return rang 
+     * 				de la carte
      */
     public static Card.Rank rank(int pkCard) {
         assert isValid(pkCard);

@@ -70,7 +70,7 @@ public final class MctsPlayer implements Player {
             this.state = state;
             this.handPlayer = handPlayer;
             this.id = state.nextPlayer();
-            // en fonction de c'est si ownId qui joue où un autre joueur
+            // en fonction de ownId, si c'est lui qui joue où un autre joueur
             long handCurrent = ownId == id ? handPlayer
                     : handOther(state, handPlayer);
             unPlayed = playable(state, handCurrent);

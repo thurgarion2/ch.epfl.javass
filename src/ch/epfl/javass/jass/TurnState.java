@@ -5,7 +5,7 @@ import ch.epfl.javass.jass.Card.Color;
 /**
  * l'état d'un tour de jeu
  * 
- * @author esera erwan serandour (296100)
+ * @author erwan serandour (296100)
  *
  */
 
