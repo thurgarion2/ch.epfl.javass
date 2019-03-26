@@ -97,6 +97,7 @@ public final class MctsPlayer implements Player {
         private double score(int C, Node parent) {
             double s=S;
             double n=N;
+
             //teste si racine
             if (N == 0) {
                 return Double.POSITIVE_INFINITY;
