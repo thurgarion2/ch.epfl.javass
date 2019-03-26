@@ -13,7 +13,7 @@ public final class RandomJassGame {
       Map<PlayerId, Player> players = new HashMap<>();
       Map<PlayerId, String> playerNames = new HashMap<>();
       for (PlayerId pId: PlayerId.ALL) {
-      Player player = new MctsPlayer(pId, 2019, 1000000);
+      Player player = new MctsPlayer(pId, 0, 300000);
         //Player player = new RandomPlayer(2019);
         if (pId == PlayerId.PLAYER_1)
       player = new PrintingPlayer(player);
@@ -21,7 +21,7 @@ public final class RandomJassGame {
         playerNames.put(pId, pId.name());
       }
 
-      JassGame g = new JassGame(2019, players, playerNames);
+      JassGame g = new JassGame(2018, players, playerNames);
       while (! g.isGameOver()) {
         g.advanceToEndOfNextTrick();
         System.out.println("----");

@@ -1,5 +1,7 @@
 package ch.epfl.javass.jass;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SplittableRandom;
 
 /**
@@ -31,19 +33,21 @@ public final class MctsPlayer implements Player {
 
     @Override
     public Card cardToPlay(TurnState state, CardSet hand) {
-        Node root = new Node(state, hand.packed(),ownId.team().other(), ownId, null);
+        Node root = new Node(state, hand.packed(),ownId.team().other(), ownId);
         for (int i = 0; i < iterations; i++) {
-            Node mostPromising = root.mostPromisingNode(C);
+            List<Node> nodes = root.nextNode(ownId);
             //teste si toutes les possibilitées ont étées explorées
-            Node next = mostPromising.nextChildren( ownId);
-            next.genrerateTurnWithUpdateTree(rng, ownId);
+            Node ajoute=nodes.get(nodes.size()-1);
+            int finTour=ajoute.randomGame(rng, ownId);
+            for(Node n : nodes) {
+                n.update(ajoute, finTour);
+            }
         }
         return root.bestCardFromChildren();
     }
 
     private static class Node {
         // null si la racine
-        private Node parent;
         private Node[] children;
         // nombre d'enfant directe
         private int size;
@@ -59,42 +63,41 @@ public final class MctsPlayer implements Player {
         private int S;
         private int N;
 
-        public Node(TurnState state, long handPlayer, TeamId last, PlayerId ownId, Node parent) {
-            this.parent = parent;
+        public Node(TurnState state, long handPlayer, TeamId last, PlayerId ownId) {
             this.state = state;
             this.handPlayer = handPlayer;
             this.id=last;
             unPlayed = playable(state,handPlayer,state.nextPlayer()==ownId);
-
             children = new Node[PackedCardSet.size(unPlayed)];
             S = 0;
             N = 0;
             size = 0;
         }
 
-        public Node nextChildren(PlayerId ownId) {
-            //test si toutes les cartes ont été jouées
+        public List<Node> nextNode(PlayerId ownId) {
+            List<Node> nodes=mostPromisingNode(new ArrayList());
+            nodes.get(nodes.size()-1).addNextNode(ownId,nodes); 
+            return nodes;
+        }
+        
+        private void addNextNode(PlayerId ownId, List<Node> current) {
             if(PackedCardSet.isEmpty(unPlayed)) {
-                return this;
+                return;
             }
             //prend la première carte non jouée
             int c = PackedCardSet.get(unPlayed, 0);
             unPlayed = PackedCardSet.remove(unPlayed, c);
             TurnState update = state.withNewCardPlayedAndTrickCollected(Card.ofPacked(c));
-            Node next = new Node(update, PackedCardSet.remove(handPlayer, c),state.nextPlayer().team(), ownId,this);
+            Node next = new Node(update, PackedCardSet.remove(handPlayer, c),state.nextPlayer().team(), ownId);
             children[size] = next;
             size++;
-            return next;
+            current.add(next);
         }
      
-        private double score(int C) {
+        private double score(int C, Node parent) {
             double s=S;
             double n=N;
             //teste si racine
-            if(parent==null) {
-                //tant que tout les enfants de la racines n'ont pas été ajouté
-                return PackedCardSet.isEmpty(unPlayed) ? s/n : Double.POSITIVE_INFINITY;
-            }
             if (N == 0) {
                 return Double.POSITIVE_INFINITY;
             }
@@ -113,59 +116,50 @@ public final class MctsPlayer implements Player {
             return PackedCardSet.difference(unplayedTurn, handPlayer);
         }
         
-        public Node mostPromisingNode(int C) {
-            Node best = this;
-            for (int i = 0; i < size; i++) {
-                Node child = children[i];
-                best = best.score(C) < child.score(C) ? child : best;
-            }
-            //le noeud actuell est le meilleur
-            if(best==this) {
-                return best;
-            }
-            //meilleur noeud
-            return best.mostPromisingNode(C);
-        }
-        
-        private Card playedCard() {
-            if(parent==null) {
-                return null;
-            }
-            long played=PackedCardSet.difference(parent.state.packedUnplayedCards(),state.packedUnplayedCards());
-            return Card.ofPacked(PackedCardSet.get(played, 0));
-        }
-
-        public Card bestCardFromChildren() {
+        //null si pas d'enfant
+        private Node bestChild(int C) {
             int max = 0;
             for (int i = 1; i < size; i++) {
-                if (children[i].score(0) > children[max].score(0)) {
+                Node child=children[i];
+                if (child.score(C,this) > children[max].score(C,this)) {
                     max = i;
                 }
             }
-            return children[max].playedCard();
-        }
-
-        public void genrerateTurnWithUpdateTree(SplittableRandom rng, PlayerId ownId) {
-            //test si ajout du noeud
-            if(N==0) {
-                int s=randomGame(rng, ownId);
-                update(s, id);   
-                return;
+            return children[max];
+        }        
+        private List<Node> mostPromisingNode(List<Node> current) {
+            if(current.isEmpty()) {
+                current.add(this);
+                return !PackedCardSet.isEmpty(unPlayed) ? current : bestChild(C).mostPromisingNode(current);
             }
-            update((int)this.score(0), id);   
+            double score=this.score(C,current.get(current.size()-1));
+            current.add(this);
+            Node bestChild=bestChild(C);
+            //pas d'enfants
+            if(bestChild==null) {return current;}
+            //le noeud actuel est meilleur que ses enfants
+            return score>=bestChild.score(C,this) ? current:bestChild.mostPromisingNode(current);
         }
-
-        private void update(int points, TeamId team) {
-            // teste si match 257 points
-            S += team == id ? points : Math.max(0, 157 - points);
+        
+        public Card bestCardFromChildren() {
+            return bestChild(0).cardPlayed(this);
+        }
+        
+        private Card cardPlayed(Node parent) {
+            CardSet diff = parent.state.unplayedCards().difference(state.unplayedCards());
+            return diff.get(0);
+        }
+             
+        public void update(Node ajoute, int points) {
+            //si un match
+            S += ajoute.id == id ? points : Math.max(0, 157 - points);
             N++;
-            if (parent != null) {
-                parent.update(points, team);
-            }
-          
         }
-
-        private int randomGame(SplittableRandom rng, PlayerId ownId) {
+        public int randomGame(SplittableRandom rng, PlayerId ownId) {
+            //déjà simulé
+            if(N!=0) {
+                return (int) S/N;
+            }
             TurnState simulate = state;
             long hdPlayer = handPlayer;
             while (!simulate.isTerminal()) {
