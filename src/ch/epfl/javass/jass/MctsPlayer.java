@@ -36,10 +36,12 @@ public final class MctsPlayer implements Player {
     public Card cardToPlay(TurnState state, CardSet hand) {
         Node root = new Node(state, hand.packed(), null);
         root.addAllPossibleChildren();
+        Node mostPromising;
+        Node next;
         for (int i = 1; i < iterations; i++) {
-            Node mostPromising = root.mostPromisingNode();
+            mostPromising = root.mostPromisingNode();
             //teste si toutes les possibilitées ont étées explorées
-            Node next = mostPromising.nextChildren();
+            next = mostPromising.nextChildren();
             next.genrerateTurnWithUpdateTree();
         
         }
@@ -96,11 +98,12 @@ public final class MctsPlayer implements Player {
             return next;
         }
 
+        
         private double value() {
             return N == 0 ? Double.POSITIVE_INFINITY : S / (double) N;
         }
         
-        public double score() {
+        private double score() {
             //teste si racine
             if(parent==null) {
                 return Double.NEGATIVE_INFINITY;
