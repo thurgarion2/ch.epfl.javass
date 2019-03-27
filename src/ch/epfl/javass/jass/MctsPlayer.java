@@ -35,8 +35,8 @@ public final class MctsPlayer implements Player {
     public Card cardToPlay(TurnState state, CardSet hand) {
         Node root = new Node(state, hand.packed(),ownId.team().other(), ownId);
         for (int i = 0; i < iterations; i++) {
+            //le chemin de la racine au noeud ajouté
             List<Node> nodes = root.nextNode(ownId);
-            //teste si toutes les possibilitées ont étées explorées
             Node ajoute=nodes.get(nodes.size()-1);
             int finTour=ajoute.randomGame(rng, ownId);
             for(Node n : nodes) {
@@ -47,6 +47,7 @@ public final class MctsPlayer implements Player {
     }
 
     private static class Node {
+        private int NBPOINTSPERTURN=157;
         // null si la racine
         private Node[] children;
         // nombre d'enfant directe
@@ -67,7 +68,7 @@ public final class MctsPlayer implements Player {
             this.state = state;
             this.handPlayer = handPlayer;
             this.id=last;
-            unPlayed = playable(state,handPlayer,state.nextPlayer()==ownId);
+            unPlayed = playable(state,handPlayer,ownId);
             children = new Node[PackedCardSet.size(unPlayed)];
             S = 0;
             N = 0;
@@ -75,13 +76,30 @@ public final class MctsPlayer implements Player {
         }
 
         public List<Node> nextNode(PlayerId ownId) {
-            List<Node> nodes=mostPromisingNode(new ArrayList());
+            List<Node> nodes=new ArrayList();
+            nodes.add(this);
+            //on appelle nextNode sur le noeud que l'on considère comme racine
+            //si toutes les enfants de la racine ne sont pas encore joué ont les jouent
+            //autrement on prend le plus prometeur
+            nodes=!PackedCardSet.isEmpty(unPlayed)?nodes:bestChild(C).mostPromisingNode(nodes);
             nodes.get(nodes.size()-1).addNextNode(ownId,nodes); 
             return nodes;
         }
         
+        //le chemin de la racine au noeud le plus prométeur
+        private List<Node> mostPromisingNode(List<Node> current) {
+            Node parent=current.get(current.size()-1);
+            current.add(this);
+            if(hasNoChildren()) { return current;}
+            Node bestChild=bestChild(C);
+            //le noeud actuel est meilleur que ses enfants
+            return score(C,parent)>=bestChild.score(C,this) ? current:bestChild.mostPromisingNode(current);
+        }
+        
+        
         private void addNextNode(PlayerId ownId, List<Node> current) {
-            if(PackedCardSet.isEmpty(unPlayed)) {
+            //le noeud est terminal
+            if(isTerminal()) {
                 return;
             }
             //prend la première carte non jouée
@@ -93,11 +111,13 @@ public final class MctsPlayer implements Player {
             size++;
             current.add(next);
         }
+        
+        private boolean isTerminal() {return PackedCardSet.isEmpty(unPlayed);}
+        private boolean hasNoChildren() {return size==0;}
      
         private double score(int C, Node parent) {
             double s=S;
             double n=N;
-
             //teste si racine
             if (N == 0) {
                 return Double.POSITIVE_INFINITY;
@@ -105,9 +125,9 @@ public final class MctsPlayer implements Player {
             return s/n + C * Math.sqrt(2.0 * Math.log(parent.N) / n);
         }
         
-        //toutes les cartes non jouées 
-        private long playable(TurnState state, long handPlayer, boolean isOwnId) {
-            long currentHand =isOwnId ? handPlayer:handOther(state,handPlayer );
+        //toutes les cartes non jouées de la main corresponsantes
+        private long playable(TurnState state, long handPlayer, PlayerId ownId) {
+            long currentHand =state.nextPlayer()==ownId ? handPlayer:handOther(state,handPlayer );
             int trick = state.packedTrick();
             return PackedTrick.playableCards(trick,currentHand);
         }
@@ -117,31 +137,14 @@ public final class MctsPlayer implements Player {
             return PackedCardSet.difference(unplayedTurn, handPlayer);
         }
         
-        //null si pas d'enfant
         private Node bestChild(int C) {
             int max = 0;
             for (int i = 1; i < size; i++) {
                 Node child=children[i];
-                if (child.score(C,this) > children[max].score(C,this)) {
-                    max = i;
-                }
+                max=child.score(C,this) > children[max].score(C,this) ? i : max;
             }
             return children[max];
-        }        
-        private List<Node> mostPromisingNode(List<Node> current) {
-            if(current.isEmpty()) {
-                current.add(this);
-                return !PackedCardSet.isEmpty(unPlayed) ? current : bestChild(C).mostPromisingNode(current);
-            }
-            double score=this.score(C,current.get(current.size()-1));
-            current.add(this);
-            Node bestChild=bestChild(C);
-            //pas d'enfants
-            if(bestChild==null) {return current;}
-            //le noeud actuel est meilleur que ses enfants
-            return score>=bestChild.score(C,this) ? current:bestChild.mostPromisingNode(current);
-        }
-        
+        }   
         public Card bestCardFromChildren() {
             return bestChild(0).cardPlayed(this);
         }
@@ -153,7 +156,7 @@ public final class MctsPlayer implements Player {
              
         public void update(Node ajoute, int points) {
             //si un match
-            S += ajoute.id == id ? points : Math.max(0, 157 - points);
+            S += ajoute.id == id ? points : Math.max(0, NBPOINTSPERTURN - points);
             N++;
         }
         public int randomGame(SplittableRandom rng, PlayerId ownId) {
@@ -164,7 +167,7 @@ public final class MctsPlayer implements Player {
             TurnState simulate = state;
             long hdPlayer = handPlayer;
             while (!simulate.isTerminal()) {
-                long playable = playable(simulate, hdPlayer,simulate.nextPlayer()==ownId);
+                long playable = playable(simulate, hdPlayer,ownId);
                 int size = PackedCardSet.size(playable);
                 int c = PackedCardSet.get(playable, rng.nextInt(size));
                 // on peut sans problème supprimer une carte qui n'existe pas
