@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SplittableRandom;
 
+import ch.epfl.javass.Preconditions;
+
 /**
  * un joueur qui utilse un arbre de montecarlo pour choisir la carte à jouer
  * 
@@ -26,6 +28,7 @@ public final class MctsPlayer implements Player {
      *             si le nombre d'iterations inferieur à 9
      */
     public MctsPlayer(PlayerId ownId, long rngSeed, int iterations) {
+        Preconditions.checkArgument(iterations>=9);
         this.ownId = ownId;
         this.rng = new SplittableRandom(rngSeed);
         this.iterations = iterations;
@@ -64,7 +67,7 @@ public final class MctsPlayer implements Player {
         private int S;
         private int N;
 
-        public Node(TurnState state, long handPlayer, TeamId last, PlayerId ownId) {
+        private Node(TurnState state, long handPlayer, TeamId last, PlayerId ownId) {
             this.state = state;
             this.handPlayer = handPlayer;
             this.id=last;
@@ -75,7 +78,7 @@ public final class MctsPlayer implements Player {
             size = 0;
         }
 
-        public List<Node> nextNode(PlayerId ownId) {
+        private List<Node> nextNode(PlayerId ownId) {
             List<Node> nodes=new ArrayList();
             nodes.add(this);
             //on appelle nextNode sur le noeud que l'on considère comme racine
@@ -124,7 +127,6 @@ public final class MctsPlayer implements Player {
             }
             return s/n + C * Math.sqrt(2.0 * Math.log(parent.N) / n);
         }
-        
         //toutes les cartes non jouées de la main corresponsantes
         private long playable(TurnState state, long handPlayer, PlayerId ownId) {
             long currentHand =state.nextPlayer()==ownId ? handPlayer:handOther(state,handPlayer );
@@ -145,7 +147,7 @@ public final class MctsPlayer implements Player {
             }
             return children[max];
         }   
-        public Card bestCardFromChildren() {
+        private Card bestCardFromChildren() {
             return bestChild(0).cardPlayed(this);
         }
         
@@ -154,12 +156,12 @@ public final class MctsPlayer implements Player {
             return diff.get(0);
         }
              
-        public void update(Node ajoute, int points) {
+        private void update(Node ajoute, int points) {
             //si un match
             S += ajoute.id == id ? points : Math.max(0, NBPOINTSPERTURN - points);
             N++;
         }
-        public int randomGame(SplittableRandom rng, PlayerId ownId) {
+        private int randomGame(SplittableRandom rng, PlayerId ownId) {
             //déjà simulé
             if(N!=0) {
                 return (int) S/N;
