@@ -5,14 +5,21 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * identifie les équipes à l'aide d'une énumaration
+ * défini les équipes du jeux de jass
  * 
  * @author Jean.Daniel Rouveyrol(301480)
  *
  */
 public enum TeamId {
 	
-	TEAM_1(), TEAM_2();
+	/**
+	 * l'équipe 1
+	 */
+	TEAM_1(), 
+	/**
+	 * l'équipe 2
+	 */
+	TEAM_2();
 	
 	/**
 	 * liste de chaque équipe membre de l'énumeration
@@ -20,11 +27,11 @@ public enum TeamId {
 	public static final List<TeamId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
 
 	/**
-	 * compte du nombre d'équipe(s)
+	 * nombre d'équipes
 	 */
 	public static final int COUNT = ALL.size();
 
-    /**
+    /**retourne l'identifiant de l'autre équipe
      * 
      * @return l'identifiant de l'autre équipe
      */

@@ -25,7 +25,7 @@ public final class MctsPlayer implements Player {
      * @param iterations
      *            le nombre d'iterations maximum (>=9)
      * @throws IllegalArgumentException
-     *             si le nombre d'iterations inferieur à 9
+     *             si le nombre d'iterations est inferieur à 9
      */
     public MctsPlayer(PlayerId ownId, long rngSeed, int iterations) {
         Preconditions.checkArgument(iterations>=9);
@@ -51,7 +51,6 @@ public final class MctsPlayer implements Player {
 
     private static class Node {
         private int NBPOINTSPERTURN=157;
-        // null si la racine
         private Node[] children;
         // nombre d'enfant directe
         private int size;
@@ -79,30 +78,26 @@ public final class MctsPlayer implements Player {
         }
 
         private List<Node> nextNode(PlayerId ownId) {
+            //le noeud à partir du quel on l'appelle est considérer comme racine
             List<Node> nodes=new ArrayList();
             nodes.add(this);
-            //on appelle nextNode sur le noeud que l'on considère comme racine
-            //si toutes les enfants de la racine ne sont pas encore joué ont les jouent
-            //autrement on prend le plus prometeur
-            nodes=!PackedCardSet.isEmpty(unPlayed)?nodes:bestChild(C).mostPromisingNode(nodes);
+            this.mostPromisingNode(nodes);
+            //on ajoute un enfant au dernier noeud
             nodes.get(nodes.size()-1).addNextNode(ownId,nodes); 
             return nodes;
         }
         
         //le chemin de la racine au noeud le plus prométeur
         private List<Node> mostPromisingNode(List<Node> current) {
-            Node parent=current.get(current.size()-1);
-            current.add(this);
-            if(hasNoChildren()) { return current;}
-            Node bestChild=bestChild(C);
-            //le noeud actuel est meilleur que ses enfants
-            return score(C,parent)>=bestChild.score(C,this) ? current:bestChild.mostPromisingNode(current);
-        }
-        
-        
+            if(!allChildrenAdded() || hasNoChildren()) { return current;}
+            //le noeud actuel est plein
+            Node next=bestChild(C);
+            current.add(next);
+            return  next.mostPromisingNode(current);
+        }        
         private void addNextNode(PlayerId ownId, List<Node> current) {
             //le noeud est terminal
-            if(isTerminal()) {
+            if(allChildrenAdded()) {
                 return;
             }
             //prend la première carte non jouée
@@ -115,13 +110,12 @@ public final class MctsPlayer implements Player {
             current.add(next);
         }
         
-        private boolean isTerminal() {return PackedCardSet.isEmpty(unPlayed);}
-        private boolean hasNoChildren() {return size==0;}
-     
+        private boolean allChildrenAdded() {return PackedCardSet.isEmpty(unPlayed);}
+        private boolean hasNoChildren() {return children.length==0;}
+    
         private double score(int C, Node parent) {
             double s=S;
             double n=N;
-            //teste si racine
             if (N == 0) {
                 return Double.POSITIVE_INFINITY;
             }
@@ -133,7 +127,7 @@ public final class MctsPlayer implements Player {
             int trick = state.packedTrick();
             return PackedTrick.playableCards(trick,currentHand);
         }
-
+        //les cartes des joueurs sauf celui représenter par cette instance
         private long handOther(TurnState state, long handPlayer) {
             long unplayedTurn = state.packedUnplayedCards();
             return PackedCardSet.difference(unplayedTurn, handPlayer);
@@ -162,7 +156,7 @@ public final class MctsPlayer implements Player {
             N++;
         }
         private int randomGame(SplittableRandom rng, PlayerId ownId) {
-            //déjà simulé
+            //déjà simulé (le noeud est terminale)
             if(N!=0) {
                 return (int) S/N;
             }

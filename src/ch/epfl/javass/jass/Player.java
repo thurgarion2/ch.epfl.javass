@@ -7,7 +7,7 @@ import ch.epfl.javass.jass.Card.Color;
 /**
  * défini le minimum pour se compoter comme un joueur
  * 
- * @author esera erwan serandour (296100)
+ * @author erwan serandour (296100)
  *
  */
 
@@ -43,7 +43,7 @@ public interface Player {
      * informe le joueur de sa nouvelle main après un changement
      * 
      * @param newHand
-     *            la nouvelle main d u joueur
+     *            la nouvelle main du joueur
      */
     public default void updateHand(CardSet newHand) {
     }

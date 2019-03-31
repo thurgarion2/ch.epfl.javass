@@ -16,7 +16,7 @@ import ch.epfl.javass.Preconditions;
 public final class Card {
     private int card;
 
-    public Card(int packedCard) {
+    private Card(int packedCard) {
         card = packedCard;
     };
 
@@ -173,6 +173,9 @@ public final class Card {
      * @param packed
      *            le nombre de la carte
      * @return retourne la carte correspondante au int empaqueté
+     * 
+     * @throws IllegalArgumentException
+     *             ssi la carte empaquetée n'est pas valide
      * 
      */
     public static Card ofPacked(int packed) {

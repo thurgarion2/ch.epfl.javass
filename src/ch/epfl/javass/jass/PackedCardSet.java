@@ -23,7 +23,7 @@ import ch.epfl.javass.bits.Bits64;
 //bits: 32 à 47 le carreau
 //bits: 48 à 61 le trèfle
 public final class PackedCardSet {
-
+    //pour chaque couleur l'ensemble des cartes de cette couleurs
     private final static long SUBSETCOLOROF[] = subsetOfColor();
 
     /**
@@ -46,8 +46,9 @@ public final class PackedCardSet {
     }
 
     private static long[] subsetOfColor() {
-        long[] out = { Bits64.mask(0, 9), Bits64.mask(16, 9),
-                Bits64.mask(32, 9), Bits64.mask(48, 9) };
+        long[] out = { Bits64.mask(0, CARDPERCOLOR),
+                Bits64.mask(16, CARDPERCOLOR), Bits64.mask(32, CARDPERCOLOR),
+                Bits64.mask(48, CARDPERCOLOR) };
         return out;
     }
     //génère pour chaque carte toutes l'ensemble des cartes d'atout au dessus
@@ -76,7 +77,7 @@ public final class PackedCardSet {
      * empaqueté valide
      * 
      * @param pkCardSet
-     *            l'ensemble de cartes empqueté
+     *            l'ensemble de cartes empaqueté
      * @return vrai ssi la valeur donnée représente un ensemble de cartes
      *         empaqueté valide
      */

@@ -7,7 +7,7 @@ import ch.epfl.javass.jass.*;
 public class MctsPlayerExampleTest {
     
     public static void main(String[] args) {
-        Player player = new MctsPlayer(PlayerId.PLAYER_2, 0, 100000);
+        Player player = new MctsPlayer(PlayerId.PLAYER_2, 0, 10);
         TurnState state= TurnState.initial(Card.Color.SPADE, Score.INITIAL, PlayerId.PLAYER_1);
         state=state.withNewCardPlayed(Card.of(Card.Color.SPADE, Card.Rank.JACK));
         CardSet hand = CardSet.EMPTY

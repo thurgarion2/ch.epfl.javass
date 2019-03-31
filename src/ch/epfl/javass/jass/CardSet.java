@@ -17,12 +17,12 @@ public final class CardSet {
 	}
 	
 	/**
-	 * constante : l'ensemble de cartes vide 
+	 * l'ensemble de cartes vide 
 	 */
 	public static final CardSet EMPTY =ofPacked(PackedCardSet.EMPTY);
 	
 	/**
-	 * constante : l'ensemble de cartes représentant le jeu complet
+	 * l'ensemble de cartes représentant le jeu complet
 	 */
 	public static final CardSet ALL_CARDS = ofPacked(PackedCardSet.ALL_CARDS);
 	

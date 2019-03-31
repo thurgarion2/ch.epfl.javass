@@ -73,9 +73,9 @@ public final class PackedScore {
 
     private static int oneTeamScorePk(int turnTricks, int turnPoints,
             int gamePoints) {
-        assert (turnTricks >= 0 && turnTricks <= 9);
-        assert (turnPoints >= 0 && turnPoints <= 257);
-        assert (gamePoints >= 0 && gamePoints <= 2000);
+        assert (turnTricks >= 0 && turnTricks <= MAXTRICKPERTURN);
+        assert (turnPoints >= 0 && turnPoints <= MAXPOINTPERTURN);
+        assert (gamePoints >= 0 && gamePoints <= MAXPOINTPERGAME);
         return Bits32.pack(turnTricks, BITSIZEOFTRICKS, turnPoints,
                 BITSIZEOFTURN, gamePoints, BITSIZEOFGAME);
 
@@ -190,7 +190,7 @@ public final class PackedScore {
     public static long withAdditionalTrick(long pkScore, TeamId winningTeam,
             int trickPoints) {
         assert isValid(pkScore);
-        assert trickPoints <= 257;
+        assert trickPoints <= MAXPOINTPERTURN;
 
         int turnTricks = turnTricks(pkScore, winningTeam) + 1;
         int turnPoints = turnPoints(pkScore, winningTeam) + trickPoints;

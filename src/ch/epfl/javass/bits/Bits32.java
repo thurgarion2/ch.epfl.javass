@@ -14,11 +14,10 @@ public final class Bits32 {
     private Bits32() {
     }
 
-    /**
-     * vérifie si le nombre n'occcupe pas plus de valeur que sa taille (cf pack)
-     * 
-     * bits le nombre size la taille
-     */
+    // vérifie si le nombre n'occcupe pas plus de valeur que sa taille (cf pack)
+  
+    //bits le nombre size la taille
+
     private static void checkSize(int bits, int size) {
         Preconditions.checkArgument(size > 0 && size < Integer.SIZE);
         int mask = mask(size, Integer.SIZE - size);

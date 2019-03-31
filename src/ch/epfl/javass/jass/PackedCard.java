@@ -3,7 +3,7 @@ package ch.epfl.javass.jass;
 import ch.epfl.javass.bits.Bits32;
 
 /**
- * modélise une carte empaquetée
+ * des méthodes utiles pour empaqueté une carte dans un int 
  * 
  * @author Jean.Daniel Rouveyrol(301480)
  */
@@ -12,6 +12,9 @@ public final class PackedCard {
     private PackedCard() {
     }
 
+    /**
+     * une carte non valide
+     */
     public static final int INVALID = 0b111111;
 
     // tableau contenant les points la cartes (atout ou non)
@@ -24,7 +27,7 @@ public final class PackedCard {
      * @param pkCard 
      * 				 la carte empaquetée
      * 
-     * @return true, si le format entier de la carte est valide false, si le
+     * @return vrai, si le format entier de la carte est valide faux, si le
      *         format entier de la carte est invalide
      */
     public static boolean isValid(int pkCard) {
@@ -176,7 +179,7 @@ public final class PackedCard {
     }
 
     /**
-     * surchage la méthode toString
+     * retourne une carte sous sa forme textuelle
      * 
      * @param pkCard
      *            carte empaquetée

@@ -5,32 +5,51 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * contient les joueurs dans une énumération
+ * défini les joueurs du jass
  * 
  * @author Jean.Daniel Rouveyrol (301480)
  *
  */
 
 public enum PlayerId {
-	PLAYER_1(), PLAYER_2(), PLAYER_3(), PLAYER_4();
-	
-	/**
-	 * liste de chaque joueur membre de l'énumeration - constante
-	 */
-	public static final List<PlayerId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
-	
-	/**
-	 * compte du nombre de joueur(s)
-	 */
-	public static final int COUNT = ALL.size();
+    /**
+     * le joueur 1
+     */
+    PLAYER_1(),
+    /**
+     * le joueur 2
+     */
+    PLAYER_2(),
+    /**
+     * le joueur 3
+     */
+    PLAYER_3(),
+    /**
+     * le joueur 4
+     */
+    PLAYER_4();
 
     /**
-     * 
-     * @return le nom de l'équipe à laquelle appartient le joueur sur lequel la  méthode est appelée
+     * liste de chaque joueur membre de l'énumeration
      */
-	public TeamId team() {
-		if (this.equals(PLAYER_1) || this.equals(PLAYER_3))
-			return TeamId.TEAM_1;
-		return TeamId.TEAM_2;
-	}
+    public static final List<PlayerId> ALL = Collections
+            .unmodifiableList(Arrays.asList(values()));
+
+    /**
+     * le nombre de joeurs
+     */
+    public static final int COUNT = ALL.size();
+
+    /**
+     * retourne le nom de l'équipe à la quelle appartient le joueur sur lequel
+     * la méthode est appelée
+     * 
+     * @return le nom de l'équipe à la quelle appartient le joueur sur lequel la
+     *         méthode est appelée
+     */
+    public TeamId team() {
+        if (this.equals(PLAYER_1) || this.equals(PLAYER_3))
+            return TeamId.TEAM_1;
+        return TeamId.TEAM_2;
+    }
 }
