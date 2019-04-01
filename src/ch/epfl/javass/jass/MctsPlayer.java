@@ -71,6 +71,7 @@ public final class MctsPlayer implements Player {
             this.handPlayer = handPlayer;
             this.id=last;
             unPlayed = playable(state,handPlayer,ownId);
+        
             children = new Node[PackedCardSet.size(unPlayed)];
             S = 0;
             N = 0;
@@ -89,7 +90,7 @@ public final class MctsPlayer implements Player {
         
         //le chemin de la racine au noeud le plus prométeur
         private List<Node> mostPromisingNode(List<Node> current) {
-            if(!allChildrenAdded() || hasNoChildren()) { return current;}
+            if(!allChildrenAdded() || state.isTerminal()) { return current;}
             //le noeud actuel est plein
             Node next=bestChild(C);
             current.add(next);
@@ -97,7 +98,7 @@ public final class MctsPlayer implements Player {
         }        
         private void addNextNode(PlayerId ownId, List<Node> current) {
             //le noeud est terminal
-            if(allChildrenAdded()) {
+            if(state.isTerminal()) {
                 return;
             }
             //prend la première carte non jouée
@@ -111,7 +112,7 @@ public final class MctsPlayer implements Player {
         }
         
         private boolean allChildrenAdded() {return PackedCardSet.isEmpty(unPlayed);}
-        private boolean hasNoChildren() {return children.length==0;}
+
     
         private double score(int C, Node parent) {
             double s=S;

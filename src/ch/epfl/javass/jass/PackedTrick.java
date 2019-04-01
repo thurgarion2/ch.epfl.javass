@@ -13,6 +13,11 @@ import ch.epfl.javass.jass.Card.Rank;
 /*
  * un pli empaquté 24 premiers bits (6 bits par carte 111111 si vide) 4 prochain
  * bits le numero du pli 2 prochain le premier joueur 2 dernier l'atout
+ * 
+ *de 0 à 23 les cartes du pli
+ *de 24 à 27 l'index du pli
+ *de 28 à 29 l'index du premier joueur
+ *de 30 à 31 l'atout
  */
 public final class PackedTrick {
     /**
@@ -22,6 +27,7 @@ public final class PackedTrick {
     // représente les 4 cartes vides d'un pli
     private static int FOURINVALIDCARD = Bits32.mask(0, 24);
     private static int BITSPERCARD = 6;
+    private static int CARDSPERTRICK=4;
 
     private PackedTrick() {
     }
@@ -38,7 +44,8 @@ public final class PackedTrick {
      * @return vrai ssi l'entier donné représente un pli empaqueté valide
      */
     public static boolean isValid(int pkTrick) {
-        // index du pli plus petit que 8
+        // index du pli plus petit que 9
+        //9 pli par tout --> de 0 à 8
         if (index(pkTrick) > 8) {
             return false;
         }
@@ -134,7 +141,7 @@ public final class PackedTrick {
      */
     public static boolean isFull(int pkTrick) {
         assert isValid(pkTrick);
-        return size(pkTrick) == 4;
+        return size(pkTrick) == CARDSPERTRICK;
     }
 
     /**
@@ -151,7 +158,7 @@ public final class PackedTrick {
                 return i;
             }
         }
-        return 4;
+        return CARDSPERTRICK;
     }
 
     /**
@@ -224,7 +231,7 @@ public final class PackedTrick {
     public static int withAddedCard(int pkTrick, int pkCard) {
         assert isValid(pkTrick);
         assert PackedCard.isValid(pkCard);
-        assert size(pkTrick) < 4;
+        assert size(pkTrick) < CARDSPERTRICK;
         // le pli avec que des 0 à la place de la prochaine carte
         int pkTrickClear = pkTrick
                 & ~(Bits32.mask(BITSPERCARD * size(pkTrick), BITSPERCARD));

@@ -7,7 +7,10 @@ import ch.epfl.javass.bits.Bits32;
  * 
  * @author Jean.Daniel Rouveyrol(301480)
  */
-
+//représentation d'une carte empaquetée
+//les bits de 0 à 3 le rang
+//de 4 à 5 la couleur
+//le reste que des 0
 public final class PackedCard {
     private PackedCard() {
     }
@@ -20,6 +23,10 @@ public final class PackedCard {
     // tableau contenant les points la cartes (atout ou non)
     private static final int trumpPoints[] = { 0, 0, 0, 14, 10, 20, 3, 4, 11 };
     private static final int normalPoints[] = { 0, 0, 0, 0, 10, 2, 3, 4, 11 };
+    //quelques constantes
+    private static int NBBITSFORRANK = 4;
+    private static int NBBITSFORCOLOUR = 2;
+
 
     /**
      * véfifie que l'entier représentant la carte est correctement formé
@@ -31,11 +38,12 @@ public final class PackedCard {
      *         format entier de la carte est invalide
      */
     public static boolean isValid(int pkCard) {
+        //tout le reste des bits est à 0
         if (Bits32.extract(pkCard, 6, Integer.SIZE - 6) != 0) {
             return false;
         }
 
-        int rank = Bits32.extract(pkCard, 0, 4);
+        int rank = Bits32.extract(pkCard, 0, NBBITSFORRANK);
         if (rank < 0 || rank > 8) {
             return false;
         }
@@ -58,7 +66,7 @@ public final class PackedCard {
     public static int pack(Card.Color c, Card.Rank r) {
         int indexRank = r.ordinal();
         int indexColor = c.ordinal();
-        int pkCard = Bits32.pack(indexRank, 4, indexColor, 2);
+        int pkCard = Bits32.pack(indexRank, NBBITSFORRANK, indexColor, NBBITSFORCOLOUR);
         assert isValid(pkCard);
         return pkCard;
     }
@@ -67,7 +75,7 @@ public final class PackedCard {
     // couleur de la carte
     private static int colorIndex(int pkCard) {
         assert isValid(pkCard);
-        return Bits32.extract(pkCard, 4, 2);
+        return Bits32.extract(pkCard,4, NBBITSFORCOLOUR);
     }
 
     /**
@@ -87,7 +95,7 @@ public final class PackedCard {
     // de la carte
     private static int rankIndex(int pkCard) {
         assert isValid(pkCard);
-        return Bits32.extract(pkCard, 0, 4);
+        return Bits32.extract(pkCard, 0, NBBITSFORRANK);
     }
 
     /**
@@ -187,8 +195,8 @@ public final class PackedCard {
      * @return le symbole de la couleur de la carte ainsi que son rang
      */
     public static String toString(int pkCard) {
-        int indexColor = Bits32.extract(pkCard, 4, 2);
-        int indexRank = Bits32.extract(pkCard, 0, 4);
+        int indexColor = Bits32.extract(pkCard, NBBITSFORRANK, 2);
+        int indexRank = Bits32.extract(pkCard, 0, NBBITSFORRANK);
         return Card.Color.ALL.get(indexColor).toString()
                 + Card.Rank.ALL.get(indexRank).toString();
     }

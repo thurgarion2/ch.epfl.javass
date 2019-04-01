@@ -30,10 +30,11 @@ public final class PackedScore {
     private static final int MAXTRICKPERTURN = Jass.TRICKS_PER_TURN;
     private static final int MAXPOINTPERTURN = 257;
     private static final int MAXPOINTPERGAME = 2000;
+    private static final int NBBITSPERTEAM = Integer.SIZE;
 
     private PackedScore() {
     }
-
+    //teste si le score d'une équipe est correct sur 32 bits
     private static boolean isValid(int pkScore) {
         if (Bits32.extract(pkScore, 0, BITSIZEOFTRICKS) > MAXTRICKPERTURN) {
             return false;
@@ -48,7 +49,7 @@ public final class PackedScore {
                 BITSIZEOFGAME) > MAXPOINTPERGAME) {
             return false;
         }
-
+        //le 8 dernier bits sont nuls
         if (Bits32.extract(pkScore, 24, 8) != 0) {
             return false;
         }
@@ -102,15 +103,15 @@ public final class PackedScore {
             int turnTricks2, int turnPoints2, int gamePoints2) {
         long B0To31 = oneTeamScorePk(turnTricks1, turnPoints1, gamePoints1);
         long B32To63 = oneTeamScorePk(turnTricks2, turnPoints2, gamePoints2);
-        return Bits64.pack(B0To31, Integer.SIZE, B32To63, Integer.SIZE);
+        return Bits64.pack(B0To31, NBBITSPERTEAM, B32To63, NBBITSPERTEAM);
     }
 
     private static int extractPkTeam(long pkScore, TeamId t) {
         assert isValid(pkScore);
         if (t == TeamId.TEAM_1) {
-            return (int) Bits64.extract(pkScore, 0, Integer.SIZE);
+            return (int) Bits64.extract(pkScore, 0, NBBITSPERTEAM);
         }
-        return (int) Bits64.extract(pkScore, Integer.SIZE, Integer.SIZE);
+        return (int) Bits64.extract(pkScore, 32, NBBITSPERTEAM);
     }
 
     /**
@@ -204,11 +205,11 @@ public final class PackedScore {
         int losingTeamPk = extractPkTeam(pkScore, winningTeam.other());
 
         if (winningTeam == TeamId.TEAM_1) {
-            return Bits64.pack(winningTeamPk, Integer.SIZE, losingTeamPk,
-                    Integer.SIZE);
+            return Bits64.pack(winningTeamPk,NBBITSPERTEAM, losingTeamPk,
+                    NBBITSPERTEAM);
         }
-        return Bits64.pack(losingTeamPk, Integer.SIZE, winningTeamPk,
-                Integer.SIZE);
+        return Bits64.pack(losingTeamPk,NBBITSPERTEAM, winningTeamPk,
+                NBBITSPERTEAM);
     }
 
     /**
@@ -223,7 +224,7 @@ public final class PackedScore {
 
         int team1Pk = oneTeamScorePk(0, 0, totalPoints(pkScore, TeamId.TEAM_1));
         int team2Pk = oneTeamScorePk(0, 0, totalPoints(pkScore, TeamId.TEAM_2));
-        return Bits64.pack(team1Pk, 32, team2Pk, 32);
+        return Bits64.pack(team1Pk, NBBITSPERTEAM, team2Pk, NBBITSPERTEAM);
     }
 
     private static String teamToString(long pkScore, TeamId t) {
