@@ -5,6 +5,8 @@ import ch.epfl.javass.jass.Card.Color;
 
 /**
  * 
+ * modéilse un pli de jass
+ * 
  * @author Jean.Daniel Rouveyrol (301480)
  *
  */
@@ -23,13 +25,11 @@ public final class Trick {
     /**
      * créer un pli vide, initaliser avec l'atout et le premier joueur
      * 
-     * @param trump 
-     * 			l'atout
+     * @param trump l'atout
      * 
-     * @param firstPlayer
-     * 			le premier joueur
+     * @param firstPlayer le premier joueur
      * 
-     * @return un nouveau plis vide sachant l'atout et le premier joueur de type Trick
+     * @return un nouveau pli vide sachant l'atout et le premier joueur de type Trick
      */
     public static Trick firstEmpty(Color trump, PlayerId firstPlayer) {
         return new Trick(PackedTrick.firstEmpty(trump, firstPlayer));
@@ -38,10 +38,9 @@ public final class Trick {
     /**
      * créer un Trick à partir d'un pli empaqueté
      * 
-     * @param packed
-     * 			 pli empaqueté
+     * @param packed pli empaqueté
      * 
-     * @return un nouveau Trick 
+     * @return un nouveau pli
      * 
      * @throws IllegalArgumentException si le plis empaqueté en paramètre est invalide
      */
@@ -53,7 +52,7 @@ public final class Trick {
     }
 
     /**
-     * @return la version empaquetée d'un Trick
+     * @return la version empaquetée d'un pli
      */
     public int packed() {
         return this.pkTrick;
@@ -61,7 +60,7 @@ public final class Trick {
 
     /**
      * @return le pli vide suivant celui-ci sachant l'atout et le vainqueur du
-     *         pli (le premier joueur du prochain pli)
+     *         pli courant (le premier joueur du prochain pli suivant)
      *         
      * @throws IllegalStateException si le pli donné n'est pas plein
      */
@@ -120,12 +119,11 @@ public final class Trick {
     /**
      * donne l'identifiant du joueur à l'index donné
      * 
-     * @param index 
-     * 			position du joueur dans le pli
+     * @param index position du joueur dans le pli
      * 
      * @return le joueur d'index donné 
      * 
-     * @throws IndexOutOfBoundsException si l'index est invalide (index vlaide -> 0 <= index < 4)
+     * @throws IndexOutOfBoundsException si l'index est invalide (index vlide : 0 <= index < 4)
      */
     public PlayerId player(int index) throws IndexOutOfBoundsException {
         Preconditions.checkIndex(index,4);
@@ -135,12 +133,11 @@ public final class Trick {
     /**
      * donne la carte de l'index donné
      * 
-     * @param index 
-     * 			position de la carte donné dans le pli
+     * @param index position de la carte donné dans le pli
      * 
-     * @return la version empaquetée de la carte du pli à l'index donné (supposée avoir été posée)
+     * @return la carte du pli à l'index donné (supposée avoir été posée)
      *         
-     * @throws IndexOutOfBoundsException si l index est invalide (index valide -> 0 <= index < taille du pli)
+     * @throws IndexOutOfBoundsException si l index est invalide (index valide : 0 <= index < taille du pli)
      */
     public Card card(int index) throws IndexOutOfBoundsException {
         Preconditions.checkIndex(index,this.size());
@@ -150,10 +147,9 @@ public final class Trick {
     /**
      * ajoute une carte à un pli
      * 
-     * @param c 
-     *			carte à ajouter 
+     * @param c carte à ajouter 
      * 
-     * @return retourne un pli identique à celui donné, mais auquel la carte donnée a été ajouté
+     * @return retourne un pli identique à celui donné, mais auquel la carte donnée a été ajoutée
      *         
      * @throws IllegalStateException si le pli est plein
      */
@@ -167,7 +163,7 @@ public final class Trick {
     /**
      * donne la couleur demandée dans le pli
      * 
-     * @return la couleur de base du pli, c-à-d la couleur de sa première carte
+     * @return la couleur de base du pli, la couleur de sa première carte
      * 
      * @throws IllegalStateException si le pli est vide
      */
@@ -179,12 +175,11 @@ public final class Trick {
     }
 
     /**
-     * détermine l'enemble de carte jouable par un joueur étant donné sa main
+     * détermine l'enemble de carte(s) jouable(s) par un joueur étant donné sa main
      * 
-     * @param hand
-     * 			main d'un joueur
+     * @param hand main d'un joueur
      * 
-     * @return le sous-ensemble des cartes de la main hand qui peuvent être jouées comme prochaine carte du pli
+     * @return le sous-ensemble des cartes de la main (hand) qui peuvent être jouées comme prochaine carte du pli
      * 
      * @throws IllegalStateException si le pli est plein
      */
@@ -204,7 +199,7 @@ public final class Trick {
     }
 
     /**
-     * détermine le joueur étant entrain de gagner  
+     * détermine le joueur étant entrain de gagner le pli
      * 
      * @return l'identifiant du joueur menant le pli
      * 
