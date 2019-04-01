@@ -86,7 +86,7 @@ public final class CardSet {
 	}
 	
 	/**
-	 * retourne la version empaquetée de la carte d'index donné de l'ensemble de
+	 * retourne la carte d'index donné de l'ensemble de
      * cartes donné (comme si c'était un ensemble normal)
      * 
 	 * @param index
@@ -167,7 +167,7 @@ public final class CardSet {
 	 * 
 	 * @param that le deuxième ensemble de cartes 
 	 * 
-	 * @return un nouvel ensemble de cartes qui est le premier sans les élément de celui passé en argument 
+	 * @return un nouvel ensemble de cartes qui est le premier sans les éléments de celui passé en argument 
 	 */
 	public CardSet difference(CardSet that) {
 		return new CardSet(PackedCardSet.difference(cardSet, that.packed()));

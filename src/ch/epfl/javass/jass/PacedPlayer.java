@@ -16,6 +16,12 @@ public final class PacedPlayer implements Player {
 	//en milli seconde
 	private double minTime;
 	
+	/**
+	 *
+	 * @param underlyingPlayer joueur devant être ralenti
+	 * 
+	 * @param minTime temps minimum que le joueur doit mettre avant de jouer
+	 */
 	public PacedPlayer(Player underlyingPlayer, double minTime) {
 		this.underlyingPlayer = underlyingPlayer;
 		this.minTime = minTime*1000;

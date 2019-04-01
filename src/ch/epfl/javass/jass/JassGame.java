@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * permet de jouer une partie de jass aléatoire
+ * 
+ * @author Jean.Daniel Rouveyrol(301480)
+ *
+ */
 public final class JassGame {
     // la carte qui définit le premier joueur
     private final static Card BEGIN = Card.of(Card.Color.DIAMOND,
@@ -23,6 +29,14 @@ public final class JassGame {
     private PlayerId firstPlayer=null;
     private TurnState turnState;
 
+    /**
+     * 
+     * @param rngSeed la graine utilisée par les méthode de la calsse Random
+     * 
+     * @param players relie les identfiants des joueurs aux joueurs
+     * 
+     * @param playerNames relie les identifiants des joueurs aux joueurs
+     */
     public JassGame(long rngSeed, Map<PlayerId, Player> players,
             Map<PlayerId, String> playerNames) {
         Random rng = new Random(rngSeed);
