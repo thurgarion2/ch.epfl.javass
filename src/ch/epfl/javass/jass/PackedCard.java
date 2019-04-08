@@ -24,8 +24,11 @@ public final class PackedCard {
     private static final int trumpPoints[] = { 0, 0, 0, 14, 10, 20, 3, 4, 11 };
     private static final int normalPoints[] = { 0, 0, 0, 0, 10, 2, 3, 4, 11 };
     // quelques constantes
-    private static int NBBITSFORRANK = 4;
-    private static int NBBITSFORCOLOUR = 2;
+    private static final int STARTOFRANK = 0;
+    private static final int NBBITSFORRANK = 4;
+
+    private static final int STARTOFCOLOUR = 4;
+    private static final int NBBITSFORCOLOUR = 2;
 
     /**
      * vérifie que l'entier représentant la carte est correctement formé
@@ -42,7 +45,7 @@ public final class PackedCard {
             return false;
         }
 
-        int rank = Bits32.extract(pkCard, 0, NBBITSFORRANK);
+        int rank = Bits32.extract(pkCard, STARTOFRANK, NBBITSFORRANK);
         if (rank < 0 || rank > 8) {
             return false;
         }
@@ -75,7 +78,7 @@ public final class PackedCard {
     // couleur de la carte
     private static int colorIndex(int pkCard) {
         assert isValid(pkCard);
-        return Bits32.extract(pkCard, 4, NBBITSFORCOLOUR);
+        return Bits32.extract(pkCard, STARTOFCOLOUR, NBBITSFORCOLOUR);
     }
 
     /**
@@ -95,7 +98,7 @@ public final class PackedCard {
     // de la carte
     private static int rankIndex(int pkCard) {
         assert isValid(pkCard);
-        return Bits32.extract(pkCard, 0, NBBITSFORRANK);
+        return Bits32.extract(pkCard, STARTOFRANK, NBBITSFORRANK);
     }
 
     /**

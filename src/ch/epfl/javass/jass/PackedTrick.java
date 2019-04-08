@@ -14,20 +14,30 @@ import ch.epfl.javass.jass.Card.Rank;
  * un pli empaquté 24 premiers bits (6 bits par carte 111111 si vide) 4 prochain
  * bits le numero du pli 2 prochain le premier joueur 2 dernier l'atout
  * 
- *de 0 à 23 les cartes du pli
- *de 24 à 27 l'index du pli
- *de 28 à 29 l'index du premier joueur
- *de 30 à 31 l'atout
+ * de 0 à 23 les cartes du pli de 24 à 27 l'index du pli de 28 à 29 l'index du
+ * premier joueur de 30 à 31 l'atout
  */
 public final class PackedTrick {
     /**
      * un pli empaqueté invalide
      */
-    public static int INVALID = Bits32.mask(0, 32);
+    public static final int INVALID = Bits32.mask(0, 32);
     // représente les 4 cartes vides d'un pli
-    private static int FOURINVALIDCARD = Bits32.mask(0, 24);
-    private static int BITSPERCARD = 6;
-    private static int CARDSPERTRICK=4;
+    private static final int FOURINVALIDCARD = Bits32.mask(0, 24);
+    private static final int BITSPERCARD = 6;
+    private static final int CARDSPERTRICK = 4;
+
+    private static final int STARTOFCARDS = 0;
+    private static final int BITSIZEOFCARDS = 24;
+
+    private static final int STARTOFTRICKINDEX = 24;
+    private static final int BITSIZEOFTRICKINDEX = 4;
+
+    private static final int STARTOFPLAYERINDEX = 28;
+    private static final int BITSIZEOFPLAYERINDEX = 2;
+
+    private static final int STARTOFTRUMP = 30;
+    private static final int BITSIZEOFTRUMP = 2;
 
     private PackedTrick() {
     }
@@ -45,12 +55,12 @@ public final class PackedTrick {
      */
     public static boolean isValid(int pkTrick) {
         // index du pli plus petit que 9
-        //9 pli par tout --> de 0 à 8
+        // 9 pli par tout --> de 0 à 8
         if (index(pkTrick) > 8) {
             return false;
         }
         // teste si aucune carte ne se retrouve à une place invalide
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < CARDSPERTRICK; i++) {
             int pkCard = cardsAt(pkTrick, i);
             // emplacement soit vide soit une carte valide
             if (pkCard != PackedCard.INVALID && !PackedCard.isValid(pkCard)) {
@@ -72,8 +82,11 @@ public final class PackedTrick {
             PlayerId firstPlayer) {
         int color = trump.ordinal();
         int indexPlayer = firstPlayer.ordinal();
-        int cardsAndIndex = Bits32.pack(FOURINVALIDCARD, 24, index, 4);
-        return Bits32.pack(cardsAndIndex, 28, indexPlayer, 2, color, 2);
+        int cardsAndIndex = Bits32.pack(FOURINVALIDCARD, BITSIZEOFCARDS, index,
+                BITSIZEOFTRICKINDEX);
+        int size = BITSIZEOFCARDS + BITSIZEOFTRICKINDEX;
+        return Bits32.pack(cardsAndIndex, size, indexPlayer,
+                BITSIZEOFPLAYERINDEX, color, BITSIZEOFTRUMP);
     }
 
     /**
@@ -129,7 +142,8 @@ public final class PackedTrick {
      */
     public static boolean isEmpty(int pkTrick) {
         assert isValid(pkTrick);
-        return Bits32.extract(pkTrick, 0, 24) == FOURINVALIDCARD;
+        return Bits32.extract(pkTrick, STARTOFCARDS,
+                BITSIZEOFCARDS) == FOURINVALIDCARD;
     }
 
     /**
@@ -153,7 +167,7 @@ public final class PackedTrick {
      */
     public static int size(int pkTrick) {
         assert isValid(pkTrick);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < CARDSPERTRICK; i++) {
             if (cardsAt(pkTrick, i) == PackedCard.INVALID) {
                 return i;
             }
@@ -170,12 +184,13 @@ public final class PackedTrick {
      */
     public static Color trump(int pkTrick) {
         assert isValid(pkTrick);
-        int color = Bits32.extract(pkTrick, 30, 2);
+        int color = Bits32.extract(pkTrick, STARTOFTRUMP, BITSIZEOFTRUMP);
         return Card.Color.ALL.get(color);
     }
 
     private static int indexFirstPalyer(int pkTrick) {
-        return Bits32.extract(pkTrick, 28, 2);
+        return Bits32.extract(pkTrick, STARTOFPLAYERINDEX,
+                BITSIZEOFPLAYERINDEX);
     }
 
     /**
@@ -201,7 +216,7 @@ public final class PackedTrick {
      * @return l'index du pli
      */
     public static int index(int pkTrick) {
-        return Bits32.extract(pkTrick, 24, 4);
+        return Bits32.extract(pkTrick, STARTOFTRICKINDEX, BITSIZEOFTRICKINDEX);
     }
 
     /**

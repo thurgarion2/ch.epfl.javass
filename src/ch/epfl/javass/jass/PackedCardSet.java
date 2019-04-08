@@ -17,13 +17,13 @@ import ch.epfl.javass.bits.Bits64;
  * @author erwan serandour (296100)
  *
  */
-//les 9 premiers bits représentent les 9 première cartes
-//bits: 0 à 15 le pique
-//bits: 16 à 31 le coeur
-//bits: 32 à 47 le carreau
-//bits: 48 à 61 le trèfle
+// les 9 premiers bits représentent les 9 première cartes
+// bits: 0 à 15 le pique
+// bits: 16 à 31 le coeur
+// bits: 32 à 47 le carreau
+// bits: 48 à 61 le trèfle
 public final class PackedCardSet {
-    //pour chaque couleur l'ensemble des cartes de cette couleurs
+    // pour chaque couleur l'ensemble des cartes de cette couleurs
     private final static long SUBSETCOLOROF[] = subsetOfColor();
 
     /**
@@ -36,22 +36,29 @@ public final class PackedCardSet {
      */
     public static final long ALL_CARDS = SUBSETCOLOROF[0] | SUBSETCOLOROF[1]
             | SUBSETCOLOROF[2] | SUBSETCOLOROF[3];
-    
-    //pour chaque carte toutes l'ensemble des cartes d'atout au dessus
+
+    // pour chaque carte toutes l'ensemble des cartes d'atout au dessus
     private static final long[][] TRUMPABOVE = trumpAbove();
     private static final int CARDPERCOLOR = 9;
-    
+    private static final int BITSPERCOLOR = 16;
+
+    private static final int BEGINSPADE = 0;
+    private static final int BEGINHEART = 16;
+    private static final int BEGINDIAMOND = 32;
+    private static final int BEGINCLUB = 48;
 
     private PackedCardSet() {
     }
 
     private static long[] subsetOfColor() {
-        long[] out = { Bits64.mask(0, CARDPERCOLOR),
-                Bits64.mask(16, CARDPERCOLOR), Bits64.mask(32, CARDPERCOLOR),
-                Bits64.mask(48, CARDPERCOLOR) };
+        long[] out = { Bits64.mask(BEGINSPADE, CARDPERCOLOR),
+                Bits64.mask(BEGINHEART, CARDPERCOLOR),
+                Bits64.mask(BEGINDIAMOND, CARDPERCOLOR),
+                Bits64.mask(BEGINCLUB, CARDPERCOLOR) };
         return out;
     }
-    //génère pour chaque carte toutes l'ensemble des cartes d'atout au dessus
+
+    // génère pour chaque carte toutes l'ensemble des cartes d'atout au dessus
     private static long[][] trumpAbove() {
         long[][] trumpAbove = new long[Card.Color.COUNT][Card.Rank.COUNT];
         for (int card = 0; card < size(ALL_CARDS); card++) {
@@ -82,7 +89,7 @@ public final class PackedCardSet {
      *         empaqueté valide
      */
     public static boolean isValid(long pkCardSet) {
-        //teste si tout les bits qui ne représente pas une carte sont à sero
+        // teste si tout les bits qui ne représente pas une carte sont à sero
         return (pkCardSet & (~ALL_CARDS)) == 0L;
     }
 
@@ -156,24 +163,25 @@ public final class PackedCardSet {
     public static int get(long pkCardSet, int index) {
         assert isValid(pkCardSet);
         assert index >= 0 && index < size(pkCardSet);
-        //nettoye le long de toutes les cartes précédant la carte d'index
+        // nettoye le long de toutes les cartes précédant la carte d'index
         for (int i = 0; i < index; i++) {
             pkCardSet ^= Long.lowestOneBit(pkCardSet);
         }
-        //la couleur dépant du nombre de zéro (0-15 pique..)
-        //le rang dépant du nombre de zéro après le début de la couleur
+        // la couleur dépant du nombre de zéro (0-15 pique..)
+        // le rang dépant du nombre de zéro après le début de la couleur
         int numberOfZero = Long.numberOfTrailingZeros(pkCardSet);
-        int color = numberOfZero / 16;
-        int rank = numberOfZero % 16;
+        int color = numberOfZero / BITSPERCOLOR;
+        int rank = numberOfZero % BITSPERCOLOR;
 
         return PackedCard.pack(Card.Color.ALL.get(color),
                 Card.Rank.ALL.get(rank));
 
     }
-    //retourne l'index d'une carte dans le l'ensemble de carte
+
+    // retourne l'index d'une carte dans le l'ensemble de carte
     private static int cardIndex(int pkCard) {
         assert PackedCard.isValid(pkCard);
-        return PackedCard.color(pkCard).ordinal() * 16
+        return PackedCard.color(pkCard).ordinal() * BITSPERCOLOR
                 + PackedCard.rank(pkCard).ordinal();
     }
 

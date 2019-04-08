@@ -14,7 +14,7 @@ import ch.epfl.javass.Preconditions;
  */
 
 public final class Card {
-    private int card;
+    private final int card;
 
     private Card(int packedCard) {
         card = packedCard;

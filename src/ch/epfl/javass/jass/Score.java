@@ -13,7 +13,7 @@ import ch.epfl.javass.bits.Bits64;
 
 public final class Score {
 
-    private long score;
+    private final long score;
 
     private Score(long packed) {
         score = packed;

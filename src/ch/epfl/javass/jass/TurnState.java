@@ -11,9 +11,9 @@ import ch.epfl.javass.jass.Card.Color;
 
 public final class TurnState {
 
-    private long score;
-    private long unplayedCards;
-    private int trick;
+    private final long score;
+    private final long unplayedCards;
+    private final int trick;
 
     private TurnState(long score, long unplayedCards, int trick) {
         this.score = score;
