@@ -26,6 +26,7 @@ import ch.epfl.javass.jass.TurnState;
  */
 public final class RemotePlayerServer {
    private Player underlyingPlayer;
+   private static final int PORT=5108;
    
    public RemotePlayerServer (Player underlyingPlayer) {
        this.underlyingPlayer=underlyingPlayer;
@@ -33,7 +34,7 @@ public final class RemotePlayerServer {
    
    public void run() {
        boolean end=false;
-       try (ServerSocket s0 = new ServerSocket(5108);
+       try (ServerSocket s0 = new ServerSocket(PORT);
                Socket s = s0.accept();
                BufferedReader r =
                  new BufferedReader(
