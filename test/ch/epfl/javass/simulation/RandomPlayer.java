@@ -1,6 +1,11 @@
-package ch.epfl.javass.jass;
+package ch.epfl.javass.simulation;
 
 import java.util.Random;
+
+import ch.epfl.javass.jass.Card;
+import ch.epfl.javass.jass.CardSet;
+import ch.epfl.javass.jass.Player;
+import ch.epfl.javass.jass.TurnState;
 
 public class RandomPlayer implements Player {
     private final Random rng;

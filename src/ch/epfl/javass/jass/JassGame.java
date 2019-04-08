@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * permet de jouer une partie de jass aléatoire
+ * génère une partie de jass
  * 
  * @author Jean.Daniel Rouveyrol(301480)
  *
@@ -26,16 +26,19 @@ public final class JassGame {
     private Random shuffleRng;
     private Random trumpRng;
 
-    private PlayerId firstPlayer=null;
+    private PlayerId firstPlayer = null;
     private TurnState turnState;
 
     /**
      * 
-     * @param rngSeed la graine utilisée par les méthode de la calsse Random
+     * @param rngSeed
+     *            la graine utilisée par les méthode de la calsse Random
      * 
-     * @param players relie les identfiants des joueurs aux joueurs
+     * @param players
+     *            relie les identfiants des joueurs aux joueurs
      * 
-     * @param playerNames relie les identifiants des joueurs aux joueurs
+     * @param playerNames
+     *            relie les identifiants des joueurs aux noms des joueurs
      */
     public JassGame(long rngSeed, Map<PlayerId, Player> players,
             Map<PlayerId, String> playerNames) {
@@ -49,7 +52,7 @@ public final class JassGame {
         for (PlayerId id : PlayerId.ALL) {
             players.get(id).setPlayers(id, playerNames);
         }
-        
+
         beginNewGame();
     }
 
@@ -69,8 +72,9 @@ public final class JassGame {
         }
         return false;
     }
-    
-    //créer une List<Card> représentant le jeu complet à partir de ALL_CARDS de CardSet
+
+    // créer une List<Card> représentant le jeu complet à partir de ALL_CARDS de
+    // CardSet
     private List<Card> deck() {
         List<Card> deck = new LinkedList();
         for (int i = 0; i < CardSet.ALL_CARDS.size(); i++) {
@@ -79,7 +83,7 @@ public final class JassGame {
         return deck;
     }
 
-    //mélange puis assigne les cartes du jeu à chaque joueur
+    // mélange puis assigne les cartes du jeu à chaque joueur
     private void distribution() {
         List<Card> deck = deck();
         Collections.shuffle(deck, shuffleRng);
@@ -92,7 +96,8 @@ public final class JassGame {
         }
     }
 
-    //détermine le premier joueur au début de la oertie (en fct du 7 de carreau)
+    // détermine le premier joueur au début de la oertie (en fct du 7 de
+    // carreau)
     private PlayerId firstPlayerStartOfGame() {
         for (PlayerId id : PlayerId.ALL) {
             if (hands.get(id).contains(BEGIN)) {
@@ -102,12 +107,12 @@ public final class JassGame {
         return PlayerId.PLAYER_1;
     }
 
-    //détermine le premier joueur au début d'un tour
+    // détermine le premier joueur au début d'un tour
     private PlayerId firstPlayerToStartTurn() {
         return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % 4);
     }
 
-    //détermine le nouvel atout
+    // détermine le nouvel atout
     private Card.Color newTrump() {
         int indexTrump = this.trumpRng.nextInt(4);
         Card.Color trump = Card.Color.ALL.get(indexTrump);
@@ -117,29 +122,29 @@ public final class JassGame {
         return trump;
     }
 
-    //met à jour la connaissance du pli de chaque joeur
+    // met à jour la connaissance du pli de chaque joeur
     private void updateTrick() {
         for (Player each : players.values()) {
             each.updateTrick(turnState.trick());
         }
     }
 
-    //met à jour le score de chaque joueur
+    // met à jour le score de chaque joueur
     private void updateScore(Score score) {
         for (Player each : players.values()) {
             each.updateScore(score);
         }
     }
-    //débute une nouvelle partie
+
+    // débute une nouvelle partie
     private void beginNewGame() {
         distribution();
-       firstPlayer = firstPlayerStartOfGame();
-        turnState = TurnState.initial(newTrump(), Score.INITIAL,
-                firstPlayer);
+        firstPlayer = firstPlayerStartOfGame();
+        turnState = TurnState.initial(newTrump(), Score.INITIAL, firstPlayer);
         updateScore(turnState.score());
     }
 
-    //débute un nouveau tour
+    // débute un nouveau tour
     private void beginNewTurn() {
         distribution();
         firstPlayer = firstPlayerToStartTurn();
@@ -147,14 +152,14 @@ public final class JassGame {
                 firstPlayer);
         updateScore(turnState.score());
     }
-    
-    //rammasse le pli courant
+
+    // rammasse le pli courant
     private void collect() {
         turnState = turnState.withTrickCollected();
         updateScore(turnState.score());
     }
-    
-    //fait jouer un joeur
+
+    // fait jouer un joeur
     private void play(PlayerId playerId) {
         Player player = players.get(playerId);
         CardSet hand = hands.get(playerId);
@@ -166,8 +171,8 @@ public final class JassGame {
         player.updateHand(hands.get(playerId));
         updateTrick();
     }
-    
-    //fini la partie
+
+    // fini la partie
     private void endGame() {
         Score score = turnState.score().nextTurn();
         int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
@@ -191,14 +196,14 @@ public final class JassGame {
         // collecte le trick précédant
         if (turnState.trick().isFull()) {
             collect();
-            //teste si le pli collecté met fin à la partie 
-            if(isGameOver()) {
+            // teste si le pli collecté met fin à la partie
+            if (isGameOver()) {
                 endGame();
                 return;
             }
         }
-        
-        //vérifie si il faut commencer un nouveau tour ou pas
+
+        // vérifie si il faut commencer un nouveau tour ou pas
         if (turnState.isTerminal()) {
             beginNewTurn();
         }

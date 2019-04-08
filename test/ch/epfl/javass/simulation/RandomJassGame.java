@@ -1,9 +1,15 @@
-package ch.epfl.javass.jass;
+package ch.epfl.javass.simulation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import ch.epfl.javass.jass.JassGame;
+import ch.epfl.javass.jass.MctsPlayer;
+import ch.epfl.javass.jass.Player;
+import ch.epfl.javass.jass.PlayerId;
+import ch.epfl.javass.jass.TeamId;
 /**
  * plusieurs méthodes utiles pour empaqueté un pli dans un int
  * 

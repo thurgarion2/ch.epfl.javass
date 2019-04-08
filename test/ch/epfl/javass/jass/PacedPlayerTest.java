@@ -4,6 +4,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import ch.epfl.javass.simulation.RandomPlayer;
+
 class DelayPlayer extends RandomPlayer{
     private double timeToPlay;
     public DelayPlayer(long rngSeed, double timeToPlay) {

@@ -3,14 +3,14 @@ package ch.epfl.javass.jass;
 import ch.epfl.javass.bits.Bits32;
 
 /**
- * des méthodes utiles pour empaqueté une carte dans un int 
+ * des méthodes utiles pour empaqueté une carte dans un int
  * 
  * @author Jean.Daniel Rouveyrol(301480)
  */
-//représentation d'une carte empaquetée
-//les bits de 0 à 3 le rang
-//de 4 à 5 la couleur
-//le reste que des 0
+// représentation d'une carte empaquetée
+// les bits de 0 à 3 le rang
+// de 4 à 5 la couleur
+// le reste que des 0
 public final class PackedCard {
     private PackedCard() {
     }
@@ -23,22 +23,21 @@ public final class PackedCard {
     // tableau contenant les points la cartes (atout ou non)
     private static final int trumpPoints[] = { 0, 0, 0, 14, 10, 20, 3, 4, 11 };
     private static final int normalPoints[] = { 0, 0, 0, 0, 10, 2, 3, 4, 11 };
-    //quelques constantes
+    // quelques constantes
     private static int NBBITSFORRANK = 4;
     private static int NBBITSFORCOLOUR = 2;
 
-
     /**
-     * véfifie que l'entier représentant la carte est correctement formé
+     * vérifie que l'entier représentant la carte est correctement formé
      * 
-     * @param pkCard 
-     * 				 la carte empaquetée
+     * @param pkCard
+     *            la carte empaquetée
      * 
      * @return vrai, si le format entier de la carte est valide faux, si le
      *         format entier de la carte est invalide
      */
     public static boolean isValid(int pkCard) {
-        //tout le reste des bits est à 0
+        // tout le reste des bits est à 0
         if (Bits32.extract(pkCard, 6, Integer.SIZE - 6) != 0) {
             return false;
         }
@@ -52,7 +51,7 @@ public final class PackedCard {
     }
 
     /**
-     * empacte une carte dans le format d'entier en partant du rang et de la
+     * empaquete une carte dans le format d'entier en partant du rang et de la
      * couleur de la carte
      * 
      * @param r
@@ -66,7 +65,8 @@ public final class PackedCard {
     public static int pack(Card.Color c, Card.Rank r) {
         int indexRank = r.ordinal();
         int indexColor = c.ordinal();
-        int pkCard = Bits32.pack(indexRank, NBBITSFORRANK, indexColor, NBBITSFORCOLOUR);
+        int pkCard = Bits32.pack(indexRank, NBBITSFORRANK, indexColor,
+                NBBITSFORCOLOUR);
         assert isValid(pkCard);
         return pkCard;
     }
@@ -75,7 +75,7 @@ public final class PackedCard {
     // couleur de la carte
     private static int colorIndex(int pkCard) {
         assert isValid(pkCard);
-        return Bits32.extract(pkCard,4, NBBITSFORCOLOUR);
+        return Bits32.extract(pkCard, 4, NBBITSFORCOLOUR);
     }
 
     /**
@@ -104,8 +104,7 @@ public final class PackedCard {
      * @param pkCard
      *            carte empaquetée
      * 
-     * @return rang 
-     * 				de la carte
+     * @return rang de la carte
      */
     public static Card.Rank rank(int pkCard) {
         assert isValid(pkCard);
@@ -125,7 +124,7 @@ public final class PackedCard {
 
     /**
      * regarde si la première carte est meilleure que la seconde (format
-     * empaueté pour les deux cartes)
+     * empaqueté pour les deux cartes)
      * 
      * @param trump
      *            couleur de l'atout
@@ -164,7 +163,7 @@ public final class PackedCard {
     }
 
     /**
-     * calcule les points d'une carte
+     * retourne la valeur en points d'une carte
      * 
      * @param trump
      *            couleur de l'atout

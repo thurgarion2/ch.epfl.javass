@@ -1,9 +1,17 @@
-package ch.epfl.javass.jass;
+package ch.epfl.javass.simulation;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import ch.epfl.javass.jass.Card;
+import ch.epfl.javass.jass.CardSet;
+import ch.epfl.javass.jass.Player;
+import ch.epfl.javass.jass.PlayerId;
+import ch.epfl.javass.jass.Score;
+import ch.epfl.javass.jass.TeamId;
+import ch.epfl.javass.jass.Trick;
+import ch.epfl.javass.jass.TurnState;
 import ch.epfl.javass.jass.Card.Color;
 
 public final class PrintingPlayer implements Player {

@@ -5,18 +5,16 @@ import ch.epfl.javass.bits.Bits64;
 
 /**
  * 
- * modélise le score de jass, contient le score du pli courant, du tour courant et de la partie
+ * représante le score d'une partie de jass
  * 
  * @author Jean.Daniel Rouveyrol (301480)
  *
  */
 
-
 public final class Score {
 
     private long score;
 
-    
     private Score(long packed) {
         score = packed;
     }
@@ -27,13 +25,15 @@ public final class Score {
     public static final Score INITIAL = ofPacked(PackedScore.INITIAL);
 
     /**
-     * créer un Score à partir d'une version empaquetée
+     * créer un score à partir d'une version empaquetée
      * 
-     * @param packed score empaqueté
+     * @param packed
+     *            score empaqueté
      * 
-     * @return Score
+     * @return le score généré à partir de sa version empaquetée
      * 
-     * @throws IllegalArgumentException si la version empauetée n'est pas valide
+     * @throws IllegalArgumentException
+     *             si la version empauetée n'est pas valide
      */
     public static Score ofPacked(long packed) throws IllegalArgumentException {
         Preconditions.checkArgument(PackedScore.isValid(packed));
@@ -41,7 +41,8 @@ public final class Score {
     }
 
     /**
-  	 *
+     * retourne le score sous forme empaquetée
+     *
      * @return le score sous forme empaquetée
      */
     public long packed() {
@@ -49,37 +50,50 @@ public final class Score {
     }
 
     /**
-     * @param t identifiant d'une équipe
+     * retourne le nombre de pli gagné par l'équipe donnée (au tour courant)
      * 
-     * @return le nombre de plis du tour courant de l'équipe passée en argument
+     * @param t
+     *            l'identifiant de l'équipe
+     * 
+     * @return le nombre de pli gagné par l'équipe donnée (au tour courant)
      */
     public int turnTricks(TeamId t) {
         return PackedScore.turnTricks(score, t);
     }
 
     /**
+     * retourne le nombre de points (durant le tour) gagné par l'équipe donnée
      * 
-     * @param t identifiant d'une équipe
+     * @param t
+     *            l'identifiant de l'équipe
      * 
-     * @return le nombre de points du tour courant de l'équipe passée en argument
+     * @return le nombre de points (durant le tour) gagné par l'équipe donnée
      */
     public int turnPoints(TeamId t) {
         return PackedScore.turnPoints(score, t);
     }
 
     /**
-     * @param t identifiant d'une équipe
+     * retourne le nombre de points (durant la partie) gagné par l'équipe donnée
      * 
-     * @return le nombre de points total de l'équipe passée en argument
+     * @param t
+     *            l'identifiant de l'équipe
+     * 
+     * @return le nombre de points (durant la partie) gagné par l'équipe donnée
      */
     public int gamePoints(TeamId t) {
         return PackedScore.gamePoints(score, t);
     }
 
     /**
-     * @param t identifiant d'une équipe
+     * retourne le nombre de points gagné au totale durant la partie par
+     * l'équipe donnée (ceux du tour + partie)
      * 
-     * @return le nombre de points total de l'équipe passée en argument
+     * @param t
+     *            l'identifiant de l'équipe
+     * 
+     * @return le nombre de points gagné au totale durant la partie par l'équipe
+     *         donnée (ceux du tour + partie)
      */
     public int totalPoints(TeamId t) {
         return PackedScore.totalPoints(score, t);
@@ -88,13 +102,17 @@ public final class Score {
     /**
      * met à jour les points en fonction de l'équipe gagnante et du dernier plis
      * 
-     * @param winningTeam équipe ayant gagné le pli
+     * @param winningTeam
+     *            équipe ayant gagné le pli
      * 
-     * @param trickPoints nobmre de point du pli
+     * @param trickPoints
+     *            nobmre de point du pli
      * 
-     * @return un nouveau Score
+     * @return le score mis à jour
      * 
-     * @throws IllegalArgumentException si le nombre de point du pli est invalide, c-t-d. qu'il est strictement plus petit que 0
+     * @throws IllegalArgumentException
+     *             si le nombre de point du pli est invalide, c-t-d. qu'il est
+     *             strictement plus petit que 0
      */
     public Score withAdditionalTrick(TeamId winningTeam, int trickPoints)
             throws IllegalArgumentException {
@@ -106,11 +124,11 @@ public final class Score {
     }
 
     /**
-     * met à jour les points de la prtie avec les points du dernier tour et
+     * met à jour les points de la partie avec les points du dernier tour et
      * remets à 0 le nombre de plis et les points du tour courant de chaque
      * équipe
      * 
-     * @return un nouveau Score
+     * @return le score mis à jour pour le début du prochain tour
      */
     public Score nextTurn() {
         return ofPacked(PackedScore.nextTurn(score));

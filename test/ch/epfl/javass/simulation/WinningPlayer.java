@@ -1,4 +1,4 @@
-package ch.epfl.javass.jass;
+package ch.epfl.javass.simulation;
 import java.util.Map;
 
 import ch.epfl.javass.jass.*;

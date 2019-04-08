@@ -5,14 +5,14 @@ import ch.epfl.javass.jass.Card.Color;
 
 /**
  * 
- * modéilse un pli de jass
+ * représante un pli du jass
  * 
  * @author Jean.Daniel Rouveyrol (301480)
  *
  */
 public final class Trick {
     /**
-     * plis invalide (constante)
+     * plis invalide
      */
     public static final Trick INVALID = new Trick(PackedTrick.INVALID);
 
@@ -25,24 +25,29 @@ public final class Trick {
     /**
      * créer un pli vide, initaliser avec l'atout et le premier joueur
      * 
-     * @param trump l'atout
+     * @param trump
+     *            l'atout
      * 
-     * @param firstPlayer le premier joueur
+     * @param firstPlayer
+     *            le premier joueur
      * 
-     * @return un nouveau pli vide sachant l'atout et le premier joueur de type Trick
+     * @return un nouveau pli vide sachant l'atout et le premier joueur de type
+     *         Trick
      */
     public static Trick firstEmpty(Color trump, PlayerId firstPlayer) {
         return new Trick(PackedTrick.firstEmpty(trump, firstPlayer));
     }
 
     /**
-     * créer un Trick à partir d'un pli empaqueté
+     * créer un pli à partir d'un pli empaqueté
      * 
-     * @param packed pli empaqueté
+     * @param packed
+     *            pli empaqueté
      * 
-     * @return un nouveau pli
+     * @return un pli généré à partir du pli empaqueté
      * 
-     * @throws IllegalArgumentException si le plis empaqueté en paramètre est invalide
+     * @throws IllegalArgumentException
+     *             si le plis empaqueté en paramètre est invalide
      */
     public static Trick ofPacked(int packed) throws IllegalArgumentException {
         if (!PackedTrick.isValid(packed)) {
@@ -52,6 +57,8 @@ public final class Trick {
     }
 
     /**
+     * retourne la version empaquetée d'un pli
+     * 
      * @return la version empaquetée d'un pli
      */
     public int packed() {
@@ -59,10 +66,13 @@ public final class Trick {
     }
 
     /**
+     * retourne le pli vide suivant celui-ci
+     * 
      * @return le pli vide suivant celui-ci sachant l'atout et le vainqueur du
      *         pli courant (le premier joueur du prochain pli suivant)
-     *         
-     * @throws IllegalStateException si le pli donné n'est pas plein
+     * 
+     * @throws IllegalStateException
+     *             si le pli donné n'est pas plein
      */
     public Trick nextEmpty() throws IllegalStateException {
         if (!this.isFull()) {
@@ -72,30 +82,35 @@ public final class Trick {
     }
 
     /**
-     * @return vrai si le pli est vide, 
-     * 		   faux sinon
+     * retourne si le pli est vide
+     * 
+     * @return vrai si le pli est vide, faux sinon
      */
     public boolean isEmpty() {
         return PackedTrick.isEmpty(this.pkTrick);
     }
 
     /**
-     * @return vrai si le pli est plein, 
-     * 		   faux sinon
+     * retourne si le pli est plein
+     * 
+     * @return vrai si le pli est plein, faux sinon
      */
     public boolean isFull() {
         return PackedTrick.isFull(this.pkTrick);
     }
 
     /**
-     * @return vrai si le pli est le dernier pli du tour courant, 
-     * 		   faux sinon
+     * retourne si le pli est le dernier du tour
+     * 
+     * @return vrai si le pli est le dernier pli du tour courant, faux sinon
      */
     public boolean isLast() {
         return PackedTrick.isLast(this.pkTrick);
     }
 
     /**
+     * retourne le nombre de carte que le plis contient
+     * 
      * @return le nombre de carte que le plis contient (la taille du pli)
      */
     public int size() {
@@ -103,6 +118,8 @@ public final class Trick {
     }
 
     /**
+     * retourne la couleur de l'atout du pli
+     * 
      * @return la couleur de l'atout du pli
      */
     public Card.Color trump() {
@@ -110,6 +127,8 @@ public final class Trick {
     }
 
     /**
+     * retourne l'index du pli
+     * 
      * @return l'index du pli
      */
     public int index() {
@@ -119,39 +138,47 @@ public final class Trick {
     /**
      * donne l'identifiant du joueur à l'index donné
      * 
-     * @param index position du joueur dans le pli
+     * @param index
+     *            position du joueur dans le pli
      * 
-     * @return le joueur d'index donné 
+     * @return le joueur d'index donné
      * 
-     * @throws IndexOutOfBoundsException si l'index est invalide (index vlide : 0 <= index < 4)
+     * @throws IndexOutOfBoundsException
+     *             si l'index est invalide (index vlide : 0 <= index < 4)
      */
     public PlayerId player(int index) throws IndexOutOfBoundsException {
-        Preconditions.checkIndex(index,4);
+        Preconditions.checkIndex(index, 4);
         return PackedTrick.player(this.pkTrick, index);
     }
 
     /**
      * donne la carte de l'index donné
      * 
-     * @param index position de la carte donné dans le pli
+     * @param index
+     *            position de la carte donné dans le pli
      * 
      * @return la carte du pli à l'index donné (supposée avoir été posée)
-     *         
-     * @throws IndexOutOfBoundsException si l index est invalide (index valide : 0 <= index < taille du pli)
+     * 
+     * @throws IndexOutOfBoundsException
+     *             si l index est invalide (index valide : 0 <= index < taille
+     *             du pli)
      */
     public Card card(int index) throws IndexOutOfBoundsException {
-        Preconditions.checkIndex(index,this.size());
+        Preconditions.checkIndex(index, this.size());
         return Card.ofPacked(PackedTrick.card(this.pkTrick, index));
     }
 
     /**
      * ajoute une carte à un pli
      * 
-     * @param c carte à ajouter 
+     * @param c
+     *            la carte à ajouter
      * 
-     * @return retourne un pli identique à celui donné, mais auquel la carte donnée a été ajoutée
-     *         
-     * @throws IllegalStateException si le pli est plein
+     * @return retourne un pli identique à celui donné, mais auquel la carte
+     *         donnée a été ajoutée
+     * 
+     * @throws IllegalStateException
+     *             si le pli est plein
      */
     public Trick withAddedCard(Card c) throws IllegalStateException {
         if (this.isFull()) {
@@ -161,11 +188,12 @@ public final class Trick {
     }
 
     /**
-     * donne la couleur demandée dans le pli
+     * donne la couleur demandée (de base) dans le pli
      * 
      * @return la couleur de base du pli, la couleur de sa première carte
      * 
-     * @throws IllegalStateException si le pli est vide
+     * @throws IllegalStateException
+     *             si le pli est vide
      */
     public Card.Color baseColor() throws IllegalStateException {
         if (this.isEmpty()) {
@@ -175,13 +203,17 @@ public final class Trick {
     }
 
     /**
-     * détermine l'enemble de carte(s) jouable(s) par un joueur étant donné sa main
+     * détermine l'enemble de carte(s) jouable(s) par un joueur étant donné sa
+     * main
      * 
-     * @param hand main d'un joueur
+     * @param hand
+     *            main d'un joueur
      * 
-     * @return le sous-ensemble des cartes de la main (hand) qui peuvent être jouées comme prochaine carte du pli
+     * @return le sous-ensemble des cartes de la main (hand) qui peuvent être
+     *         jouées comme prochaine carte du pli
      * 
-     * @throws IllegalStateException si le pli est plein
+     * @throws IllegalStateException
+     *             si le pli est plein
      */
     public CardSet playableCards(CardSet hand) throws IllegalStateException {
         if (this.isFull()) {
@@ -192,6 +224,8 @@ public final class Trick {
     }
 
     /**
+     * retourne le nombre de points du pli
+     * 
      * @return le nombre de points du pli, en tenant compte des « 5 de der »
      */
     public int points() {
@@ -203,7 +237,8 @@ public final class Trick {
      * 
      * @return l'identifiant du joueur menant le pli
      * 
-     * @throws IllegalStateException si le pli est vide
+     * @throws IllegalStateException
+     *             si le pli est vide
      */
     public PlayerId winningPlayer() throws IllegalStateException {
         if (this.isEmpty()) {
