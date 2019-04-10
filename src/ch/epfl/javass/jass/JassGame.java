@@ -18,13 +18,13 @@ public final class JassGame {
     private final static Card BEGIN = Card.of(Card.Color.DIAMOND,
             Card.Rank.SEVEN);
 
-    private Map<PlayerId, Player> players;
-    private Map<PlayerId, String> playerNames;
+    private final Map<PlayerId, Player> players;
+    private final Map<PlayerId, String> playerNames;
 
     private Map<PlayerId, CardSet> hands;
 
-    private Random shuffleRng;
-    private Random trumpRng;
+    private final Random shuffleRng;
+    private final Random trumpRng;
 
     private PlayerId firstPlayer = null;
     private TurnState turnState;
@@ -50,7 +50,7 @@ public final class JassGame {
         this.playerNames = Collections.unmodifiableMap(playerNames);
 
         for (PlayerId id : PlayerId.ALL) {
-            players.get(id).setPlayers(id, playerNames);
+            players.get(id).setPlayers(id, this.playerNames);
         }
 
         beginNewGame();
@@ -87,10 +87,11 @@ public final class JassGame {
     private void distribution() {
         List<Card> deck = deck();
         Collections.shuffle(deck, shuffleRng);
-
+        int size = Jass.HAND_SIZE;
         for (PlayerId id : PlayerId.ALL) {
             int index = id.ordinal();
-            CardSet hand = CardSet.of(deck.subList(index * 9, (index + 1) * 9));
+            CardSet hand = CardSet
+                    .of(deck.subList(index * size, (index + 1) * size));
             hands.put(id, hand);
             players.get(id).updateHand(hand);
         }
@@ -109,12 +110,12 @@ public final class JassGame {
 
     // détermine le premier joueur au début d'un tour
     private PlayerId firstPlayerToStartTurn() {
-        return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % 4);
+        return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % PlayerId.COUNT);
     }
 
     // détermine le nouvel atout
     private Card.Color newTrump() {
-        int indexTrump = this.trumpRng.nextInt(4);
+        int indexTrump = this.trumpRng.nextInt(Card.Color.COUNT);
         Card.Color trump = Card.Color.ALL.get(indexTrump);
         for (Player each : players.values()) {
             each.setTrump(trump);

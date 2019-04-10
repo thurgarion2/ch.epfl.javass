@@ -2,6 +2,8 @@ package ch.epfl.javass.jass;
 
 import java.util.List;
 
+import ch.epfl.javass.Preconditions;
+
 /**
  * modélise un ensmble de carte
  * 
@@ -53,11 +55,8 @@ public final class CardSet {
      * @throws IllegalArgumentException
      *             si la version empaquetée passée en argument est invalide
      */
-    public static CardSet ofPacked(long packed)
-            throws IllegalArgumentException {
-        if (!PackedCardSet.isValid(packed)) {
-            throw new IllegalArgumentException();
-        }
+    public static CardSet ofPacked(long packed){
+        Preconditions.checkArgument(PackedCardSet.isValid(packed));
         return new CardSet(packed);
     }
 

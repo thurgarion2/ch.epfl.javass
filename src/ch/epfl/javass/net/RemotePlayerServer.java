@@ -25,7 +25,7 @@ import ch.epfl.javass.jass.TurnState;
  *
  */
 public final class RemotePlayerServer {
-   private Player underlyingPlayer;
+   private final Player underlyingPlayer;
    private static final int PORT=5108;
    
    public RemotePlayerServer (Player underlyingPlayer) {

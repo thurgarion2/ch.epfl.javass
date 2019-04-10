@@ -1,5 +1,6 @@
 package ch.epfl.javass.jass;
 
+import ch.epfl.javass.Preconditions;
 import ch.epfl.javass.jass.Card.Color;
 
 /**
@@ -40,7 +41,8 @@ public final class TurnState {
     }
 
     /**
-     * retourne l'état d'un tour dont les composantes (empaquetées) sont celles données
+     * retourne l'état d'un tour dont les composantes (empaquetées) sont celles
+     * données
      * 
      * @param pkScore
      *            le score courant empqueté
@@ -55,11 +57,10 @@ public final class TurnState {
      */
     public static TurnState ofPackedComponents(long pkScore,
             long pkUnplayedCards, int pkTrick) {
-        if (!PackedScore.isValid(pkScore)
-                || !PackedCardSet.isValid(pkUnplayedCards)
-                || !PackedTrick.isValid(pkTrick)) {
-            throw new IllegalArgumentException();
-        }
+        Preconditions.checkArgument(PackedScore.isValid(pkScore)
+                && PackedCardSet.isValid(pkUnplayedCards)
+                && PackedTrick.isValid(pkTrick));
+
         return new TurnState(pkScore, pkUnplayedCards, pkTrick);
     }
 
@@ -167,8 +168,8 @@ public final class TurnState {
      * retourne l'état correspondant après que le pli courant ait été ramassé
      * 
      * @return l'état correspondant après que le pli courant aie été ramassé
-     * @throws si
-     *             le pli courant n'est pas plein
+     * @throws IllegalStateException
+     *             si le pli courant n'est pas plein
      */
     public TurnState withTrickCollected() {
         if (!PackedTrick.isFull(trick)) {

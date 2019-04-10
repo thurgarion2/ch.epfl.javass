@@ -35,7 +35,7 @@ public final class Score {
      * @throws IllegalArgumentException
      *             si la version empauetée n'est pas valide
      */
-    public static Score ofPacked(long packed) throws IllegalArgumentException {
+    public static Score ofPacked(long packed) {
         Preconditions.checkArgument(PackedScore.isValid(packed));
         return new Score(packed);
     }
@@ -114,11 +114,8 @@ public final class Score {
      *             si le nombre de point du pli est invalide, c-t-d. qu'il est
      *             strictement plus petit que 0
      */
-    public Score withAdditionalTrick(TeamId winningTeam, int trickPoints)
-            throws IllegalArgumentException {
-        if (trickPoints < 0) {
-            throw new IllegalArgumentException();
-        }
+    public Score withAdditionalTrick(TeamId winningTeam, int trickPoints) {
+        Preconditions.checkArgument(trickPoints >= 0);
         return ofPacked(PackedScore.withAdditionalTrick(score, winningTeam,
                 trickPoints));
     }
