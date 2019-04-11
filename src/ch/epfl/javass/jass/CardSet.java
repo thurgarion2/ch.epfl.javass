@@ -137,7 +137,7 @@ public final class CardSet {
 	 * définit l'ensemble de cartes comlémentaire, l'ensemble des cartes qui
 	 * n'appartiennent pas au premier ensemble
 	 * 
-	 * @return un nouvel ensemble - complémentaire au premier
+	 * @return un nouvel ensemble   complémentaire au premier
 	 */
 	public CardSet complement() {
 		return new CardSet(PackedCardSet.complement(cardSet));
