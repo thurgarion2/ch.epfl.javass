@@ -167,6 +167,7 @@ public final class JassGame {
 		int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
 		int ptTeam2 = score.totalPoints(TeamId.TEAM_2);
 		TeamId winning = ptTeam1 >= Jass.WINNING_POINTS ? TeamId.TEAM_1 : TeamId.TEAM_2;
+		
 		for (Player each : players.values()) {
 			each.setWinningTeam(winning);
 		}

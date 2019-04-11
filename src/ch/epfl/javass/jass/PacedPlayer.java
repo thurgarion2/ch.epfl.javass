@@ -13,71 +13,68 @@ import ch.epfl.javass.jass.Card.Color;
 
 public final class PacedPlayer implements Player {
 
-    private final Player underlyingPlayer;
-    // en milli seconde
-    private final double minTime;
-    // le nombre par lequel multiplier pour convertir le temps en secondes en
-    // milli secondes
-    private static final int CONVERSION = 1000;
+	private final Player underlyingPlayer;
 
-    /**
-     *
-     * @param underlyingPlayer
-     *            le joeur sous-jassant
-     * 
-     * @param minTime
-     *            temps minimum que le joueur doit mettre avant de jouer (en
-     *            seconde)
-     */
-    public PacedPlayer(Player underlyingPlayer, double minTime) {
-        this.underlyingPlayer = underlyingPlayer;
-        this.minTime = minTime * CONVERSION;
-    }
+	// en milli seconde
+	private final double minTime;
+	
+	// le nombre par lequel multiplier pour convertir le temps en secondes en
+	// milli secondes
+	private static final int CONVERSION = 1000;
 
-    @Override
-    public Card cardToPlay(TurnState state, CardSet hand) {
-        double initTime = System.currentTimeMillis();
-        Card result = this.underlyingPlayer.cardToPlay(state, hand);
+	/**
+	 * @param underlyingPlayer le joeur sous-jassant
+	 * 
+	 * @param minTime   temps minimum que le joueur doit mettre avant de jouer (en seconde)
+	 */
+	public PacedPlayer(Player underlyingPlayer, double minTime) {
+		this.underlyingPlayer = underlyingPlayer;
+		this.minTime = minTime * CONVERSION;
+	}
 
-        double deltaTime = System.currentTimeMillis() - initTime;
-        if (deltaTime < minTime) {
-            try {
-                Thread.sleep((long) (minTime - deltaTime));
-            } catch (InterruptedException e) {
-            }
-        }
-        return result;
-    }
+	@Override
+	public Card cardToPlay(TurnState state, CardSet hand) {
+		double initTime = System.currentTimeMillis();
+		Card result = this.underlyingPlayer.cardToPlay(state, hand);
 
-    @Override
-    public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-        underlyingPlayer.setPlayers(ownId, playerNames);
-    }
+		double deltaTime = System.currentTimeMillis() - initTime;
+		if (deltaTime < minTime) {
+			try {
+				Thread.sleep((long) (minTime - deltaTime));
+			} catch (InterruptedException e) {
+			}
+		}
+		return result;
+	}
 
-    @Override
-    public void setTrump(Color trump) {
-        underlyingPlayer.setTrump(trump);
-        ;
-    }
+	@Override
+	public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
+		underlyingPlayer.setPlayers(ownId, playerNames);
+	}
 
-    @Override
-    public void updateHand(CardSet newHand) {
-        underlyingPlayer.updateHand(newHand);
-    }
+	@Override
+	public void setTrump(Color trump) {
+		underlyingPlayer.setTrump(trump);
+	}
 
-    @Override
-    public void updateTrick(Trick newTrick) {
-        underlyingPlayer.updateTrick(newTrick);
-    }
+	@Override
+	public void updateHand(CardSet newHand) {
+		underlyingPlayer.updateHand(newHand);
+	}
 
-    @Override
-    public void updateScore(Score score) {
-        underlyingPlayer.updateScore(score);
-    }
+	@Override
+	public void updateTrick(Trick newTrick) {
+		underlyingPlayer.updateTrick(newTrick);
+	}
 
-    @Override
-    public void setWinningTeam(TeamId winningTeam) {
-        underlyingPlayer.setWinningTeam(winningTeam);
-    }
+	@Override
+	public void updateScore(Score score) {
+		underlyingPlayer.updateScore(score);
+	}
+
+	@Override
+	public void setWinningTeam(TeamId winningTeam) {
+		underlyingPlayer.setWinningTeam(winningTeam);
+	}
 
 }
