@@ -21,39 +21,39 @@ public final class PackedScore {
      */
     public static final long INITIAL = 0;
 
-    private static final int STARTOFTEAM1 = 0;
-    private static final int STARTOFTEAM2 = 32;
-    private static final int NBBITSPERTEAM = Integer.SIZE;
+    private static final int START_OF_TEAM1 = 0;
+    private static final int START_OF_TEAM2 = 32;
+    private static final int NB_BITS_PER_TEAM = Integer.SIZE;
 
-    private static final int BITSIZEOFTRICKS = 4;
-    private static final int BITSIZEOFTURN = 9;
-    private static final int BITSIZEOFGAME = 11;
+    private static final int BIT_SIZE_OF_TRICKS = 4;
+    private static final int BIT_SIZE_OF_TURN = 9;
+    private static final int BIT_SIZE_OF_GAME = 11;
 
-    private static final int STARTOFTRICK = 0;
-    private static final int STARTOFTURN = BITSIZEOFTRICKS + STARTOFTRICK;
-    private static final int STARTOFGAME = STARTOFTURN + BITSIZEOFTURN;
+    private static final int START_OF_TRICK = 0;
+    private static final int START_OF_TURN = BIT_SIZE_OF_TRICKS + START_OF_TRICK;
+    private static final int START_OF_GAME = START_OF_TURN + BIT_SIZE_OF_TURN;
 
-    private static final int MAXTRICKPERTURN = Jass.TRICKS_PER_TURN;
-    private static final int MAXPOINTPERTURN = 257;
-    private static final int MAXPOINTPERGAME = 2000;
+    private static final int MAX_TRICK_PER_TURN = Jass.TRICKS_PER_TURN;
+    private static final int MAX_POINT_PER_TURN = 257;
+    private static final int MAX_POINT_PER_GAME = 2000;
 
     private PackedScore() {
     }
 
     // teste si le score d'une équipe est correct sur 32 bits
     private static boolean isValid(int pkScore) {
-        if (Bits32.extract(pkScore, STARTOFTRICK,BITSIZEOFTRICKS) 
-                > MAXTRICKPERTURN) {
+        if (Bits32.extract(pkScore, START_OF_TRICK,BIT_SIZE_OF_TRICKS) 
+                > MAX_TRICK_PER_TURN) {
             return false;
         }
 
-        if (Bits32.extract(pkScore, STARTOFTURN,BITSIZEOFTURN) 
-                > MAXPOINTPERTURN) {
+        if (Bits32.extract(pkScore, START_OF_TURN,BIT_SIZE_OF_TURN) 
+                > MAX_POINT_PER_TURN) {
             return false;
         }
 
-        if (Bits32.extract(pkScore, STARTOFGAME,BITSIZEOFGAME) 
-                > MAXPOINTPERGAME) {
+        if (Bits32.extract(pkScore, START_OF_GAME,BIT_SIZE_OF_GAME) 
+                > MAX_POINT_PER_GAME) {
             return false;
         }
         // le 8 dernier bits sont nuls
@@ -74,18 +74,18 @@ public final class PackedScore {
      *         (pli<=9,point<=257,le totale des points<=2000)
      */
     public static boolean isValid(long pkScore) {
-        int B0To31 = (int) Bits64.extract(pkScore, STARTOFTEAM1, NBBITSPERTEAM);
-        int B32To63 = (int) Bits64.extract(pkScore, STARTOFTEAM2, NBBITSPERTEAM);
+        int B0To31 = (int) Bits64.extract(pkScore, START_OF_TEAM1, NB_BITS_PER_TEAM);
+        int B32To63 = (int) Bits64.extract(pkScore, START_OF_TEAM2, NB_BITS_PER_TEAM);
         return isValid(B0To31) && isValid(B32To63);
     }
 
     
     private static int oneTeamScorePk(int turnTricks, int turnPoints, int gamePoints) {
-        assert (turnTricks >= 0 && turnTricks <= MAXTRICKPERTURN);
-        assert (turnPoints >= 0 && turnPoints <= MAXPOINTPERTURN);
-        assert (gamePoints >= 0 && gamePoints <= MAXPOINTPERGAME);
-        return Bits32.pack(turnTricks, BITSIZEOFTRICKS, turnPoints,
-                BITSIZEOFTURN, gamePoints, BITSIZEOFGAME);
+        assert (turnTricks >= 0 && turnTricks <= MAX_TRICK_PER_TURN);
+        assert (turnPoints >= 0 && turnPoints <= MAX_POINT_PER_TURN);
+        assert (gamePoints >= 0 && gamePoints <= MAX_POINT_PER_GAME);
+        return Bits32.pack(turnTricks, BIT_SIZE_OF_TRICKS, turnPoints,
+                BIT_SIZE_OF_TURN, gamePoints, BIT_SIZE_OF_GAME);
     }
 
     /**
@@ -109,15 +109,15 @@ public final class PackedScore {
             int turnTricks2, int turnPoints2, int gamePoints2) {
         long B0To31 = oneTeamScorePk(turnTricks1, turnPoints1, gamePoints1);
         long B32To63 = oneTeamScorePk(turnTricks2, turnPoints2, gamePoints2);
-        return Bits64.pack(B0To31, NBBITSPERTEAM, B32To63, NBBITSPERTEAM);
+        return Bits64.pack(B0To31, NB_BITS_PER_TEAM, B32To63, NB_BITS_PER_TEAM);
     }
 
     private static int extractPkTeam(long pkScore, TeamId t) {
         assert isValid(pkScore);
         if (t == TeamId.TEAM_1) {
-            return (int) Bits64.extract(pkScore, STARTOFTEAM1, NBBITSPERTEAM);
+            return (int) Bits64.extract(pkScore, START_OF_TEAM1, NB_BITS_PER_TEAM);
         }
-        return (int) Bits64.extract(pkScore, STARTOFTEAM2, NBBITSPERTEAM);
+        return (int) Bits64.extract(pkScore, START_OF_TEAM2, NB_BITS_PER_TEAM);
     }
 
     /**
@@ -131,7 +131,7 @@ public final class PackedScore {
      */
     public static int turnTricks(long pkScore, TeamId t) {
         assert isValid(pkScore);
-        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFTRICK, BITSIZEOFTRICKS);
+        return Bits32.extract(extractPkTeam(pkScore, t), START_OF_TRICK, BIT_SIZE_OF_TRICKS);
     }
 
     /**
@@ -145,7 +145,7 @@ public final class PackedScore {
      */
     public static int turnPoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
-        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFTURN, BITSIZEOFTURN);
+        return Bits32.extract(extractPkTeam(pkScore, t), START_OF_TURN, BIT_SIZE_OF_TURN);
     }
 
     /**
@@ -161,7 +161,7 @@ public final class PackedScore {
      */
     public static int gamePoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
-        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFGAME, BITSIZEOFGAME);
+        return Bits32.extract(extractPkTeam(pkScore, t), START_OF_GAME, BIT_SIZE_OF_GAME);
     }
 
     /**
@@ -194,7 +194,7 @@ public final class PackedScore {
      */
     public static long withAdditionalTrick(long pkScore, TeamId winningTeam, int trickPoints) {
         assert isValid(pkScore);
-        assert trickPoints <= MAXPOINTPERTURN;
+        assert trickPoints <= MAX_POINT_PER_TURN;
 
         int turnTricks = turnTricks(pkScore, winningTeam) + 1;
         int turnPoints = turnPoints(pkScore, winningTeam) + trickPoints;
@@ -208,9 +208,9 @@ public final class PackedScore {
         int losingTeamPk = extractPkTeam(pkScore, winningTeam.other());
 
         if (winningTeam == TeamId.TEAM_1) {
-            return Bits64.pack(winningTeamPk, NBBITSPERTEAM, losingTeamPk, NBBITSPERTEAM);
+            return Bits64.pack(winningTeamPk, NB_BITS_PER_TEAM, losingTeamPk, NB_BITS_PER_TEAM);
         }
-        return Bits64.pack(losingTeamPk, NBBITSPERTEAM, winningTeamPk, NBBITSPERTEAM);
+        return Bits64.pack(losingTeamPk, NB_BITS_PER_TEAM, winningTeamPk, NB_BITS_PER_TEAM);
     }
 
     /**
@@ -225,7 +225,7 @@ public final class PackedScore {
         // les points du tour et le nb plis gagné sont mis à zéro
         int team1Pk = oneTeamScorePk(0, 0, totalPoints(pkScore, TeamId.TEAM_1));
         int team2Pk = oneTeamScorePk(0, 0, totalPoints(pkScore, TeamId.TEAM_2));
-        return Bits64.pack(team1Pk, NBBITSPERTEAM, team2Pk, NBBITSPERTEAM);
+        return Bits64.pack(team1Pk, NB_BITS_PER_TEAM, team2Pk, NB_BITS_PER_TEAM);
     }
 
     private static String teamToString(long pkScore, TeamId t) {

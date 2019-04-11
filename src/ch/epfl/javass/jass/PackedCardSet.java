@@ -24,37 +24,42 @@ import ch.epfl.javass.bits.Bits64;
 // bits: 48 à 61 le trèfle
 public final class PackedCardSet {
     // pour chaque couleur l'ensemble des cartes de cette couleurs
-    private final static long SUBSETCOLOROF[] = subsetOfColor();
+    private final static long SUBSET_COLOR_OF[] = subsetOfColor();
+    
+
+    /**
+     * l'ensemble des 36 cartes du jeu de Jass
+     */
+    public static final long ALL_CARDS = SUBSET_COLOR_OF[0] 
+            | SUBSET_COLOR_OF[1]
+            | SUBSET_COLOR_OF[2]
+            | SUBSET_COLOR_OF[3];
+
+    
+    // pour chaque carte toutes l'ensemble des cartes d'atout au dessus
+    private static final long[][] TRUMP_ABOVE = trumpAbove();
+    private static final int CARD_PER_COLOR = 9;
+    private static final int BITS_PER_COLOR = 16;
+
+    private static final int BEGIN_SPADE = 0;
+    private static final int BEGIN_HEART = 16;
+    private static final int BEGIN_DIAMOND = 32;
+    private static final int BEGIN_CLUB = 48;
 
     /**
      * l'ensemble de cartes vide
      */
     public static final long EMPTY = 0L;
 
-    /**
-     * l'ensemble des 36 cartes du jeu de Jass
-     */
-    public static final long ALL_CARDS = SUBSETCOLOROF[0] | SUBSETCOLOROF[1]
-            | SUBSETCOLOROF[2] | SUBSETCOLOROF[3];
-
-    // pour chaque carte toutes l'ensemble des cartes d'atout au dessus
-    private static final long[][] TRUMPABOVE = trumpAbove();
-    private static final int CARDPERCOLOR = 9;
-    private static final int BITSPERCOLOR = 16;
-
-    private static final int BEGINSPADE = 0;
-    private static final int BEGINHEART = 16;
-    private static final int BEGINDIAMOND = 32;
-    private static final int BEGINCLUB = 48;
 
     private PackedCardSet() {
     }
 
     private static long[] subsetOfColor() {
-        long[] out = { Bits64.mask(BEGINSPADE, CARDPERCOLOR),
-                Bits64.mask(BEGINHEART, CARDPERCOLOR),
-                Bits64.mask(BEGINDIAMOND, CARDPERCOLOR),
-                Bits64.mask(BEGINCLUB, CARDPERCOLOR) };
+        long[] out = { Bits64.mask(BEGIN_SPADE, CARD_PER_COLOR),
+                Bits64.mask(BEGIN_HEART, CARD_PER_COLOR),
+                Bits64.mask(BEGIN_DIAMOND, CARD_PER_COLOR),
+                Bits64.mask(BEGIN_CLUB, CARD_PER_COLOR) };
         return out;
     }
 
@@ -62,6 +67,7 @@ public final class PackedCardSet {
     private static long[][] trumpAbove() {
         long[][] trumpAbove = new long[Card.Color.COUNT][Card.Rank.COUNT];
         for (int card = 0; card < size(ALL_CARDS); card++) {
+            //l'ensemble des cartes plus fortes que la carte
             long aboveRank = EMPTY;
             int pkCard = get(ALL_CARDS, card);
             for (int index = 0; index < size(ALL_CARDS); index++) {
@@ -73,7 +79,7 @@ public final class PackedCardSet {
             int color = PackedCard.color(pkCard).ordinal();
             int rank = PackedCard.rank(pkCard).ordinal();
             trumpAbove[color][rank] = aboveRank;
-
+           
         }
         return trumpAbove;
     }
@@ -88,7 +94,7 @@ public final class PackedCardSet {
      *         empaqueté valide
      */
     public static boolean isValid(long pkCardSet) {
-        // teste si tout les bits qui ne représente pas une carte sont à sero
+        // teste si tout les bits qui ne représente pas une carte sont à zero
         return (pkCardSet & (~ALL_CARDS)) == 0L;
     }
 
@@ -106,7 +112,7 @@ public final class PackedCardSet {
         assert PackedCard.isValid(pkCard);
         int color = PackedCard.color(pkCard).ordinal();
         int rank = PackedCard.rank(pkCard).ordinal();
-        return TRUMPABOVE[color][rank];
+        return TRUMP_ABOVE[color][rank];
     }
 
     /**
@@ -169,8 +175,8 @@ public final class PackedCardSet {
         // la couleur dépant du nombre de zéro (0-15 pique..)
         // le rang dépant du nombre de zéro après le début de la couleur
         int numberOfZero = Long.numberOfTrailingZeros(pkCardSet);
-        int color = numberOfZero / BITSPERCOLOR;
-        int rank = numberOfZero % BITSPERCOLOR;
+        int color = numberOfZero / BITS_PER_COLOR;
+        int rank = numberOfZero % BITS_PER_COLOR;
 
         return PackedCard.pack(Card.Color.ALL.get(color),
                 Card.Rank.ALL.get(rank));
@@ -180,7 +186,7 @@ public final class PackedCardSet {
     // retourne l'index d'une carte dans le l'ensemble de carte
     private static int cardIndex(int pkCard) {
         assert PackedCard.isValid(pkCard);
-        return PackedCard.color(pkCard).ordinal() * BITSPERCOLOR
+        return PackedCard.color(pkCard).ordinal() * BITS_PER_COLOR
                 + PackedCard.rank(pkCard).ordinal();
     }
 
@@ -308,7 +314,7 @@ public final class PackedCardSet {
      */
     public static long subsetOfColor(long pkCardSet, Card.Color color) {
         assert isValid(pkCardSet);
-        return pkCardSet & SUBSETCOLOROF[color.ordinal()];
+        return pkCardSet & SUBSET_COLOR_OF[color.ordinal()];
     }
 
     /**

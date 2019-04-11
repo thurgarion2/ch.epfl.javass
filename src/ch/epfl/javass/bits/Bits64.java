@@ -11,9 +11,12 @@ import ch.epfl.javass.Preconditions;
  */
 
 public final class Bits64 {
+    
     private Bits64() {
     }
-
+    // vérifie si le nombre n'occcupe pas plus de valeur que sa taille (cf pack)
+    
+    //bits le nombre size la taille
     private static void checkSize(long bits, int size) {
         Preconditions.checkArgument(size > 0 && size < Long.SIZE);
         long mask = mask(size, Long.SIZE - size);

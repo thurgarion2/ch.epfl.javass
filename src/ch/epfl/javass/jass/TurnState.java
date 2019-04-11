@@ -34,8 +34,7 @@ public final class TurnState {
      *            le joueur initinale
      * @return l'état initial d'un tour de jeu
      */
-    public static TurnState initial(Color trump, Score score,
-            PlayerId firstPlayer) {
+    public static TurnState initial(Color trump, Score score, PlayerId firstPlayer) {
         int pkTrick = PackedTrick.firstEmpty(trump, firstPlayer);
         return new TurnState(score.packed(), PackedCardSet.ALL_CARDS, pkTrick);
     }

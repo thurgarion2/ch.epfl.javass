@@ -40,7 +40,7 @@ public final class MctsPlayer implements Player {
         Node root = new Node(state, hand.packed(), ownId.team().other(), ownId);
         for (int i = 0; i < iterations; i++) {
             // le chemin de la racine au noeud ajouté
-            List<Node> nodes = root.nextNode(ownId);
+            List<Node> nodes = root.pathToNewNode(ownId);
             Node ajoute = nodes.get(nodes.size() - 1);
             int finTour = ajoute.randomGame(rng, ownId);
             for (Node n : nodes) {
@@ -51,12 +51,16 @@ public final class MctsPlayer implements Player {
     }
 
     private static class Node {
-        private int NBPOINTSPERTURN = 157;
-        private Node[] children;
+        private final static int NB_POINTS_PER_TURN = 157;
+        
+        
+
+        private final TurnState state;
+        private final Node[] children;
         // nombre d'enfant directe
         private int size;
 
-        private TurnState state;
+       
         // représante la main du joueur ownId
         private long handPlayer;
         private long unPlayed;
@@ -66,9 +70,25 @@ public final class MctsPlayer implements Player {
 
         private int S;
         private int N;
+        
+        
 
-        private Node(TurnState state, long handPlayer, TeamId last,
+        // toutes les cartes non jouées de la main corresponsantes
+        private static long playable(TurnState state, long handPlayer,
                 PlayerId ownId) {
+            long currentHand = state.nextPlayer() == ownId ? handPlayer
+                    : handOther(state, handPlayer);
+            int trick = state.packedTrick();
+            return PackedTrick.playableCards(trick, currentHand);
+        }
+
+        // les cartes des joueurs sauf celui représenter par cette instance
+        private static long handOther(TurnState state, long handPlayer) {
+            long unplayedTurn = state.packedUnplayedCards();
+            return PackedCardSet.difference(unplayedTurn, handPlayer);
+        }
+
+        private Node(TurnState state, long handPlayer, TeamId last, PlayerId ownId) {
             this.state = state;
             this.handPlayer = handPlayer;
             this.id = last;
@@ -79,28 +99,50 @@ public final class MctsPlayer implements Player {
             N = 0;
             size = 0;
         }
-
-        private List<Node> nextNode(PlayerId ownId) {
+        
+    
+        private List<Node> pathToNewNode(PlayerId ownId) {
+            List<Node> nodes = new ArrayList();
             // le noeud à partir du quel on l'appelle est considérer comme
             // racine
-            List<Node> nodes = new ArrayList();
             nodes.add(this);
-            this.mostPromisingNode(nodes);
+            this.pathToMostPromisingNode(nodes);
             // on ajoute un enfant au dernier noeud
             nodes.get(nodes.size() - 1).addNextNode(ownId, nodes);
             return nodes;
         }
 
         // le chemin de la racine au noeud le plus prométeur
-        private List<Node> mostPromisingNode(List<Node> current) {
-            if (!allChildrenAdded() || state.isTerminal()) {
+        private List<Node> pathToMostPromisingNode(List<Node> current) {
+            boolean allChidrenAdded=PackedCardSet.isEmpty(unPlayed);
+            if (! allChidrenAdded || state.isTerminal()) {
                 return current;
             }
             // le noeud actuel est plein
             Node next = bestChild(C);
             current.add(next);
-            return next.mostPromisingNode(current);
+            return next.pathToMostPromisingNode(current);
         }
+        
+        private double  score(int C, Node parent) {
+            double s = S;
+            double n = N;
+            if (N == 0) {
+                return Double.POSITIVE_INFINITY;
+            }
+            double explore=Math.sqrt(2.0 * Math.log(parent.N) / n);
+            return s / n + C * explore;
+        }
+
+        private Node bestChild(int C) {
+            int max = 0;
+            for (int i = 1; i < size; i++) {
+                Node child = children[i];
+                max = child.score(C, this) > children[max].score(C, this) ? i : max;
+            }
+            return children[max];
+        }
+
 
         private void addNextNode(PlayerId ownId, List<Node> current) {
             // le noeud est terminal
@@ -112,51 +154,15 @@ public final class MctsPlayer implements Player {
             unPlayed = PackedCardSet.remove(unPlayed, c);
             TurnState update = state
                     .withNewCardPlayedAndTrickCollected(Card.ofPacked(c));
-            Node next = new Node(update, PackedCardSet.remove(handPlayer, c),
+            Node next = new Node(update,
+                    PackedCardSet.remove(handPlayer, c),
                     state.nextPlayer().team(), ownId);
             children[size] = next;
             size++;
             current.add(next);
         }
-
-        private boolean allChildrenAdded() {
-            return PackedCardSet.isEmpty(unPlayed);
-        }
-
-        private double score(int C, Node parent) {
-            double s = S;
-            double n = N;
-            if (N == 0) {
-                return Double.POSITIVE_INFINITY;
-            }
-            return s / n + C * Math.sqrt(2.0 * Math.log(parent.N) / n);
-        }
-
-        // toutes les cartes non jouées de la main corresponsantes
-        private long playable(TurnState state, long handPlayer,
-                PlayerId ownId) {
-            long currentHand = state.nextPlayer() == ownId ? handPlayer
-                    : handOther(state, handPlayer);
-            int trick = state.packedTrick();
-            return PackedTrick.playableCards(trick, currentHand);
-        }
-
-        // les cartes des joueurs sauf celui représenter par cette instance
-        private long handOther(TurnState state, long handPlayer) {
-            long unplayedTurn = state.packedUnplayedCards();
-            return PackedCardSet.difference(unplayedTurn, handPlayer);
-        }
-
-        private Node bestChild(int C) {
-            int max = 0;
-            for (int i = 1; i < size; i++) {
-                Node child = children[i];
-                max = child.score(C, this) > children[max].score(C, this) ? i
-                        : max;
-            }
-            return children[max];
-        }
-
+        
+        
         private Card bestCardFromChildren() {
             return bestChild(0).cardPlayed(this);
         }
@@ -170,15 +176,11 @@ public final class MctsPlayer implements Player {
         private void update(Node ajoute, int points) {
             // si un match
             S += ajoute.id == id ? points
-                    : Math.max(0, NBPOINTSPERTURN - points);
+                    : Math.max(0, NB_POINTS_PER_TURN - points);
             N++;
         }
-
+        //simule une fin de partie aléatoire
         private int randomGame(SplittableRandom rng, PlayerId ownId) {
-            // déjà simulé (le noeud est terminale)
-            if (N != 0) {
-                return (int) S / N;
-            }
             TurnState simulate = state;
             long hdPlayer = handPlayer;
             while (!simulate.isTerminal()) {

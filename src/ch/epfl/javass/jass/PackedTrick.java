@@ -23,32 +23,32 @@ public final class PackedTrick {
      */
     public static final int INVALID = Bits32.mask(0, 32);
     // représente les 4 cartes vides d'un pli
-    private static final int FOURINVALIDCARD = Bits32.mask(0, 24);
-    private static final int BITSPERCARD = 6;
-    private static final int CARDSPERTRICK = 4;
+    private static final int FOUR_INVALID_CARD = Bits32.mask(0, 24);
+    private static final int BITS_PER_CARD = 6;
+    private static final int CARD_PER_TRICK = 4;
 
-    private static final int STARTOFCARDS = 0;
-    private static final int BITSIZEOFCARDS = 24;
+    private static final int START_OF_CARDS = 0;
+    private static final int BIT_SIZE_OF_CARDS = 24;
 
-    private static final int STARTOFTRICKINDEX = 24;
-    private static final int BITSIZEOFTRICKINDEX = 4;
+    private static final int START_OF_TRICK_INDEX = 24;
+    private static final int BIT_SIZE_OF_TRICK_INDEX = 4;
 
-    private static final int STARTOFPLAYERINDEX = 28;
-    private static final int BITSIZEOFPLAYERINDEX = 2;
+    private static final int START_OF_PLAYER_INDEX = 28;
+    private static final int BIT_SIZE_OF_PLAYER_INDEX = 2;
 
-    private static final int STARTOFTRUMP = 30;
-    private static final int BITSIZEOFTRUMP = 2;
+    private static final int START_OF_TRUMP = 30;
+    private static final int BIT_SIZE_OF_TRUMP = 2;
 
     private PackedTrick() {
     }
 
     private static int cardsAt(int pkTrick, int index) {
-        return Bits32.extract(pkTrick, index * BITSPERCARD, BITSPERCARD);
+        return Bits32.extract(pkTrick, index * BITS_PER_CARD, BITS_PER_CARD);
     }
 
     /**
      * retourne vrai ssi l'entier donné représente un pli empaqueté valide
-     * 
+     * +=
      * @param pkTrick
      *            le pli empaqueté
      * @return vrai ssi l'entier donné représente un pli empaqueté valide
@@ -56,11 +56,11 @@ public final class PackedTrick {
     public static boolean isValid(int pkTrick) {
         // index du pli plus petit que 9
         // 9 pli par tout --> de 0 à 8
-        if (index(pkTrick) > 8) {
+        if (index(pkTrick) >= Jass.TRICKS_PER_TURN) {
             return false;
         }
         // teste si aucune carte ne se retrouve à une place invalide
-        for (int i = 0; i < CARDSPERTRICK; i++) {
+        for (int i = 0; i < CARD_PER_TRICK; i++) {
             int pkCard = cardsAt(pkTrick, i);
             // emplacement soit vide soit une carte valide
             if (pkCard != PackedCard.INVALID && !PackedCard.isValid(pkCard)) {
@@ -82,11 +82,12 @@ public final class PackedTrick {
             PlayerId firstPlayer) {
         int color = trump.ordinal();
         int indexPlayer = firstPlayer.ordinal();
-        int cardsAndIndex = Bits32.pack(FOURINVALIDCARD, BITSIZEOFCARDS, index,
-                BITSIZEOFTRICKINDEX);
-        int size = BITSIZEOFCARDS + BITSIZEOFTRICKINDEX;
-        return Bits32.pack(cardsAndIndex, size, indexPlayer,
-                BITSIZEOFPLAYERINDEX, color, BITSIZEOFTRUMP);
+        int cardsAndIndex = Bits32.pack(FOUR_INVALID_CARD, BIT_SIZE_OF_CARDS,
+                index, BIT_SIZE_OF_TRICK_INDEX);
+        int size = BIT_SIZE_OF_CARDS + BIT_SIZE_OF_TRICK_INDEX;
+        return Bits32.pack(cardsAndIndex, size,
+                indexPlayer, BIT_SIZE_OF_PLAYER_INDEX, 
+                color, BIT_SIZE_OF_TRUMP);
     }
 
     /**
@@ -115,10 +116,8 @@ public final class PackedTrick {
     public static int nextEmpty(int pkTrick) {
         assert isValid(pkTrick);
         int index = index(pkTrick);
-        if (isLast(pkTrick)) {
-            return INVALID;
-        }
-        return packNewTrick(index + 1, trump(pkTrick), winningPlayer(pkTrick));
+        return isLast(pkTrick) ? INVALID : 
+            packNewTrick(index + 1, trump(pkTrick), winningPlayer(pkTrick));
     }
 
     /**
@@ -142,8 +141,8 @@ public final class PackedTrick {
      */
     public static boolean isEmpty(int pkTrick) {
         assert isValid(pkTrick);
-        return Bits32.extract(pkTrick, STARTOFCARDS,BITSIZEOFCARDS) 
-                == FOURINVALIDCARD;
+        return Bits32.extract(pkTrick, START_OF_CARDS,BIT_SIZE_OF_CARDS) 
+                == FOUR_INVALID_CARD;
     }
 
     /**
@@ -155,7 +154,7 @@ public final class PackedTrick {
      */
     public static boolean isFull(int pkTrick) {
         assert isValid(pkTrick);
-        return size(pkTrick) == CARDSPERTRICK;
+        return size(pkTrick) == CARD_PER_TRICK;
     }
 
     /**
@@ -167,12 +166,12 @@ public final class PackedTrick {
      */
     public static int size(int pkTrick) {
         assert isValid(pkTrick);
-        for (int i = 0; i < CARDSPERTRICK; i++) {
+        for (int i = 0; i < CARD_PER_TRICK; i++) {
             if (cardsAt(pkTrick, i) == PackedCard.INVALID) {
                 return i;
             }
         }
-        return CARDSPERTRICK;
+        return CARD_PER_TRICK;
     }
 
     /**
@@ -184,12 +183,14 @@ public final class PackedTrick {
      */
     public static Color trump(int pkTrick) {
         assert isValid(pkTrick);
-        int color = Bits32.extract(pkTrick, STARTOFTRUMP, BITSIZEOFTRUMP);
+        int color = Bits32.extract(pkTrick, 
+                START_OF_TRUMP, BIT_SIZE_OF_TRUMP);
         return Card.Color.ALL.get(color);
     }
 
     private static int indexFirstPalyer(int pkTrick) {
-        return Bits32.extract(pkTrick, STARTOFPLAYERINDEX, BITSIZEOFPLAYERINDEX);
+        return Bits32.extract(pkTrick, 
+                START_OF_PLAYER_INDEX, BIT_SIZE_OF_PLAYER_INDEX);
     }
 
     /**
@@ -204,7 +205,8 @@ public final class PackedTrick {
     public static PlayerId player(int pkTrick, int index) {
         assert isValid(pkTrick);
         assert index < 4 && index >= 0;
-        return PlayerId.ALL.get((indexFirstPalyer(pkTrick) + index) % 4);
+        int next=(indexFirstPalyer(pkTrick) + index) % PlayerId.COUNT;
+        return PlayerId.ALL.get(next);
     }
 
     /**
@@ -215,7 +217,8 @@ public final class PackedTrick {
      * @return l'index du pli
      */
     public static int index(int pkTrick) {
-        return Bits32.extract(pkTrick, STARTOFTRICKINDEX, BITSIZEOFTRICKINDEX);
+        return Bits32.extract(pkTrick, 
+                START_OF_TRICK_INDEX, BIT_SIZE_OF_TRICK_INDEX);
     }
 
     /**
@@ -245,11 +248,11 @@ public final class PackedTrick {
     public static int withAddedCard(int pkTrick, int pkCard) {
         assert isValid(pkTrick);
         assert PackedCard.isValid(pkCard);
-        assert size(pkTrick) < CARDSPERTRICK;
+        assert size(pkTrick) < CARD_PER_TRICK;
         // le pli avec que des 0 à la place de la prochaine carte
-        int pkTrickClear = pkTrick
-                & ~(Bits32.mask(BITSPERCARD * size(pkTrick), BITSPERCARD));
-        return pkTrickClear | (pkCard << (BITSPERCARD * size(pkTrick)));
+        int decalage=BITS_PER_CARD * size(pkTrick);
+        int pkTrickClear = pkTrick & ~(PackedCard.INVALID<<(decalage));
+        return pkTrickClear | (pkCard <<  decalage);
     }
 
     /**
@@ -305,18 +308,15 @@ public final class PackedTrick {
         long playableCards = PackedCardSet.subsetOfColor(pkHand, color);
 
         // toutes les cartes de l'atout jouable
-        long above;
+        long above= PackedCardSet.subsetOfColor(pkHand, trump);
         if (PackedCard.color(winningCard) == trump) {
-            above = PackedCardSet.intersection(PackedCardSet.trumpAbove(winningCard), 
-                    pkHand);
-        } else {
-            above = PackedCardSet.subsetOfColor(pkHand, trump);
-        }
-
+            above = PackedCardSet.intersection(PackedCardSet.trumpAbove(winningCard), above);
+        } 
+        //le joeur n'a pas de cartes de la couleur de bases
         if (PackedCardSet.isEmpty(playableCards)) {
             // toute la main moins les cartes de l'atout non jouable
-            long under = PackedCardSet.complement(above);
-            under = PackedCardSet.subsetOfColor(under, trump);
+            long under = PackedCardSet.subsetOfColor(PackedCardSet.complement(above), 
+                    trump);
             playableCards = PackedCardSet.difference(pkHand, under);
 
             // test si seulement sous couper est possible
@@ -324,7 +324,8 @@ public final class PackedTrick {
         }
         // teste ssi le valet peut être jouer en atout
         int jack = PackedCard.pack(trump, Rank.JACK);
-        if (PackedCardSet.size(playableCards) == 1 && trump == color
+        if (PackedCardSet.size(playableCards) == 1 
+                && trump == color
                 && PackedCardSet.get(playableCards, 0) == jack) {
             return pkHand;
         }
