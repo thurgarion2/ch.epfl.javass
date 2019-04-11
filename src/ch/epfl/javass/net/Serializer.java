@@ -106,7 +106,7 @@ public final class Serializer {
      *            la carte sérialisée
      * @return la carte sérialisée
      */
-    public static Card deserialize(String card) {
+    public static Card deserializeCard(String card) {
         return Card.ofPacked(StringSerializer.deserializeInt(card));
     }
 
