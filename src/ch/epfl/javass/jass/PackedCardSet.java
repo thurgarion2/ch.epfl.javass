@@ -62,12 +62,11 @@ public final class PackedCardSet {
     private static long[][] trumpAbove() {
         long[][] trumpAbove = new long[Card.Color.COUNT][Card.Rank.COUNT];
         for (int card = 0; card < size(ALL_CARDS); card++) {
-            long aboveRank = 0L;
+            long aboveRank = EMPTY;
             int pkCard = get(ALL_CARDS, card);
             for (int index = 0; index < size(ALL_CARDS); index++) {
                 int pkCardCompare = get(ALL_CARDS, index);
-                if (PackedCard.isBetter(PackedCard.color(pkCard), pkCardCompare,
-                        pkCard)) {
+                if (PackedCard.isBetter(PackedCard.color(pkCard), pkCardCompare, pkCard)) {
                     aboveRank = add(aboveRank, pkCardCompare);
                 }
             }
@@ -233,7 +232,7 @@ public final class PackedCardSet {
     public static boolean contains(long pkCardSet, int pkCard) {
         assert isValid(pkCardSet);
         assert PackedCard.isValid(pkCard);
-        return (pkCardSet & (1L << cardIndex(pkCard))) != 0;
+        return (pkCardSet & (1L << cardIndex(pkCard))) != EMPTY;
     }
 
     /**

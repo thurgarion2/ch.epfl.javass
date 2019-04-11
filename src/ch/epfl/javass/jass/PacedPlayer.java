@@ -13,9 +13,12 @@ import ch.epfl.javass.jass.Card.Color;
 
 public final class PacedPlayer implements Player {
 
-    private Player underlyingPlayer;
+    private final Player underlyingPlayer;
     // en milli seconde
-    private double minTime;
+    private final double minTime;
+    // le nombre par lequel multiplier pour convertir le temps en secondes en
+    // milli secondes
+    private static final int CONVERSION = 1000;
 
     /**
      *
@@ -28,7 +31,7 @@ public final class PacedPlayer implements Player {
      */
     public PacedPlayer(Player underlyingPlayer, double minTime) {
         this.underlyingPlayer = underlyingPlayer;
-        this.minTime = minTime * 1000;
+        this.minTime = minTime * CONVERSION;
     }
 
     @Override

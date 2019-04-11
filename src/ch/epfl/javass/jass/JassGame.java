@@ -14,9 +14,9 @@ import java.util.Random;
  *
  */
 public final class JassGame {
+
 	// la carte qui définit le premier joueur
-	private final static Card BEGIN = Card.of(Card.Color.DIAMOND,
-			Card.Rank.SEVEN);
+	private final static Card BEGIN = Card.of(Card.Color.DIAMOND, Card.Rank.SEVEN);
 
 	private final Map<PlayerId, Player> players;
 	private final Map<PlayerId, String> playerNames;
@@ -24,9 +24,8 @@ public final class JassGame {
 
 	private final Random shuffleRng;
 	private final Random trumpRng;
-	
-	private PlayerId firstPlayer;
-	
+
+	private PlayerId firstPlayer = null;
 	private TurnState turnState;
 
 	/**
@@ -37,9 +36,7 @@ public final class JassGame {
 	 * 
 	 * @param playerNames relie les identifiants des joueurs aux noms des joueurs
 	 */
-	public JassGame(long rngSeed, Map<PlayerId, Player> players,
-			Map<PlayerId, String> playerNames) {
-		firstPlayer = null;
+	public JassGame(long rngSeed, Map<PlayerId, Player> players, Map<PlayerId, String> playerNames) {
 		Random rng = new Random(rngSeed);
 		this.shuffleRng = new Random(rng.nextLong());
 		this.trumpRng = new Random(rng.nextLong());
@@ -48,7 +45,7 @@ public final class JassGame {
 		this.playerNames = Collections.unmodifiableMap(playerNames);
 
 		for (PlayerId id : PlayerId.ALL) {
-			players.get(id).setPlayers(id, playerNames);
+			players.get(id).setPlayers(id, this.playerNames);
 		}
 
 		beginNewGame();
@@ -64,8 +61,7 @@ public final class JassGame {
 		Score score = turnState.score();
 		int pointsTeam1 = score.totalPoints(TeamId.TEAM_1);
 		int pointsTeam2 = score.totalPoints(TeamId.TEAM_2);
-		boolean condition = pointsTeam1 >= Jass.WINNING_POINTS || pointsTeam2 >= Jass.WINNING_POINTS;
-		return condition ? true : false;
+		return pointsTeam1 >= Jass.WINNING_POINTS || pointsTeam2 >= Jass.WINNING_POINTS;
 	}
 
 	// créer une List<Card> représentant le jeu complet à partir de ALL_CARDS de
@@ -82,16 +78,16 @@ public final class JassGame {
 	private void distribution() {
 		List<Card> deck = deck();
 		Collections.shuffle(deck, shuffleRng);
+		int size = Jass.HAND_SIZE;
 		for (PlayerId id : PlayerId.ALL) {
 			int index = id.ordinal();
-			CardSet hand = CardSet.of(deck.subList(index * 9, (index + 1) * 9));
+			CardSet hand = CardSet.of(deck.subList(index * size, (index + 1) * size));
 			hands.put(id, hand);
 			players.get(id).updateHand(hand);
 		}
 	}
 
-	// détermine le premier joueur au début de la oertie (en fct du 7 de
-	// carreau)
+	// détermine le premier joueur au début de la oertie (en fct du 7 de carreau)
 	private PlayerId firstPlayerStartOfGame() {
 		for (PlayerId id : PlayerId.ALL) {
 			if (hands.get(id).contains(BEGIN)) {
@@ -103,12 +99,12 @@ public final class JassGame {
 
 	// détermine le premier joueur au début d'un tour
 	private PlayerId firstPlayerToStartTurn() {
-		return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % 4);
+		return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % PlayerId.COUNT);
 	}
 
 	// détermine le nouvel atout
 	private Card.Color newTrump() {
-		int indexTrump = this.trumpRng.nextInt(4);
+		int indexTrump = this.trumpRng.nextInt(Card.Color.COUNT);
 		Card.Color trump = Card.Color.ALL.get(indexTrump);
 		for (Player each : players.values()) {
 			each.setTrump(trump);
@@ -142,8 +138,7 @@ public final class JassGame {
 	private void beginNewTurn() {
 		distribution();
 		firstPlayer = firstPlayerToStartTurn();
-		turnState = TurnState.initial(newTrump(), turnState.score().nextTurn(),
-				firstPlayer);
+		turnState = TurnState.initial(newTrump(), turnState.score().nextTurn(), firstPlayer);
 		updateScore(turnState.score());
 	}
 
@@ -171,16 +166,15 @@ public final class JassGame {
 		Score score = turnState.score().nextTurn();
 		int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
 		int ptTeam2 = score.totalPoints(TeamId.TEAM_2);
-		TeamId winning = ptTeam1 >= Jass.WINNING_POINTS ? TeamId.TEAM_1
-				: TeamId.TEAM_2;
+		TeamId winning = ptTeam1 >= Jass.WINNING_POINTS ? TeamId.TEAM_1 : TeamId.TEAM_2;
 		for (Player each : players.values()) {
 			each.setWinningTeam(winning);
 		}
 	}
 
 	/**
-	 * fait avancer l'état du jeu jusqu'à la fin du prochain pli, ou ne fait
-	 * rien si la partie est terminée
+	 * fait avancer l'état du jeu jusqu'à la fin du prochain pli, ou ne fait rien si
+	 * la partie est terminée
 	 * 
 	 */
 	public void advanceToEndOfNextTrick() {

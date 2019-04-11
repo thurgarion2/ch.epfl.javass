@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import ch.epfl.javass.jass.Card;
@@ -28,39 +31,30 @@ public final class RemotePlayerClient implements Player, AutoCloseable{
 	private BufferedWriter w;
 
 	public RemotePlayerClient(String host) {
-		try(Socket s = new Socket(host, 5108);
-				BufferedReader r =
-						   new BufferedReader(
-						     new InputStreamReader(s.getInputStream(),
-									   US_ASCII));
-						 BufferedWriter w =
-						   new BufferedWriter(
-						     new OutputStreamWriter(s.getOutputStream(),
-									    US_ASCII))) {
-			this.s = s;
-			this.r = r;
-			this.w = w;
-		}catch(IOException e) {
-			throw new UncheckedIOException(e);
-		}
+	    try {
+	        s = new Socket(host, 5108);
+	        r = new BufferedReader(
+	                new InputStreamReader(s.getInputStream(),
+	                        US_ASCII));
+	        w = new BufferedWriter(
+	                new OutputStreamWriter(s.getOutputStream(),
+	                        US_ASCII));
+	    } catch (IOException e) {
+	        throw new UncheckedIOException(e);
+	    }
+
 	}
 
-	private static String serializeMapPlayerIdString(char combine, Map<PlayerId, String> playerNames) {
-		return StringSerializer.combineString(combine, 
-				StringSerializer.serializeString(playerNames.get(PlayerId.PLAYER_1)), 
-					StringSerializer.serializeString(playerNames.get(PlayerId.PLAYER_2)),
-						StringSerializer.serializeString(playerNames.get(PlayerId.PLAYER_3)),
-							StringSerializer.serializeString(playerNames.get(PlayerId.PLAYER_4)));
-		
+	private static String serializeMap(Map<PlayerId, String> playerNames) {
+		String[] names= new String[4];
+		playerNames.forEach((k,s)->{names[k.ordinal()]=StringSerializer.serializeString(s);});
+		return StringSerializer.combineString(',',  names);
 	}
 	@Override
 	public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
 		try {
-			w.write("PLRS ");
-			w.write(Serializer.serializeEnum(ownId));
-			w.write(" ");
-			w.write(serializeMapPlayerIdString(',', playerNames));
-			w.write('\n');
+		    String message="PLRS "+Serializer.serializeEnum(ownId)+" "+serializeMap(playerNames)+'\n';
+			w.write(message);
 			w.flush();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -136,7 +130,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable{
 			w.write(Serializer.serializeCardSet(hand));
 			w.write('\n');
 			w.flush();
-			return Serializer.deserialize(r.readLine());
+			return Serializer.deserializeCard(r.readLine());
 			
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

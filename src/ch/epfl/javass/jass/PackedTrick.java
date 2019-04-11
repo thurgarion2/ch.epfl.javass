@@ -142,8 +142,8 @@ public final class PackedTrick {
      */
     public static boolean isEmpty(int pkTrick) {
         assert isValid(pkTrick);
-        return Bits32.extract(pkTrick, STARTOFCARDS,
-                BITSIZEOFCARDS) == FOURINVALIDCARD;
+        return Bits32.extract(pkTrick, STARTOFCARDS,BITSIZEOFCARDS) 
+                == FOURINVALIDCARD;
     }
 
     /**
@@ -189,8 +189,7 @@ public final class PackedTrick {
     }
 
     private static int indexFirstPalyer(int pkTrick) {
-        return Bits32.extract(pkTrick, STARTOFPLAYERINDEX,
-                BITSIZEOFPLAYERINDEX);
+        return Bits32.extract(pkTrick, STARTOFPLAYERINDEX, BITSIZEOFPLAYERINDEX);
     }
 
     /**
@@ -266,6 +265,18 @@ public final class PackedTrick {
         // la première carte jouée définit la couleur
         return PackedCard.color(card(pkTrick, 0));
     }
+    
+    private static int indexOfwinningCard(int pkTrick) {
+        int best = 0;
+        // incémentale teste si la prochaine carte est plus forte que la carte
+        // courante
+        for (int i = 1; i < size(pkTrick); i++) {
+            if (PackedCard.isBetter(trump(pkTrick), card(pkTrick, i), card(pkTrick, best))) {
+                best = i;
+            }
+        }
+        return best;
+    }
 
     /**
      * retourne le sous-ensemble (empaqueté) des cartes de la main pkHand qui
@@ -296,8 +307,8 @@ public final class PackedTrick {
         // toutes les cartes de l'atout jouable
         long above;
         if (PackedCard.color(winningCard) == trump) {
-            above = PackedCardSet.intersection(
-                    PackedCardSet.trumpAbove(winningCard), pkHand);
+            above = PackedCardSet.intersection(PackedCardSet.trumpAbove(winningCard), 
+                    pkHand);
         } else {
             above = PackedCardSet.subsetOfColor(pkHand, trump);
         }
@@ -309,11 +320,7 @@ public final class PackedTrick {
             playableCards = PackedCardSet.difference(pkHand, under);
 
             // test si seulement sous couper est possible
-            if (PackedCardSet.isEmpty(playableCards)) {
-                return pkHand;
-            }
-
-            return playableCards;
+            return !PackedCardSet.isEmpty(playableCards) ? playableCards : pkHand;
         }
         // teste ssi le valet peut être jouer en atout
         int jack = PackedCard.pack(trump, Rank.JACK);
@@ -342,18 +349,6 @@ public final class PackedTrick {
         return points;
     }
 
-    private static int indexOfwinningCard(int pkTrick) {
-        int best = 0;
-        // incémentale teste si la prochaine carte est plus forte que la carte
-        // courante
-        for (int i = 1; i < size(pkTrick); i++) {
-            if (PackedCard.isBetter(trump(pkTrick), card(pkTrick, i),
-                    card(pkTrick, best))) {
-                best = i;
-            }
-        }
-        return best;
-    }
 
     /**
      * retourne l'identité du joueur menant le pli

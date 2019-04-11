@@ -25,7 +25,7 @@ import ch.epfl.javass.jass.TurnState;
  *
  */
 public final class RemotePlayerServer {
-   private Player underlyingPlayer;
+   private final Player underlyingPlayer;
    private static final int PORT=5108;
    
    public RemotePlayerServer (Player underlyingPlayer) {
@@ -45,13 +45,16 @@ public final class RemotePlayerServer {
                    new OutputStreamWriter(s.getOutputStream(),
                            StandardCharsets.US_ASCII))) {
         while(!end) {
-            String[] message=StringSerializer.splitString(r.readLine(),' ');
-            JassCommand cmd = JassCommand.valueOf(message[0]);
             
+            String line=r.readLine();
+            System.out.println(line);
+            String[] message=StringSerializer.splitString(line,' ');
+            JassCommand cmd = JassCommand.valueOf(message[0]);
+          
             switch(cmd) {
               case PLRS:
                   PlayerId own = PlayerId.ALL.get(StringSerializer.deserializeInt(message[1]));
-                  Map<PlayerId, String> names=playersNames(StringSerializer.splitString(message[1],','));
+                  Map<PlayerId, String> names=playersNames(StringSerializer.splitString(message[2],','));
                   underlyingPlayer.setPlayers(own, names);
                   break;
               case TRMP:
@@ -68,6 +71,7 @@ public final class RemotePlayerServer {
                   Card c = underlyingPlayer.cardToPlay(Serializer.deserializeTurnState(message[1]),hand);
                   w.write(Serializer.serializeCard(c));
                   w.write('\n');
+                  w.flush();
                   break;
               case SCOR:
                   underlyingPlayer.updateScore(Serializer.deserializeScore(message[1]));

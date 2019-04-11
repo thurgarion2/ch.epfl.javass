@@ -42,18 +42,18 @@ public final class PackedScore {
 
     // teste si le score d'une équipe est correct sur 32 bits
     private static boolean isValid(int pkScore) {
-        if (Bits32.extract(pkScore, STARTOFTRICK,
-                BITSIZEOFTRICKS) > MAXTRICKPERTURN) {
+        if (Bits32.extract(pkScore, STARTOFTRICK,BITSIZEOFTRICKS) 
+                > MAXTRICKPERTURN) {
             return false;
         }
 
-        if (Bits32.extract(pkScore, STARTOFTURN,
-                BITSIZEOFTURN) > MAXPOINTPERTURN) {
+        if (Bits32.extract(pkScore, STARTOFTURN,BITSIZEOFTURN) 
+                > MAXPOINTPERTURN) {
             return false;
         }
 
-        if (Bits32.extract(pkScore, STARTOFGAME,
-                BITSIZEOFGAME) > MAXPOINTPERGAME) {
+        if (Bits32.extract(pkScore, STARTOFGAME,BITSIZEOFGAME) 
+                > MAXPOINTPERGAME) {
             return false;
         }
         // le 8 dernier bits sont nuls
@@ -75,19 +75,17 @@ public final class PackedScore {
      */
     public static boolean isValid(long pkScore) {
         int B0To31 = (int) Bits64.extract(pkScore, STARTOFTEAM1, NBBITSPERTEAM);
-        int B32To63 = (int) Bits64.extract(pkScore, STARTOFTEAM2,
-                NBBITSPERTEAM);
+        int B32To63 = (int) Bits64.extract(pkScore, STARTOFTEAM2, NBBITSPERTEAM);
         return isValid(B0To31) && isValid(B32To63);
     }
 
-    private static int oneTeamScorePk(int turnTricks, int turnPoints,
-            int gamePoints) {
+    
+    private static int oneTeamScorePk(int turnTricks, int turnPoints, int gamePoints) {
         assert (turnTricks >= 0 && turnTricks <= MAXTRICKPERTURN);
         assert (turnPoints >= 0 && turnPoints <= MAXPOINTPERTURN);
         assert (gamePoints >= 0 && gamePoints <= MAXPOINTPERGAME);
         return Bits32.pack(turnTricks, BITSIZEOFTRICKS, turnPoints,
                 BITSIZEOFTURN, gamePoints, BITSIZEOFGAME);
-
     }
 
     /**
@@ -133,8 +131,7 @@ public final class PackedScore {
      */
     public static int turnTricks(long pkScore, TeamId t) {
         assert isValid(pkScore);
-        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFTRICK,
-                BITSIZEOFTRICKS);
+        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFTRICK, BITSIZEOFTRICKS);
     }
 
     /**
@@ -148,8 +145,7 @@ public final class PackedScore {
      */
     public static int turnPoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
-        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFTURN,
-                BITSIZEOFTURN);
+        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFTURN, BITSIZEOFTURN);
     }
 
     /**
@@ -165,8 +161,7 @@ public final class PackedScore {
      */
     public static int gamePoints(long pkScore, TeamId t) {
         assert isValid(pkScore);
-        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFGAME,
-                BITSIZEOFGAME);
+        return Bits32.extract(extractPkTeam(pkScore, t), STARTOFGAME, BITSIZEOFGAME);
     }
 
     /**
@@ -197,8 +192,7 @@ public final class PackedScore {
      * @return un score empqueté avec les champs mis à jour en tenant compte que
      *         l'équipe gagante à gagner trickPoints
      */
-    public static long withAdditionalTrick(long pkScore, TeamId winningTeam,
-            int trickPoints) {
+    public static long withAdditionalTrick(long pkScore, TeamId winningTeam, int trickPoints) {
         assert isValid(pkScore);
         assert trickPoints <= MAXPOINTPERTURN;
 
@@ -214,11 +208,9 @@ public final class PackedScore {
         int losingTeamPk = extractPkTeam(pkScore, winningTeam.other());
 
         if (winningTeam == TeamId.TEAM_1) {
-            return Bits64.pack(winningTeamPk, NBBITSPERTEAM, losingTeamPk,
-                    NBBITSPERTEAM);
+            return Bits64.pack(winningTeamPk, NBBITSPERTEAM, losingTeamPk, NBBITSPERTEAM);
         }
-        return Bits64.pack(losingTeamPk, NBBITSPERTEAM, winningTeamPk,
-                NBBITSPERTEAM);
+        return Bits64.pack(losingTeamPk, NBBITSPERTEAM, winningTeamPk, NBBITSPERTEAM);
     }
 
     /**

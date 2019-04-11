@@ -49,10 +49,8 @@ public final class Trick {
      * @throws IllegalArgumentException
      *             si le plis empaqueté en paramètre est invalide
      */
-    public static Trick ofPacked(int packed) throws IllegalArgumentException {
-        if (!PackedTrick.isValid(packed)) {
-            throw new IllegalArgumentException();
-        }
+    public static Trick ofPacked(int packed) {
+        Preconditions.checkArgument(PackedTrick.isValid(packed));
         return new Trick(packed);
     }
 
@@ -74,7 +72,7 @@ public final class Trick {
      * @throws IllegalStateException
      *             si le pli donné n'est pas plein
      */
-    public Trick nextEmpty() throws IllegalStateException {
+    public Trick nextEmpty() {
         if (!this.isFull()) {
             throw new IllegalStateException();
         }
@@ -146,7 +144,7 @@ public final class Trick {
      * @throws IndexOutOfBoundsException
      *             si l'index est invalide (index vlide : 0 <= index < 4)
      */
-    public PlayerId player(int index) throws IndexOutOfBoundsException {
+    public PlayerId player(int index) {
         Preconditions.checkIndex(index, 4);
         return PackedTrick.player(this.pkTrick, index);
     }
@@ -163,7 +161,7 @@ public final class Trick {
      *             si l index est invalide (index valide : 0 <= index < taille
      *             du pli)
      */
-    public Card card(int index) throws IndexOutOfBoundsException {
+    public Card card(int index) {
         Preconditions.checkIndex(index, this.size());
         return Card.ofPacked(PackedTrick.card(this.pkTrick, index));
     }
@@ -180,7 +178,7 @@ public final class Trick {
      * @throws IllegalStateException
      *             si le pli est plein
      */
-    public Trick withAddedCard(Card c) throws IllegalStateException {
+    public Trick withAddedCard(Card c) {
         if (this.isFull()) {
             throw new IllegalStateException();
         }
@@ -195,7 +193,7 @@ public final class Trick {
      * @throws IllegalStateException
      *             si le pli est vide
      */
-    public Card.Color baseColor() throws IllegalStateException {
+    public Card.Color baseColor() {
         if (this.isEmpty()) {
             throw new IllegalStateException();
         }
@@ -215,7 +213,7 @@ public final class Trick {
      * @throws IllegalStateException
      *             si le pli est plein
      */
-    public CardSet playableCards(CardSet hand) throws IllegalStateException {
+    public CardSet playableCards(CardSet hand) {
         if (this.isFull()) {
             throw new IllegalStateException();
         }
@@ -240,7 +238,7 @@ public final class Trick {
      * @throws IllegalStateException
      *             si le pli est vide
      */
-    public PlayerId winningPlayer() throws IllegalStateException {
+    public PlayerId winningPlayer() {
         if (this.isEmpty()) {
             throw new IllegalStateException();
         }
