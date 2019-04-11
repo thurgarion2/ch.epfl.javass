@@ -105,6 +105,7 @@ public final class StringSerializer {
     public static String combineString(char combine, String... strings) {
         return String.join(combine + "", strings);
     }
+    
 
     /**
      * retourne un tableau contenant la chaine de caractères partitionnée par le

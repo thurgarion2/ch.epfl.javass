@@ -14,203 +14,197 @@ import java.util.Random;
  *
  */
 public final class JassGame {
-    // la carte qui définit le premier joueur
-    private final static Card BEGIN = Card.of(Card.Color.DIAMOND,
-            Card.Rank.SEVEN);
+	// la carte qui définit le premier joueur
+	private final static Card BEGIN = Card.of(Card.Color.DIAMOND,
+			Card.Rank.SEVEN);
 
-    private Map<PlayerId, Player> players;
-    private Map<PlayerId, String> playerNames;
+	private final Map<PlayerId, Player> players;
+	private final Map<PlayerId, String> playerNames;
+	private final Map<PlayerId, CardSet> hands;
 
-    private Map<PlayerId, CardSet> hands;
+	private final Random shuffleRng;
+	private final Random trumpRng;
+	
+	private PlayerId firstPlayer;
+	
+	private TurnState turnState;
 
-    private Random shuffleRng;
-    private Random trumpRng;
+	/**
+	 * 
+	 * @param rngSeed     la graine utilisée par les méthode de la calsse Random
+	 * 
+	 * @param players     relie les identfiants des joueurs aux joueurs
+	 * 
+	 * @param playerNames relie les identifiants des joueurs aux noms des joueurs
+	 */
+	public JassGame(long rngSeed, Map<PlayerId, Player> players,
+			Map<PlayerId, String> playerNames) {
+		firstPlayer = null;
+		Random rng = new Random(rngSeed);
+		this.shuffleRng = new Random(rng.nextLong());
+		this.trumpRng = new Random(rng.nextLong());
+		this.hands = new HashMap<>();
+		this.players = Collections.unmodifiableMap(players);
+		this.playerNames = Collections.unmodifiableMap(playerNames);
 
-    private PlayerId firstPlayer = null;
-    private TurnState turnState;
+		for (PlayerId id : PlayerId.ALL) {
+			players.get(id).setPlayers(id, playerNames);
+		}
 
-    /**
-     * 
-     * @param rngSeed
-     *            la graine utilisée par les méthode de la calsse Random
-     * 
-     * @param players
-     *            relie les identfiants des joueurs aux joueurs
-     * 
-     * @param playerNames
-     *            relie les identifiants des joueurs aux noms des joueurs
-     */
-    public JassGame(long rngSeed, Map<PlayerId, Player> players,
-            Map<PlayerId, String> playerNames) {
-        Random rng = new Random(rngSeed);
-        this.shuffleRng = new Random(rng.nextLong());
-        this.trumpRng = new Random(rng.nextLong());
-        this.hands = new HashMap<>();
-        this.players = Collections.unmodifiableMap(players);
-        this.playerNames = Collections.unmodifiableMap(playerNames);
+		beginNewGame();
+	}
 
-        for (PlayerId id : PlayerId.ALL) {
-            players.get(id).setPlayers(id, playerNames);
-        }
+	/**
+	 * retourne vrai ssi la partie est terminée
+	 * 
+	 * @return vrai ssi la partie est terminée
+	 */
+	public boolean isGameOver() {
+		// dans le cas
+		Score score = turnState.score();
+		int pointsTeam1 = score.totalPoints(TeamId.TEAM_1);
+		int pointsTeam2 = score.totalPoints(TeamId.TEAM_2);
+		boolean condition = pointsTeam1 >= Jass.WINNING_POINTS || pointsTeam2 >= Jass.WINNING_POINTS;
+		return condition ? true : false;
+	}
 
-        beginNewGame();
-    }
+	// créer une List<Card> représentant le jeu complet à partir de ALL_CARDS de
+	// CardSet
+	private List<Card> deck() {
+		List<Card> deck = new LinkedList<>();
+		for (int i = 0; i < CardSet.ALL_CARDS.size(); i++) {
+			deck.add(CardSet.ALL_CARDS.get(i));
+		}
+		return deck;
+	}
 
-    /**
-     * retourne vrai ssi la partie est terminée
-     * 
-     * @return vrai ssi la partie est terminée
-     */
-    public boolean isGameOver() {
-        // dans le cas
-        Score score = turnState.score();
-        int pointsTeam1 = score.totalPoints(TeamId.TEAM_1);
-        int pointsTeam2 = score.totalPoints(TeamId.TEAM_2);
-        if (pointsTeam1 >= Jass.WINNING_POINTS
-                || pointsTeam2 >= Jass.WINNING_POINTS) {
-            return true;
-        }
-        return false;
-    }
+	// mélange puis assigne les cartes du jeu à chaque joueur
+	private void distribution() {
+		List<Card> deck = deck();
+		Collections.shuffle(deck, shuffleRng);
+		for (PlayerId id : PlayerId.ALL) {
+			int index = id.ordinal();
+			CardSet hand = CardSet.of(deck.subList(index * 9, (index + 1) * 9));
+			hands.put(id, hand);
+			players.get(id).updateHand(hand);
+		}
+	}
 
-    // créer une List<Card> représentant le jeu complet à partir de ALL_CARDS de
-    // CardSet
-    private List<Card> deck() {
-        List<Card> deck = new LinkedList();
-        for (int i = 0; i < CardSet.ALL_CARDS.size(); i++) {
-            deck.add(CardSet.ALL_CARDS.get(i));
-        }
-        return deck;
-    }
+	// détermine le premier joueur au début de la oertie (en fct du 7 de
+	// carreau)
+	private PlayerId firstPlayerStartOfGame() {
+		for (PlayerId id : PlayerId.ALL) {
+			if (hands.get(id).contains(BEGIN)) {
+				return id;
+			}
+		}
+		return PlayerId.PLAYER_1;
+	}
 
-    // mélange puis assigne les cartes du jeu à chaque joueur
-    private void distribution() {
-        List<Card> deck = deck();
-        Collections.shuffle(deck, shuffleRng);
+	// détermine le premier joueur au début d'un tour
+	private PlayerId firstPlayerToStartTurn() {
+		return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % 4);
+	}
 
-        for (PlayerId id : PlayerId.ALL) {
-            int index = id.ordinal();
-            CardSet hand = CardSet.of(deck.subList(index * 9, (index + 1) * 9));
-            hands.put(id, hand);
-            players.get(id).updateHand(hand);
-        }
-    }
+	// détermine le nouvel atout
+	private Card.Color newTrump() {
+		int indexTrump = this.trumpRng.nextInt(4);
+		Card.Color trump = Card.Color.ALL.get(indexTrump);
+		for (Player each : players.values()) {
+			each.setTrump(trump);
+		}
+		return trump;
+	}
 
-    // détermine le premier joueur au début de la oertie (en fct du 7 de
-    // carreau)
-    private PlayerId firstPlayerStartOfGame() {
-        for (PlayerId id : PlayerId.ALL) {
-            if (hands.get(id).contains(BEGIN)) {
-                return id;
-            }
-        }
-        return PlayerId.PLAYER_1;
-    }
+	// met à jour la connaissance du pli de chaque joeur
+	private void updateTrick() {
+		for (Player each : players.values()) {
+			each.updateTrick(turnState.trick());
+		}
+	}
 
-    // détermine le premier joueur au début d'un tour
-    private PlayerId firstPlayerToStartTurn() {
-        return PlayerId.ALL.get((firstPlayer.ordinal() + 1) % 4);
-    }
+	// met à jour le score de chaque joueur
+	private void updateScore(Score score) {
+		for (Player each : players.values()) {
+			each.updateScore(score);
+		}
+	}
 
-    // détermine le nouvel atout
-    private Card.Color newTrump() {
-        int indexTrump = this.trumpRng.nextInt(4);
-        Card.Color trump = Card.Color.ALL.get(indexTrump);
-        for (Player each : players.values()) {
-            each.setTrump(trump);
-        }
-        return trump;
-    }
+	// débute une nouvelle partie
+	private void beginNewGame() {
+		distribution();
+		firstPlayer = firstPlayerStartOfGame();
+		turnState = TurnState.initial(newTrump(), Score.INITIAL, firstPlayer);
+		updateScore(turnState.score());
+	}
 
-    // met à jour la connaissance du pli de chaque joeur
-    private void updateTrick() {
-        for (Player each : players.values()) {
-            each.updateTrick(turnState.trick());
-        }
-    }
+	// débute un nouveau tour
+	private void beginNewTurn() {
+		distribution();
+		firstPlayer = firstPlayerToStartTurn();
+		turnState = TurnState.initial(newTrump(), turnState.score().nextTurn(),
+				firstPlayer);
+		updateScore(turnState.score());
+	}
 
-    // met à jour le score de chaque joueur
-    private void updateScore(Score score) {
-        for (Player each : players.values()) {
-            each.updateScore(score);
-        }
-    }
+	// rammasse le pli courant
+	private void collect() {
+		turnState = turnState.withTrickCollected();
+		updateScore(turnState.score());
+	}
 
-    // débute une nouvelle partie
-    private void beginNewGame() {
-        distribution();
-        firstPlayer = firstPlayerStartOfGame();
-        turnState = TurnState.initial(newTrump(), Score.INITIAL, firstPlayer);
-        updateScore(turnState.score());
-    }
+	// fait jouer un joeur
+	private void play(PlayerId playerId) {
+		Player player = players.get(playerId);
+		CardSet hand = hands.get(playerId);
 
-    // débute un nouveau tour
-    private void beginNewTurn() {
-        distribution();
-        firstPlayer = firstPlayerToStartTurn();
-        turnState = TurnState.initial(newTrump(), turnState.score().nextTurn(),
-                firstPlayer);
-        updateScore(turnState.score());
-    }
+		Card played = player.cardToPlay(turnState, hand);
+		turnState = turnState.withNewCardPlayed(played);
 
-    // rammasse le pli courant
-    private void collect() {
-        turnState = turnState.withTrickCollected();
-        updateScore(turnState.score());
-    }
+		hands.put(playerId, hand.remove(played));
+		player.updateHand(hands.get(playerId));
+		updateTrick();
+	}
 
-    // fait jouer un joeur
-    private void play(PlayerId playerId) {
-        Player player = players.get(playerId);
-        CardSet hand = hands.get(playerId);
+	// fini la partie
+	private void endGame() {
+		Score score = turnState.score().nextTurn();
+		int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
+		int ptTeam2 = score.totalPoints(TeamId.TEAM_2);
+		TeamId winning = ptTeam1 >= Jass.WINNING_POINTS ? TeamId.TEAM_1
+				: TeamId.TEAM_2;
+		for (Player each : players.values()) {
+			each.setWinningTeam(winning);
+		}
+	}
 
-        Card played = player.cardToPlay(turnState, hand);
-        turnState = turnState.withNewCardPlayed(played);
+	/**
+	 * fait avancer l'état du jeu jusqu'à la fin du prochain pli, ou ne fait
+	 * rien si la partie est terminée
+	 * 
+	 */
+	public void advanceToEndOfNextTrick() {
+		if (isGameOver()) {
+			return;
+		}
+		// collecte le trick précédant
+		if (turnState.trick().isFull()) {
+			collect();
+			// teste si le pli collecté met fin à la partie
+			if (isGameOver()) {
+				endGame();
+				return;
+			}
+		}
 
-        hands.put(playerId, hand.remove(played));
-        player.updateHand(hands.get(playerId));
-        updateTrick();
-    }
+		// vérifie si il faut commencer un nouveau tour ou pas
+		if (turnState.isTerminal()) {
+			beginNewTurn();
+		}
+		updateTrick();
+		for (int i = 0; i < 4; i++) {
+			play(turnState.nextPlayer());
+		}
 
-    // fini la partie
-    private void endGame() {
-        Score score = turnState.score().nextTurn();
-        int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
-        int ptTeam2 = score.totalPoints(TeamId.TEAM_2);
-        TeamId winning = ptTeam1 >= Jass.WINNING_POINTS ? TeamId.TEAM_1
-                : TeamId.TEAM_2;
-        for (Player each : players.values()) {
-            each.setWinningTeam(winning);
-        }
-    }
-
-    /**
-     * fait avancer l'état du jeu jusqu'à la fin du prochain pli, ou ne fait
-     * rien si la partie est terminée
-     * 
-     */
-    public void advanceToEndOfNextTrick() {
-        if (isGameOver()) {
-            return;
-        }
-        // collecte le trick précédant
-        if (turnState.trick().isFull()) {
-            collect();
-            // teste si le pli collecté met fin à la partie
-            if (isGameOver()) {
-                endGame();
-                return;
-            }
-        }
-
-        // vérifie si il faut commencer un nouveau tour ou pas
-        if (turnState.isTerminal()) {
-            beginNewTurn();
-        }
-        updateTrick();
-        for (int i = 0; i < 4; i++) {
-            play(turnState.nextPlayer());
-        }
-
-    }
+	}
 }
