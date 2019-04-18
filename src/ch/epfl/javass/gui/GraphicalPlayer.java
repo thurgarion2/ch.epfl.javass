@@ -3,24 +3,17 @@ package ch.epfl.javass.gui;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import javax.swing.GroupLayout.Alignment;
-
-import ch.epfl.javass.jass.*;
+import ch.epfl.javass.jass.Card;
+import ch.epfl.javass.jass.CardSet;
+import ch.epfl.javass.jass.PlayerId;
+import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.binding.StringExpression;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -32,7 +25,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
 
 public final class GraphicalPlayer {
     
