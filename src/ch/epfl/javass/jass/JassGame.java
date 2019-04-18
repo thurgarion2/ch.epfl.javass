@@ -79,6 +79,7 @@ public final class JassGame {
 		List<Card> deck = deck();
 		Collections.shuffle(deck, shuffleRng);
 		int size = Jass.HAND_SIZE;
+		
 		for (PlayerId id : PlayerId.ALL) {
 			int index = id.ordinal();
 			CardSet hand = CardSet.of(deck.subList(index * size, (index + 1) * size));
@@ -112,13 +113,6 @@ public final class JassGame {
 		return trump;
 	}
 
-	// met à jour la connaissance du pli de chaque joeur
-	private void updateTrick() {
-		for (Player each : players.values()) {
-			each.updateTrick(turnState.trick());
-		}
-	}
-
 	// met à jour le score de chaque joueur
 	private void updateScore(Score score) {
 		for (Player each : players.values()) {
@@ -141,12 +135,31 @@ public final class JassGame {
 		turnState = TurnState.initial(newTrump(), turnState.score().nextTurn(), firstPlayer);
 		updateScore(turnState.score());
 	}
+	
+	// fini la partie
+    private void endGame() {
+        Score score = turnState.score().nextTurn();
+        int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
+        int ptTeam2 = score.totalPoints(TeamId.TEAM_2);
+        TeamId winning = ptTeam1 >= Jass.WINNING_POINTS ? TeamId.TEAM_1 : TeamId.TEAM_2;
+        
+        for (Player each : players.values()) {
+            each.setWinningTeam(winning);
+        }
+    }
 
 	// rammasse le pli courant
 	private void collect() {
 		turnState = turnState.withTrickCollected();
 		updateScore(turnState.score());
 	}
+	
+	// met à jour la connaissance du pli de chaque joeur
+    private void updateTrick() {
+        for (Player each : players.values()) {
+            each.updateTrick(turnState.trick());
+        }
+    }
 
 	// fait jouer un joeur
 	private void play(PlayerId playerId) {
@@ -159,18 +172,6 @@ public final class JassGame {
 		hands.put(playerId, hand.remove(played));
 		player.updateHand(hands.get(playerId));
 		updateTrick();
-	}
-
-	// fini la partie
-	private void endGame() {
-		Score score = turnState.score().nextTurn();
-		int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
-		int ptTeam2 = score.totalPoints(TeamId.TEAM_2);
-		TeamId winning = ptTeam1 >= Jass.WINNING_POINTS ? TeamId.TEAM_1 : TeamId.TEAM_2;
-		
-		for (Player each : players.values()) {
-			each.setWinningTeam(winning);
-		}
 	}
 
 	/**

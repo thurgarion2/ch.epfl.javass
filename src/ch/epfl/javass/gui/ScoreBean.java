@@ -10,16 +10,16 @@ import ch.epfl.javass.jass.TeamId;
 
 public final class ScoreBean {
     
-    private IntegerProperty turnPointsTeam1Property;
-    private IntegerProperty turnPointsTeam2Property;
+    private final IntegerProperty turnPointsTeam1Property;
+    private final IntegerProperty turnPointsTeam2Property;
     
-    private IntegerProperty gamePointsTeam1Property;
-    private IntegerProperty gamePointsTeam2Property;
+    private final IntegerProperty gamePointsTeam1Property;
+    private final IntegerProperty gamePointsTeam2Property;
     
-    private IntegerProperty totalPointsTeam1Property;
-    private IntegerProperty totalPointsTeam2Property;
+    private final IntegerProperty totalPointsTeam1Property;
+    private final IntegerProperty totalPointsTeam2Property;
     
-    private ObjectProperty<TeamId> winningTeamProperty;
+    private final ObjectProperty<TeamId> winningTeamProperty;
 
     public ScoreBean(int turnPointsT1, int gamePointsT1, int totalPointsT1,
             int turnPointsT2, int gamePointsT2, int totalPointsT2) {
