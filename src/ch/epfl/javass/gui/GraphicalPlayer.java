@@ -26,6 +26,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 public final class GraphicalPlayer {
     
@@ -204,7 +205,7 @@ public final class GraphicalPlayer {
           mainPane=pane;
     }
 
-    public Scene createStage() {
-        return new Scene(mainPane);
+    public Stage createStage() {
+        return null;
     }
 }
