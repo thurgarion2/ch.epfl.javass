@@ -27,6 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 public final class GraphicalPlayer {
     
@@ -258,12 +259,13 @@ public final class GraphicalPlayer {
 		BorderPane victoryPaneT2 = new BorderPane();
 		victoryPaneT2.setCenter(victoryPaneT2(playersNames, score));
 
+
 		StackPane pane = new StackPane(mainPane, victoryPaneT1, victoryPaneT2);
 		this.pane = pane;
 	}
     
     
 	public Scene createStage() {
-        return new Scene(pane);
+		return new Scene(pane);
     }
 }
