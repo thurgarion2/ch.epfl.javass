@@ -10,43 +10,79 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+/**
+ * le bean du pli d'une partie de jass
+ * 
+ * @author erwan serandour (296100)
+ *
+ */
 public final class TrickBean {
     private final ObjectProperty<Card.Color> trumpProperty;
     private final ObjectProperty<PlayerId> winningPlayerProperty;
     private final ObservableMap<PlayerId, Card> trickProperty;
-    
+
+    /**
+     * 
+     */
     public TrickBean() {
-        trumpProperty= new SimpleObjectProperty<>(null);
-        winningPlayerProperty= new SimpleObjectProperty<>(null);
-        trickProperty= FXCollections.observableHashMap();
-        for(PlayerId id : PlayerId.ALL) {
+        trumpProperty = new SimpleObjectProperty<>(null);
+        winningPlayerProperty = new SimpleObjectProperty<>(null);
+        trickProperty = FXCollections.observableHashMap();
+        for (PlayerId id : PlayerId.ALL) {
             trickProperty.put(id, null);
         }
     }
-    
-    public ReadOnlyObjectProperty <Card.Color> trumpProperty(){
+
+    /**
+     * retourne la propriété de l'atout
+     * 
+     * @return la propriété de l'atout
+     */
+    public ReadOnlyObjectProperty<Card.Color> trumpProperty() {
         return trumpProperty;
     }
-    
+
+    /**
+     * met à jour l'atout
+     * 
+     * @param trump
+     *            l'atout mis à jour
+     */
     public void setTrump(Card.Color trump) {
         trumpProperty.set(trump);
     }
-    
-    public  ReadOnlyObjectProperty <PlayerId> winningPlayerProperty(){
+
+    /**
+     * retourne la propriété du joueur gagant le plis
+     * 
+     * @return la propriété du joueur gagant le plis
+     */
+    public ReadOnlyObjectProperty<PlayerId> winningPlayerProperty() {
         return winningPlayerProperty;
     }
-    
+
+    /**
+     * retourne la propriété du plis
+     * 
+     * @return la propriété du plis
+     */
     public ObservableMap<PlayerId, Card> trick() {
         return FXCollections.unmodifiableObservableMap(trickProperty);
     }
-    
+
+    /**
+     * met à jour la propriété du plis et du joueur gagant le plis
+     * 
+     * @param newTrick
+     *            le plis mis à jour
+     */
     public void setTrick(Trick newTrick) {
         PlayerId winner = newTrick.isEmpty() ? null : newTrick.winningPlayer();
         this.winningPlayerProperty.set(winner);
-        for(int i=0; i<PlayerId.COUNT; i++) {
-            trickProperty.put(newTrick.player(i), i<newTrick.size() ? newTrick.card(i) : null);
+        for (int i = 0; i < PlayerId.COUNT; i++) {
+            trickProperty.put(newTrick.player(i),
+                    i < newTrick.size() ? newTrick.card(i) : null);
         }
     }
-    
-    
+
 }

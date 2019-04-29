@@ -132,8 +132,28 @@ public final class Serializer {
         return Score.ofPacked(StringSerializer.deserializeLong(score));
     }
 
+    /**
+     * sérialise une énummeration quelquonc
+     * 
+     * @param e
+     *            l'énumeration
+     * @return une chaine de caractère représentant l'énumération sérialisé
+     */
     public static String serializeEnum(Enum e) {
         return StringSerializer.serializeInt(e.ordinal());
+    }
+    
+    /**
+     * désérialise une énumeration
+     * 
+     * @param e
+     *            l'énumération sérialisée
+     * @param values
+     *            l'ensemble des valeurs de l'énummération
+     * @return l'énumération désérialisée
+     */
+    public static <E extends Enum<E>> E deserializeEnum(String e, E[] values) {
+        return values[StringSerializer.deserializeInt(e)];
     }
 
 }

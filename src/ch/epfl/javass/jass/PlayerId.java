@@ -33,9 +33,11 @@ public enum PlayerId {
 	 * liste de chaque joueur membre de l'énumeration
 	 */
 	public static final List<PlayerId> ALL = Collections.unmodifiableList(Arrays.asList(values()));
+	
+
 
 	/**
-	 * le nombre de joeurs
+	 * le nombre de joueurs
 	 */
 	public static final int COUNT = ALL.size();
 

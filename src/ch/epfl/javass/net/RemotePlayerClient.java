@@ -52,8 +52,10 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	@Override
 	public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
 		try {
-			String message = "PLRS " + Serializer.serializeEnum(ownId) + " " + serializeMap(playerNames) + '\n';
-			w.write(message);
+			w.write(JassCommand.PLRS.name()); 
+			w.write(" "+Serializer.serializeEnum(ownId));
+			w.write(" "+serializeMap(playerNames));
+			w.write('\n');
 			w.flush();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -63,7 +65,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	@Override
 	public void updateHand(CardSet newHand) {
 		try {
-			w.write("HAND ");
+			w.write(JassCommand.HAND.name()+" ");
 			w.write(Serializer.serializeCardSet(newHand));
 			w.write('\n');
 			w.flush();
@@ -75,7 +77,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	@Override
 	public void setTrump(Color trump) {
 		try {
-			w.write("TRMP ");
+			w.write(JassCommand.TRMP.name()+" ");
 			w.write(Serializer.serializeEnum(trump));
 			w.write('\n');
 			w.flush();
@@ -87,7 +89,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	@Override
 	public void updateTrick(Trick newTrick) {
 		try {
-			w.write("TRCK ");
+			w.write(JassCommand.TRCK.name()+" ");
 			w.write(Serializer.serializeTrick(newTrick));
 			w.write('\n');
 			w.flush();
@@ -99,7 +101,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	@Override
 	public void updateScore(Score score) {
 		try {
-			w.write("SCOR ");
+			w.write(JassCommand.SCOR.name()+" ");
 			w.write(Serializer.serializeScore(score));
 			w.write('\n');
 			w.flush();
@@ -111,7 +113,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	@Override
 	public void setWinningTeam(TeamId winningTeam) {
 		try {
-			w.write("WINR ");
+			w.write(JassCommand.WINR.name()+" ");
 			w.write(Serializer.serializeEnum(winningTeam));
 			w.write('\n');
 			w.flush();
@@ -123,7 +125,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	@Override
 	public Card cardToPlay(TurnState state, CardSet hand) {
 		try {
-			w.write("CARD ");
+			w.write(JassCommand.CARD.name()+" ");
 			w.write(Serializer.serializeTurnState(state));
 			w.write(" ");
 			w.write(Serializer.serializeCardSet(hand));

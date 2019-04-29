@@ -11,7 +11,7 @@ import ch.epfl.javass.jass.Trick;
 import ch.epfl.javass.jass.TurnState;
 
 /**
- * plusieurs méthodes utiles pour serialiser et déserialiser des stirng et des ints sous forme de
+ * plusieurs méthodes utiles pour serialiser et déserialiser des stirng et des int sous forme de
  * chaine de caractères
  * 
  * @author erwan serandour (296100)

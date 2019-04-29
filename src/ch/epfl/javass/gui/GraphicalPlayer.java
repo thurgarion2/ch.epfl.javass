@@ -11,6 +11,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -186,11 +187,8 @@ public final class GraphicalPlayer {
         ImageView trump=bindImage(TRUMP_IMAGE, trick.trumpProperty());
         trump.setFitHeight(FIT_HEIGHT_TRUMP);
         trump.setFitWidth(FIT_WIDTH_TRUMP);
-        VBox box = new VBox();
-        box.getChildren().add(trump);
-        box.setAlignment(Pos.CENTER);
-       
-        pane.add(box, 1, 1);
+        GridPane.setHalignment(trump,  HPos.CENTER);
+        pane.add(trump, 1, 1);
         
         pane.setStyle(CSS_TRICK_PANE);
         return pane;
@@ -200,7 +198,6 @@ public final class GraphicalPlayer {
             Map<PlayerId, String> playersNames, TrickBean trick,
             ScoreBean score) {
           BorderPane pane = new BorderPane();
-          
           pane.setTop(scorePane(own, score, playersNames));
           pane.setCenter(trickPane(own, trick, playersNames));
           
