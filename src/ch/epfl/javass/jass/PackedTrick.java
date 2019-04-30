@@ -304,6 +304,8 @@ public final class PackedTrick {
         Color color = baseColor(pkTrick);
         Color trump = trump(pkTrick);
         int winningCard = card(pkTrick, indexOfwinningCard(pkTrick));
+        int jack = PackedCard.pack(trump, Rank.JACK);
+        
         // ajoute toutes les cartes de la couleur de base
         long playableCards = PackedCardSet.subsetOfColor(pkHand, color);
 
@@ -318,14 +320,18 @@ public final class PackedTrick {
             long under = PackedCardSet.subsetOfColor(PackedCardSet.complement(above), 
                     trump);
             playableCards = PackedCardSet.difference(pkHand, under);
+            
+            // teste ssi le valet peut être jouer en atout
+            if (PackedCardSet.size(playableCards) == 1 
+                    && PackedCardSet.get(playableCards, 0) == jack) {
+                return pkHand;
+            }
 
             // test si seulement sous couper est possible
             return !PackedCardSet.isEmpty(playableCards) ? playableCards : pkHand;
         }
         // teste ssi le valet peut être jouer en atout
-        int jack = PackedCard.pack(trump, Rank.JACK);
         if (PackedCardSet.size(playableCards) == 1 
-                && trump == color
                 && PackedCardSet.get(playableCards, 0) == jack) {
             return pkHand;
         }

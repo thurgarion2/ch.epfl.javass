@@ -194,10 +194,7 @@ public final class TurnState {
      */
     public TurnState withNewCardPlayedAndTrickCollected(Card card) {
         TurnState next = withNewCardPlayed(card);
-        if (PackedTrick.isFull(next.trick)) {
-            return next.withTrickCollected();
-        }
-        return next;
+        return PackedTrick.isFull(next.trick) ? next.withTrickCollected() : next;
     }
 
 }

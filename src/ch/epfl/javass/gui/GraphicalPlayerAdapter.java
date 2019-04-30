@@ -2,6 +2,8 @@ package ch.epfl.javass.gui;
 
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 import javafx.application.*;
 
 import ch.epfl.javass.jass.Card;
@@ -23,10 +25,8 @@ public final class GraphicalPlayerAdapter implements Player {
     private final ScoreBean score;
     private final TrickBean trick;
     
-    public GraphicalPlayerAdapter(GraphicalPlayer underlying) {
-   
+    public GraphicalPlayerAdapter() {
         this.queu= new ArrayBlockingQueue<>(1);
-        
         this.hand= new HandBean();
         this.score= new ScoreBean();
         this.trick= new TrickBean();
@@ -38,14 +38,18 @@ public final class GraphicalPlayerAdapter implements Player {
             this.hand.setHand(hand);
             this.hand.setPlayableCards(state.trick().playableCards(hand));
         });
-        return queu.poll();
+        try {
+            return queu.poll(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+        }
+        return null;
     }
     
     
     @Override
     public void setPlayers(PlayerId ownId,
                    Map<PlayerId, String> playerNames) {
-      graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trick, score);
+      graphicalPlayer = new GraphicalPlayer(ownId, playerNames, trick, score, hand, queu);
       Platform.runLater(() -> { graphicalPlayer.createStage().show(); });
     }
     

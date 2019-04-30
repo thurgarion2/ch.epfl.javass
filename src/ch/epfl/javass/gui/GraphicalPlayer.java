@@ -2,14 +2,19 @@ package ch.epfl.javass.gui;
 
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -20,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -30,8 +36,11 @@ import javafx.stage.Stage;
 
 public final class GraphicalPlayer {
     
-    private static final int FIT_WIDTH_CARD = 120;
-    private static final int FIT_HEIGHT_CARD = 180;
+    private static final int FIT_WIDTH_CARD_TRICK = 120;
+    private static final int FIT_HEIGHT_CARD_TRICK = 180;
+    
+    private static final int FIT_WIDTH_CARD_HAND = 120;
+    private static final int FIT_HEIGHT_CARD_HAND = 180;
     
     private static final int FIT_WIDTH_TRUMP = 101;
     private static final int FIT_HEIGHT_TRUMP = 101;
@@ -39,8 +48,7 @@ public final class GraphicalPlayer {
     private static final String CSS_SCORE_PANE = "-fx-font: 16 Optima;"
             + "-fx-background-color: lightgray;" 
             + "-fx-padding: 5px;"
-            + "-fx-alignment: center;";
-    
+            + "-fx-alignment: center;";  
     private static final String CSS_TRICK_PANE = "-fx-background-color: whitesmoke;" + 
             "-fx-padding: 5px;" + 
             "-fx-border-width: 3px 0px;" + 
@@ -53,25 +61,29 @@ public final class GraphicalPlayer {
             "-fx-stroke: lightpink;" + 
             "-fx-stroke-width: 5;" + 
             "-fx-opacity: 0.5;";
-    
-    
     private static final String CSS_TEXT_NAMES = "-fx-font: 14 Optima";
+    private static final String CSS_HAND_CARD = "-fx-background-color: lightgray;" + 
+            "-fx-spacing: 5px;" + 
+            "-fx-padding: 5px;";
     
-    private static final ObservableMap<Card, Image> CARDS_IMAGE= FXCollections.unmodifiableObservableMap(allCardsImage());
-    private static final ObservableMap<Card.Color, Image> TRUMP_IMAGE= FXCollections.unmodifiableObservableMap(allTrumpImage());
+    private static final ObservableMap<Card, Image> CARDS_TRICK_IMAGE
+            =FXCollections.unmodifiableObservableMap(allCardsImage(240));
+    private static final ObservableMap<Card, Image> CARDS_HAND_IMAGE 
+            =FXCollections.unmodifiableObservableMap(allCardsImage(160));
+    private static final ObservableMap<Card.Color, Image> TRUMP_IMAGE 
+            =FXCollections.unmodifiableObservableMap(allTrumpImage());
     
 
     private final Pane mainPane;
     
-    private static ObservableMap<Card, Image> allCardsImage() {
+    private static ObservableMap<Card, Image> allCardsImage(int size) {
         ObservableMap<Card, Image> images = FXCollections.observableHashMap();
         for(int i=0; i<CardSet.ALL_CARDS.size(); i++) {
             Card card=CardSet.ALL_CARDS.get(i);
-            images.put(card, new Image("/card_"+card.color().ordinal()+"_"+card.rank().ordinal()+"_240.png"));
+            images.put(card, new Image("/card_"+card.color().ordinal()+"_"+card.rank().ordinal()+"_"+size+".png"));
         }
         return images;
     }
-    
     private static ObservableMap<Card.Color, Image> allTrumpImage() {
         ObservableMap<Card.Color, Image> images = FXCollections.observableHashMap();
         for(Card.Color c : Card.Color.ALL) {
@@ -113,7 +125,7 @@ public final class GraphicalPlayer {
                 });
         line[2]=(lasTrick);
         line[3]=new Text(" / Total : ");
-        line[4]=bindText(score.gamePointsProperty(TeamId.TEAM_1), TextAlignment.LEFT);
+        line[4]=bindText(score.gamePointsProperty(t), TextAlignment.LEFT);
         
         return line;
     }
@@ -136,17 +148,18 @@ public final class GraphicalPlayer {
         return image;
     }
     
+   
     private static Pane cardImage(PlayerId id, TrickBean trick) {
         StackPane pane = new StackPane();
         
-        ImageView image = bindImage(CARDS_IMAGE,Bindings.valueAt(trick.trick(), id));
-        image.setFitHeight(FIT_HEIGHT_CARD);
-        image.setFitWidth(FIT_WIDTH_CARD);
+        ImageView image = bindImage(CARDS_TRICK_IMAGE,Bindings.valueAt(trick.trick(), id));
+        image.setFitHeight(FIT_HEIGHT_CARD_TRICK);
+        image.setFitWidth(FIT_WIDTH_CARD_TRICK);
         pane.getChildren().add(image);
         
         Rectangle rect = new Rectangle();
-        rect.setWidth(FIT_WIDTH_CARD);
-        rect.setHeight(FIT_HEIGHT_CARD);
+        rect.setWidth(FIT_WIDTH_CARD_TRICK);
+        rect.setHeight(FIT_HEIGHT_CARD_TRICK);
         rect.setStyle(CSS_HALO);
         rect.setEffect(new GaussianBlur(4));
         rect.visibleProperty().bind(trick.winningPlayerProperty().isEqualTo(id));
@@ -195,17 +208,52 @@ public final class GraphicalPlayer {
         return pane;
     }
     
+    private static Pane handPane(HandBean hand, ArrayBlockingQueue<Card> queu) {
+        HBox box= new HBox();
+        
+        for(int i=0; i<hand.hand().size(); i++) {
+            int index=i;
+            
+            ImageView card = bindImage(CARDS_HAND_IMAGE,  Bindings.valueAt(hand.hand(), i));
+            card.setFitHeight(FIT_HEIGHT_CARD_HAND);
+            card.setFitWidth(FIT_WIDTH_CARD_HAND);
+            card.setOnMouseClicked(e->{try {
+                queu.offer(hand.hand().get(index), Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e1) {
+            }});
+            
+            BooleanBinding isPlayable=Bindings.createBooleanBinding(()->{
+                return hand.playableCards().contains(hand.hand().get(index)); },
+                hand.hand(), hand.playableCards());
+            card.opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
+            card.disableProperty().bind(isPlayable.not());
+            
+            box.getChildren().add(card);
+        }
+        
+        box.setStyle(CSS_HAND_CARD);
+        return box;
+    }
+    
     public GraphicalPlayer(PlayerId own,
-            Map<PlayerId, String> playersNames, TrickBean trick,
-            ScoreBean score) {
+            Map<PlayerId, String> playersNames,
+            TrickBean trick,
+            ScoreBean score,
+            HandBean hand,
+            ArrayBlockingQueue<Card> queu
+            ) {
           BorderPane pane = new BorderPane();
           pane.setTop(scorePane(own, score, playersNames));
           pane.setCenter(trickPane(own, trick, playersNames));
+          pane.setBottom(handPane(hand, queu));
           
           mainPane=pane;
     }
 
     public Stage createStage() {
-        return null;
+        Scene main = new Scene(mainPane);
+        Stage stage = new Stage();
+        stage.setScene(main);
+        return stage;
     }
 }

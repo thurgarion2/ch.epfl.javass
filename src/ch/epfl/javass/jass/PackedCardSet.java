@@ -183,13 +183,6 @@ public final class PackedCardSet {
 
     }
 
-    // retourne l'index d'une carte dans le l'ensemble de carte
-    private static int cardIndex(int pkCard) {
-        assert PackedCard.isValid(pkCard);
-        return PackedCard.color(pkCard).ordinal() * BITS_PER_COLOR
-                + PackedCard.rank(pkCard).ordinal();
-    }
-
     /**
      * retourne l'ensemble de cartes empaqueté donné auquel la carte empaquetée
      * donnée a été ajoutée
@@ -204,7 +197,7 @@ public final class PackedCardSet {
     public static long add(long pkCardSet, int pkCard) {
         assert isValid(pkCardSet);
         assert PackedCard.isValid(pkCard);
-        return pkCardSet | (1L << cardIndex(pkCard));
+        return pkCardSet | (1L << pkCard);
     }
 
     /**
@@ -221,7 +214,7 @@ public final class PackedCardSet {
     public static long remove(long pkCardSet, int pkCard) {
         assert isValid(pkCardSet);
         assert PackedCard.isValid(pkCard);
-        return pkCardSet & (~(1L << cardIndex(pkCard)));
+        return pkCardSet & (~(1L << pkCard));
     }
 
     /**
@@ -238,7 +231,7 @@ public final class PackedCardSet {
     public static boolean contains(long pkCardSet, int pkCard) {
         assert isValid(pkCardSet);
         assert PackedCard.isValid(pkCard);
-        return (pkCardSet & (1L << cardIndex(pkCard))) != EMPTY;
+        return (pkCardSet & (1L << pkCard)) != EMPTY;
     }
 
     /**

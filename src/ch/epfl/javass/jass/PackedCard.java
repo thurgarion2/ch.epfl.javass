@@ -43,12 +43,14 @@ public final class PackedCard {
 	 *         entier de la carte est invalide
 	 */
 	public static boolean isValid(int pkCard) {
-		// tout le reste des bits est à 0
-		if (Bits32.extract(pkCard, 6, Integer.SIZE - 6) != 0) {
-			return false;
-		}
+        int NB_BITS_FOR_CARD = NOMBRE_BITS_FOR_RANK + NOMBRE_BITS_FOR_COLOUR;
+        // tout le reste des bits est à 0
+        if (Bits32.extract(pkCard, NB_BITS_FOR_CARD,
+                Integer.SIZE - NB_BITS_FOR_CARD) != 0) {
+            return false;
+        }
 		int rank = Bits32.extract(pkCard, START_OF_RANK, NOMBRE_BITS_FOR_RANK);
-		return !(rank < 0 || rank > 8);
+		return !(rank < 0 || rank >= Card.Rank.COUNT);
 	}
 
 	/**

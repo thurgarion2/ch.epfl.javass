@@ -138,6 +138,8 @@ public final class JassGame {
 	
 	// fini la partie
     private void endGame() {
+        updateTrick(turnState.isTerminal()? Trick.firstEmpty(Card.Color.CLUB, PlayerId.PLAYER_1) 
+                : turnState.trick());
         Score score = turnState.score().nextTurn();
         int ptTeam1 = score.totalPoints(TeamId.TEAM_1);
         int ptTeam2 = score.totalPoints(TeamId.TEAM_2);
@@ -155,9 +157,9 @@ public final class JassGame {
 	}
 	
 	// met à jour la connaissance du pli de chaque joeur
-    private void updateTrick() {
+    private void updateTrick(Trick trick) {
         for (Player each : players.values()) {
-            each.updateTrick(turnState.trick());
+            each.updateTrick(trick);
         }
     }
 
@@ -171,7 +173,7 @@ public final class JassGame {
 
 		hands.put(playerId, hand.remove(played));
 		player.updateHand(hands.get(playerId));
-		updateTrick();
+		updateTrick(turnState.trick());
 	}
 
 	/**
@@ -183,7 +185,7 @@ public final class JassGame {
 		if (isGameOver()) {
 			return;
 		}
-		// collecte le trick précédant
+		// collecte le pli précédant
 		if (turnState.trick().isFull()) {
 			collect();
 			// teste si le pli collecté met fin à la partie
@@ -197,8 +199,8 @@ public final class JassGame {
 		if (turnState.isTerminal()) {
 			beginNewTurn();
 		}
-		updateTrick();
-		for (int i = 0; i < 4; i++) {
+		updateTrick(turnState.trick());
+		for (int i = 0; i < PlayerId.COUNT; i++) {
 			play(turnState.nextPlayer());
 		}
 

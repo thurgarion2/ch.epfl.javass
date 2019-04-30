@@ -124,7 +124,7 @@ public final class MctsPlayer implements Player {
             return next.pathToMostPromisingNode(current);
         }
         
-        private double  score(int C, Node parent) {
+        private double score(int C, Node parent) {
             double s = S;
             double n = N;
             if (N == 0) {

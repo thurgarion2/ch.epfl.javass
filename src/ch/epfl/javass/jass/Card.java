@@ -147,7 +147,7 @@ public enum Color {
         */
        CLUB("\u2663");
 
-       private String symbol;
+       private final String symbol;
 
        private Color(String symbol) {
            this.symbol = symbol;
@@ -228,8 +228,8 @@ public enum Color {
         */
        public final static int COUNT = ALL.size();
 
-       private String symbol;
-       private int trumpOrdinal;
+       private final String symbol;
+       private final int trumpOrdinal;
 
        private Rank(String s, int trumpOrdinal) {
            this.trumpOrdinal = trumpOrdinal;
