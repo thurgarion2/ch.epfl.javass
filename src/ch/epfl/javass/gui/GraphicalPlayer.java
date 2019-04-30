@@ -10,13 +10,9 @@ import ch.epfl.javass.jass.CardSet;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
-
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -57,20 +53,14 @@ public final class GraphicalPlayer {
             "-fx-border-style: solid;" + 
             "-fx-border-color: gray;" + 
             "-fx-alignment: center;";
-    
     private static final String CSS_HALO = "-fx-arc-width: 20;" + 
             "-fx-arc-height: 20;" + 
             "-fx-fill: transparent;" + 
             "-fx-stroke: lightpink;" + 
             "-fx-stroke-width: 5;" + 
             "-fx-opacity: 0.5;";
-
-    
     private static final String CSS_VICTORY_PANE = "-fx-font: 16 Optima;" +
     		"-fx-background-color: white;";
-    
-    
-
     private static final String CSS_TEXT_NAMES = "-fx-font: 14 Optima";
     private static final String CSS_HAND_CARD = "-fx-background-color: lightgray;" + 
             "-fx-spacing: 5px;" + 
@@ -84,7 +74,7 @@ public final class GraphicalPlayer {
             =FXCollections.unmodifiableObservableMap(allTrumpImage());
     
 
-    private final Pane pane;
+    private final Pane mainPane;
     
     private static ObservableMap<Card, Image> allCardsImage(int size) {
         ObservableMap<Card, Image> images = FXCollections.observableHashMap();
@@ -124,6 +114,7 @@ public final class GraphicalPlayer {
         }
         Text name = new Text(teamName.toString());
         name.setTextAlignment(TextAlignment.RIGHT);
+        //name.setStyle(CSS_SCORE_PANE);
         line[0]=name;
         line[1]=bindText(score.turnPointsProperty(t), TextAlignment.RIGHT);
         
@@ -242,6 +233,7 @@ public final class GraphicalPlayer {
         }
         
         box.setStyle(CSS_HAND_CARD);
+        box.setAlignment(Pos.CENTER);
         return box;
     }
     
@@ -252,37 +244,44 @@ public final class GraphicalPlayer {
             HandBean hand,
             ArrayBlockingQueue<Card> queu
             ) {
-          BorderPane pane = new BorderPane();
-          pane.setTop(scorePane(own, score, playersNames));
-          pane.setCenter(trickPane(own, trick, playersNames));
-          pane.setBottom(handPane(hand, queu));
+          StackPane pane = new StackPane();
+        
+          BorderPane gamePane = new BorderPane();
+          gamePane.setTop(scorePane(own, score, playersNames));
+          gamePane.setCenter(trickPane(own, trick, playersNames));
+          gamePane.setBottom(handPane(hand, queu));
+          pane.getChildren().add(gamePane);
+          pane.setAlignment(Pos.CENTER);
+          
+          pane.getChildren().add(
+                  victoryPane(playersNames.get(own),
+                  playersNames.get(fromOwn(own, 2)),
+                  score, own.team()));
+          
+          pane.getChildren().add(
+                  victoryPane(playersNames.get(fromOwn(own, 1)),
+                  playersNames.get(fromOwn(own, 3)),
+                  score, own.team().other()));
           
           mainPane=pane;
 
     }
+  
+    private static Pane victoryPane(String name1, String name2, ScoreBean score, TeamId team) {
+        BorderPane pane = new BorderPane();
+        Text victory = new Text();
+        victory.textProperty().bind(Bindings.format("%1$s et %2$s ont gagné avec %3$d points contre %4$d.",
+                name1,
+                name2,
+                score.totalPointsProperty(team),
+                score.totalPointsProperty(team.other())
+                ));
+        pane.setCenter(victory);
+        pane.visibleProperty().bind(score.winningTeamProperty().isEqualTo(team));
+        pane.setStyle(CSS_VICTORY_PANE);
+        return pane;
+    }
     
-    private Node victoryPaneT2(Map<PlayerId, String> playersNames, ScoreBean score) {
-		BorderPane pane = new BorderPane();
-		pane.visibleProperty().bind(score.winningTeamProperty().isEqualTo(TeamId.TEAM_2));
-		pane.setCenter(victoryPane(playersNames, score, TeamId.TEAM_2));
-		pane.setStyle(CSS_VICTORY_PANE);
-		return pane;
-	}
-    
-    public GraphicalPlayer(PlayerId own, Map<PlayerId, String> playersNames, TrickBean trick,
-			ScoreBean score) {
-    	
-		BorderPane mainPane = new BorderPane();
-		mainPane.setTop(scorePane(own, score, playersNames));
-		mainPane.setCenter(trickPane(own, trick, playersNames));
-		
-		BorderPane victoryPaneT1 = new BorderPane();
-		victoryPaneT1.setCenter(victoryPaneT1(playersNames, score));
-		
-		BorderPane victoryPaneT2 = new BorderPane();
-		victoryPaneT2.setCenter(victoryPaneT2(playersNames, score));
-
-
     public Stage createStage() {
         Scene main = new Scene(mainPane);
         Stage stage = new Stage();
