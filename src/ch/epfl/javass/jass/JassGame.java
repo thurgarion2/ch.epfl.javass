@@ -58,7 +58,7 @@ public final class JassGame {
 	 */
 	public boolean isGameOver() {
 		// dans le cas
-		Score score = turnState.score();
+		Score score = turnState.score().nextTurn();
 		int pointsTeam1 = score.totalPoints(TeamId.TEAM_1);
 		int pointsTeam2 = score.totalPoints(TeamId.TEAM_2);
 		return pointsTeam1 >= Jass.WINNING_POINTS || pointsTeam2 >= Jass.WINNING_POINTS;

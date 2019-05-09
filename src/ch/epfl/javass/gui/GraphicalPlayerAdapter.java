@@ -15,7 +15,12 @@ import ch.epfl.javass.jass.TeamId;
 import ch.epfl.javass.jass.Trick;
 import ch.epfl.javass.jass.TurnState;
 import ch.epfl.javass.jass.Card.Color;
-
+/**
+ * un adapteur permettant de lié GraphicalPlayer à l'interface player
+ * 
+ * @author erwan serandour (296100)
+ *
+ */
 public final class GraphicalPlayerAdapter implements Player {
     
     private GraphicalPlayer graphicalPlayer;
@@ -25,6 +30,9 @@ public final class GraphicalPlayerAdapter implements Player {
     private final ScoreBean score;
     private final TrickBean trick;
     
+    /**
+     * 
+     */
     public GraphicalPlayerAdapter() {
         this.queu= new ArrayBlockingQueue<>(1);
         this.hand= new HandBean();
@@ -38,8 +46,13 @@ public final class GraphicalPlayerAdapter implements Player {
             this.hand.setHand(hand);
             this.hand.setPlayableCards(state.trick().playableCards(hand));
         });
+       
         try {
-            return queu.poll(Long.MAX_VALUE,TimeUnit.MILLISECONDS);
+            Card played= queu.take();
+            Platform.runLater(()->{
+                this.hand.setPlayableCards(CardSet.EMPTY);
+            });
+            return played;
         } catch (InterruptedException e) {
         }
         return null;

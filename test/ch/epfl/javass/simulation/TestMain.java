@@ -22,7 +22,6 @@ import javafx.stage.Stage;
 import ch.epfl.javass.gui.*;
 import ch.epfl.javass.jass.*;
 import javafx.stage.Stage;
-import ch.epfl.javass.jass.Player;
 
 public final class TestMain extends Application {
     public static void main(String[] args) { launch(args); }
@@ -33,7 +32,7 @@ public final class TestMain extends Application {
       ps.put(PlayerId.PLAYER_1, new GraphicalPlayerAdapter());
       ps.put(PlayerId.PLAYER_2, new MctsPlayer(PlayerId.PLAYER_2, 123, 10_000));
       ps.put(PlayerId.PLAYER_3, new MctsPlayer(PlayerId.PLAYER_3, 456, 10_000));
-      ps.put(PlayerId.PLAYER_4, new MctsPlayer(PlayerId.PLAYER_4, 789, 10_000));
+      ps.put(PlayerId.PLAYER_4, new PacedPlayer(new MctsPlayer(PlayerId.PLAYER_4, 789, 10_000), 3));
 
       Map<PlayerId, String> ns = new EnumMap<>(PlayerId.class);
       PlayerId.ALL.forEach(i -> ns.put(i, i.name()));

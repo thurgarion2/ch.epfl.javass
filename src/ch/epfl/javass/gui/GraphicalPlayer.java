@@ -32,13 +32,19 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+/**
+ * génère le stage pour représenter un joueur
+ * 
+ * @author erwan serandour (296100)
+ *
+ */
 public final class GraphicalPlayer {
     
     private static final int FIT_WIDTH_CARD_TRICK = 120;
     private static final int FIT_HEIGHT_CARD_TRICK = 180;
     
-    private static final int FIT_WIDTH_CARD_HAND = 120;
-    private static final int FIT_HEIGHT_CARD_HAND = 180;
+    private static final int FIT_WIDTH_CARD_HAND = 80;
+    private static final int FIT_HEIGHT_CARD_HAND = 120;
     
     private static final int FIT_WIDTH_TRUMP = 101;
     private static final int FIT_HEIGHT_TRUMP = 101;
@@ -103,20 +109,11 @@ public final class GraphicalPlayer {
         return out;
     }
     
-    private static Node[] scoreTeam(PlayerId own, TeamId t, ScoreBean score, Map<PlayerId, String> playersNames) {
+    private static Node[] scoreTeam(TeamId t, ScoreBean score, String names1, String names2) {
         Node[] line = new Node[5];
         
-        StringJoiner teamName = new StringJoiner(" et ",""," : ");
-        for(int i=0; i<PlayerId.COUNT; i++) {
-            if(fromOwn(own, i).team()==t) {
-                teamName.add(fromOwn(own, i).team()==t ? playersNames.get(fromOwn(own, i)) : "");
-            }
-        }
-        Text name = new Text(teamName.toString());
-        name.setTextAlignment(TextAlignment.RIGHT);
-        //name.setStyle(CSS_SCORE_PANE);
-        line[0]=name;
-        line[1]=bindText(score.turnPointsProperty(t), TextAlignment.RIGHT);
+        Text names = new Text(names1+" et "+names2+" : ");
+        names.setTextAlignment(TextAlignment.RIGHT);
         
         Text lasTrick = new Text();
         score.turnPointsProperty(t).addListener(
@@ -124,6 +121,9 @@ public final class GraphicalPlayer {
                     int diff = nV.intValue()-oV.intValue();
                     lasTrick.setText(diff>0 ? " (+"+diff+")" : "" );
                 });
+        
+        line[0]=names;
+        line[1]=bindText(score.turnPointsProperty(t), TextAlignment.RIGHT);
         line[2]=(lasTrick);
         line[3]=new Text(" / Total : ");
         line[4]=bindText(score.gamePointsProperty(t), TextAlignment.LEFT);
@@ -134,8 +134,14 @@ public final class GraphicalPlayer {
     private static Pane scorePane(PlayerId own, ScoreBean score, Map<PlayerId, String> playersNames) {
         GridPane pane = new GridPane();
        
-        pane.addRow(0, scoreTeam(own, own.team().other(), score, playersNames));
-        pane.addRow(1, scoreTeam(own, own.team(), score, playersNames));
+        pane.addRow(0, scoreTeam(own.team().other(),
+                score, 
+                playersNames.get(fromOwn(own,1)),
+                playersNames.get(fromOwn(own,3))));
+        pane.addRow(1, scoreTeam( own.team(),
+                score, 
+                playersNames.get(fromOwn(own,0)),
+                playersNames.get(fromOwn(own,2))));
  
         pane.setStyle(CSS_SCORE_PANE);
         return pane;
@@ -219,7 +225,8 @@ public final class GraphicalPlayer {
             card.setFitHeight(FIT_HEIGHT_CARD_HAND);
             card.setFitWidth(FIT_WIDTH_CARD_HAND);
             card.setOnMouseClicked(e->{try {
-                queu.offer(hand.hand().get(index), Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+                
+                queu.put(hand.hand().get(index));
             } catch (InterruptedException e1) {
             }});
             
@@ -233,7 +240,6 @@ public final class GraphicalPlayer {
         }
         
         box.setStyle(CSS_HAND_CARD);
-        box.setAlignment(Pos.CENTER);
         return box;
     }
     
