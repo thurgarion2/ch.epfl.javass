@@ -29,12 +29,58 @@ public class LocalMain extends Application {
         put(PlayerId.PLAYER_4, "Davide");
     }});
     
+
+    private static final int DEFAULT_ITERATIONS = 10000;
+    private static final long WAITING_TIME_END_ROUD = 1000;
+    private static final long WAITING_TO_PLAY = 2;
     
+    private static final int PLAYERS_TYPES = 0;
+    private static final int PLAYERS_NAME = 1;
+    private static final int ADDITIONAL_ARGS = 2;
     
-    private final Map<PlayerId, Player> players=new HashMap<>();
-    private final Map<PlayerId, String> playerNames=new HashMap<>();
-    private final Map<PlayerId, Long> playersSeed = new HashMap<>();
+    private static final String HUMAN="h", DISTANT="r", SIMULATED="s";
+    
+    private Map<PlayerId, Player> players=new HashMap<>();
+    private Map<PlayerId, String> playerNames=new HashMap<>();
     private long gameSeed;
+    
+    
+    private static String[] resize(String[] strings, int n) {
+        String[] out = Arrays.copyOf(strings, n);
+        for(int i=0; i<n ; i++) {
+            out[i]=out[i]==null ? "" : out[i];
+        }
+        return out;
+    }
+    
+    private static void printErr(boolean b,String err) {
+        if(!b) {
+            System.err.println(err);
+            System.exit(1); 
+        }
+    }
+    
+    private static void printErr(String err) {
+        printErr(false, err);
+    }
+    
+    private static int readInt(String number) {
+        try {
+            return Integer.parseInt(number);
+        }catch(NumberFormatException exception) {
+            printErr("Erreur : le nombre : "+number+" n'est pas int valide");  
+        }
+        return 0;
+    }
+    
+    private static long readLong(String number) {
+        try {
+            return Long.parseLong(number);
+        }catch(NumberFormatException exception) {
+            printErr("Erreur : le nombre : "+number+" n'est pas Long valide");  
+        }
+        return 0;
+    }
     
     public static void main(String[] args) {
         launch(args);
@@ -43,44 +89,7 @@ public class LocalMain extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         List<String> args= this.getParameters().getRaw();
-        
-        if(args.size()<4 || args.size()>5) {
-            System.err.println("Utilisation: java ch.epfl.javass.LocalMain <j1>…<j4> [<graine>]");
-            System.err.println("où :");
-            System.err.println("<jn> spécifie le joueur n, ainsi:");
-            for(PlayersKind descr : PlayersKind.ALL) {
-                System.err.println("    "+descr.getDescription());
-            }
-            System.err.println("<jn>");
-            System.exit(1);
-        }
-        Random seedGenerator=null;
-        try {
-            seedGenerator= args.size()==5 ? new Random(Long.parseLong(args.get(4))) : new Random();
-        }catch(NumberFormatException exception) {
-            System.err.println("Erreur : la graine n'est pas un long valide : "+args.get(4));
-        }
-        gameSeed=seedGenerator.nextLong();
-        
-        for(PlayerId id : PlayerId.ALL) {
-            playersSeed.put(id, seedGenerator.nextLong());
-        }
-        
-        for(PlayerId id : PlayerId.ALL) {
-            String[] message = args.get(id.ordinal()).split(":");
-            switch(PlayersKind.valueOf(message[0])) {
-            case h:
-                human(message, id);
-                break;
-            case s:
-                simulated(message, id);
-                break;
-            case r:
-                distant(message, id);
-                break;
-            }
-        }
-        
+        game(args);
         
         Thread gameThread = new Thread(()->{
             JassGame game = new JassGame(gameSeed, players, playerNames);
@@ -88,77 +97,90 @@ public class LocalMain extends Application {
             while(!game.isGameOver()) {
                 game.advanceToEndOfNextTrick();
                 try {
-                   Thread.sleep(1000);
+                    Thread.sleep(WAITING_TIME_END_ROUD);
                 } catch (InterruptedException e) {
-                  
+                    throw new Error(e.toString());
                 }
-            }
-            
+            } 
         });
         gameThread.setDaemon(true);
         gameThread.start();
     }
     
-    private String[] resize(String[] strings, int n) {
-        String[] out = new String[n];
-        Arrays.fill(out, "");
-        for(int i=0; i<n && i<strings.length; i++) {
-            out[i]=strings[i];
+    private void game(List<String> args) {
+        String desc="Utilisation: java ch.epfl.javass.LocalMain <j1>…<j4> [<graine>] \n"
+                + "où : \n"
+                + "<jn> spécifie le joueur n, ainsi: \n"
+                + "   h:[<nom>  un joueur humain nommé <nom>]\n"
+                + "   s:[<nom>  un joueur simulé nommé <nom>], [<graine>], [<iterations>] \n"
+                + "   r:[<nom> un joueur distant nommé <nom>], <ip> l'adrresse ip du joueur <ip>\n"
+                + "<jn>";
+        
+        printErr(args.size()==4 || args.size()==5,desc);
+        Random seedGenerator= args.size()==5 ? new Random(readLong(args.get(4))) : new Random();
+                
+        gameSeed=seedGenerator.nextLong();
+  
+        for(PlayerId id : PlayerId.ALL) {
+            String[] message = args.get(id.ordinal()).split(":");
+            long seed = seedGenerator.nextLong();
+            switch(message[PLAYERS_TYPES]) {
+            case HUMAN:
+                human(message, id);
+                break;
+            case SIMULATED:
+                simulated(message, id, seed);
+                break;
+            case DISTANT:
+                distant(message, id);
+                break;
+            default :
+                printErr("Erreur : spécification de joueur invalide : "+message[0]);
+            }
         }
-        return out;
     }
     
     private void human(String[] args, PlayerId id) {
-        if(args.length>2 || args.length<1) {
-            System.err.println("Erreur : nombre d'arguments invalide (1 ou 2 nécessaire) : "+ Arrays.toString(args));
-            System.exit(1);
-        }
+        printErr(args.length==2 || args.length==1,
+                  "Erreur : nombre d'arguments invalide (1 ou 2 nécessaire) : "+ Arrays.toString(args));
         args=resize(args, 2);
-        playerNames.put(id, !args[1].isEmpty() ? args[1] : DEFAULT_PLAYERS.get(id));
+        String name = args[PLAYERS_NAME];
+        playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
         players.put(id, new GraphicalPlayerAdapter());
     }
     
-    private void simulated(String[] args, PlayerId id) {
-        if(args.length>3 || args.length<1) {
-            System.err.println("Erreur : nombre d'arguments invalide (1, 2 ou 3 nécessaire) : "+ Arrays.toString(args));
-            System.exit(1);
-        }
+    private void simulated(String[] args, PlayerId id, long seed) {
+        printErr(args.length<=3 && args.length>=1,
+                "Erreur : nombre d'arguments invalide (1, 2 ou 3 nécessaire) : "+ Arrays.toString(args));
         args=resize(args, 3);
         
-        playerNames.put(id, !args[1].isEmpty() ? args[1] : DEFAULT_PLAYERS.get(id));
-        long seed=0;
-        int iterations=0; 
+        String name = args[PLAYERS_NAME];
+        String itera = args[ADDITIONAL_ARGS];
         
-  
+        playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
+        int iterations= (!itera.isEmpty() ? readInt(itera): DEFAULT_ITERATIONS);
+      
         try {
-            iterations= (!args[2].isEmpty() ? Integer.parseInt(args[2]) : 10000);
-        }catch(NumberFormatException exception) {
-            System.err.println("Erreur : le nombre d'iterations n'est pas un int valide : "+args[2]);  
-            System.exit(1);
-        }
-        
-        try {
-            players.put(id, new PacedPlayer(new MctsPlayer(id,seed, iterations ),2));
+            players.put(id, new PacedPlayer(new MctsPlayer(id,seed, iterations ),WAITING_TO_PLAY));
         }catch(IllegalArgumentException exception) {
-            System.err.println("Erreur : nombre d'iterations inferieur à 10 : "+iterations);  
-            System.exit(1);
+            printErr("Erreur : nombre d'iterations inferieur à 10 : "+iterations);  
         }
-        
+
     }
     
     private void distant(String[] args, PlayerId id) {
-        if(args.length!=3) {
-            System.err.println("Erreur : nombre d'arguments invalide (3 nécessaire) : "+ Arrays.toString(args));
-            System.exit(1);
-        }
+        printErr(args.length==3,
+                "Erreur : nombre d'arguments invalide (3 nécessaire) : "+ Arrays.toString(args));
         args=resize(args, 3);
-        playerNames.put(id, !args[1].isEmpty() ? args[1] : DEFAULT_PLAYERS.get(id));
         
+        String name = args[PLAYERS_NAME];
+        String ip = args[ADDITIONAL_ARGS];
+        
+        playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
         try {
-            players.put(id ,new RemotePlayerClient(args[2]));
+            players.put(id ,new RemotePlayerClient(ip));
         }catch(UncheckedIOException err) {
-            System.err.println("Erreur : adresse ip invalide : "+args[2]);
-            System.exit(1);
+            printErr("Erreur : adresse ip invalide : "+ip);
         }
     }
 
