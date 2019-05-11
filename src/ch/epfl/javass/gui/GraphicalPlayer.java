@@ -40,15 +40,6 @@ import javafx.stage.Stage;
  */
 public final class GraphicalPlayer {
     
-    private static final int FIT_WIDTH_CARD_TRICK = 120;
-    private static final int FIT_HEIGHT_CARD_TRICK = 180;
-    
-    private static final int FIT_WIDTH_CARD_HAND = 80;
-    private static final int FIT_HEIGHT_CARD_HAND = 120;
-    
-    private static final int FIT_WIDTH_TRUMP = 101;
-    private static final int FIT_HEIGHT_TRUMP = 101;
-    
     private static final String CSS_SCORE_PANE = "-fx-font: 16 Optima;"
             + "-fx-background-color: lightgray;" 
             + "-fx-padding: 5px;"
@@ -72,32 +63,8 @@ public final class GraphicalPlayer {
             "-fx-spacing: 5px;" + 
             "-fx-padding: 5px;";
     
-    private static final ObservableMap<Card, Image> CARDS_TRICK_IMAGE
-            =FXCollections.unmodifiableObservableMap(allCardsImage(240));
-    private static final ObservableMap<Card, Image> CARDS_HAND_IMAGE 
-            =FXCollections.unmodifiableObservableMap(allCardsImage(160));
-    private static final ObservableMap<Card.Color, Image> TRUMP_IMAGE 
-            =FXCollections.unmodifiableObservableMap(allTrumpImage());
-    
-
     private final Pane mainPane;
-    
-    private static ObservableMap<Card, Image> allCardsImage(int size) {
-        ObservableMap<Card, Image> images = FXCollections.observableHashMap();
-        for(int i=0; i<CardSet.ALL_CARDS.size(); i++) {
-            Card card=CardSet.ALL_CARDS.get(i);
-            images.put(card, new Image("/card_"+card.color().ordinal()+"_"+card.rank().ordinal()+"_"+size+".png"));
-        }
-        return images;
-    }
-    private static ObservableMap<Card.Color, Image> allTrumpImage() {
-        ObservableMap<Card.Color, Image> images = FXCollections.observableHashMap();
-        for(Card.Color c : Card.Color.ALL) {
-            images.put(c, new Image("/trump_"+c.ordinal()+".png"));
-        }
-        return images;
-    }
-    
+       
     private static PlayerId fromOwn(PlayerId own, int index) {
         return PlayerId.ALL.get((own.ordinal()+index)%PlayerId.COUNT);
     }
@@ -148,24 +115,16 @@ public final class GraphicalPlayer {
         
     }
     
-    private static <T> ImageView bindImage(ObservableMap<T, Image> images,  ObservableValue<? extends T> key) {
-        ImageView image = new ImageView();
-        image.imageProperty().bind(Bindings.valueAt(images, key));
-        return image;
-    }
-    
    
     private static Pane cardImage(PlayerId id, TrickBean trick) {
         StackPane pane = new StackPane();
         
-        ImageView image = bindImage(CARDS_TRICK_IMAGE,Bindings.valueAt(trick.trick(), id));
-        image.setFitHeight(FIT_HEIGHT_CARD_TRICK);
-        image.setFitWidth(FIT_WIDTH_CARD_TRICK);
-        pane.getChildren().add(image);
+        pane.getChildren().add(
+                JassComponent.cardsTrickImages(Bindings.valueAt(trick.trick(), id)));
         
         Rectangle rect = new Rectangle();
-        rect.setWidth(FIT_WIDTH_CARD_TRICK);
-        rect.setHeight(FIT_HEIGHT_CARD_TRICK);
+        rect.setWidth(JassComponent.FIT_WIDTH_CARD_TRICK);
+        rect.setHeight(JassComponent.FIT_HEIGHT_CARD_TRICK);
         rect.setStyle(CSS_HALO);
         rect.setEffect(new GaussianBlur(4));
         rect.visibleProperty().bind(trick.winningPlayerProperty().isEqualTo(id));
@@ -204,9 +163,8 @@ public final class GraphicalPlayer {
         pane.add(otherCardPlayed(fromOwn(own,2),trick,playersNames), 1, 0);
         pane.add(ownCardPlayed(fromOwn(own,0),trick,playersNames), 1, 2);
         
-        ImageView trump=bindImage(TRUMP_IMAGE, trick.trumpProperty());
-        trump.setFitHeight(FIT_HEIGHT_TRUMP);
-        trump.setFitWidth(FIT_WIDTH_TRUMP);
+        ImageView trump=
+                JassComponent.trumpImages(trick.trumpProperty());
         GridPane.setHalignment(trump,  HPos.CENTER);
         pane.add(trump, 1, 1);
         
@@ -221,9 +179,8 @@ public final class GraphicalPlayer {
         for(int i=0; i<hand.hand().size(); i++) {
             int index=i;
             
-            ImageView card = bindImage(CARDS_HAND_IMAGE,  Bindings.valueAt(hand.hand(), i));
-            card.setFitHeight(FIT_HEIGHT_CARD_HAND);
-            card.setFitWidth(FIT_WIDTH_CARD_HAND);
+            ImageView card = 
+                    JassComponent.cardsHandImages(Bindings.valueAt(hand.hand(), index));
             card.setOnMouseClicked(e->{try {
                 
                 queu.put(hand.hand().get(index));
