@@ -120,6 +120,12 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+		
+		try {
+            this.close();
+        } catch (Exception e) {
+            throw new Error(e.toString());
+        }
 	}
 
 	@Override

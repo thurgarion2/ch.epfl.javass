@@ -42,19 +42,16 @@ public final class MctsPlayer implements Player {
             // le chemin de la racine au noeud ajouté
             List<Node> nodes = root.pathToNewNode(ownId);
             Node ajoute = nodes.get(nodes.size() - 1);
-            int finTour = ajoute.randomGame(rng, ownId);
+            long finTour = ajoute.randomGame(rng, ownId);
             for (Node n : nodes) {
-                n.update(ajoute, finTour);
+                n.update(finTour);
             }
         }
         return root.bestCardFromChildren();
     }
 
     private static class Node {
-        private final static int NB_POINTS_PER_TURN = 157;
-        
-        
-
+    
         private final TurnState state;
         private final Node[] children;
         // nombre d'enfant directe
@@ -173,14 +170,12 @@ public final class MctsPlayer implements Player {
             return diff.get(0);
         }
 
-        private void update(Node ajoute, int points) {
-            // si un match
-            S += ajoute.id == id ? points
-                    : Math.max(0, NB_POINTS_PER_TURN - points);
+        private void update(long points) {
+            S += PackedScore.turnPoints(points, id);
             N++;
         }
         //simule une fin de partie aléatoire
-        private int randomGame(SplittableRandom rng, PlayerId ownId) {
+        private long randomGame(SplittableRandom rng, PlayerId ownId) {
             TurnState simulate = state;
             long hdPlayer = handPlayer;
             while (!simulate.isTerminal()) {
@@ -192,7 +187,7 @@ public final class MctsPlayer implements Player {
                 simulate = simulate
                         .withNewCardPlayedAndTrickCollected(Card.ofPacked(c));
             }
-            return simulate.score().turnPoints(id);
+            return simulate.packedScore();
         }
     }
 }

@@ -11,6 +11,7 @@ import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -182,7 +183,6 @@ public final class GraphicalPlayer {
             ImageView card = 
                     JassComponent.cardsHandImages(Bindings.valueAt(hand.hand(), index));
             card.setOnMouseClicked(e->{try {
-                
                 queu.put(hand.hand().get(index));
             } catch (InterruptedException e1) {
             }});
@@ -199,6 +199,7 @@ public final class GraphicalPlayer {
         box.setStyle(CSS_HAND_CARD);
         return box;
     }
+    
     
     public GraphicalPlayer(PlayerId own,
             Map<PlayerId, String> playersNames,

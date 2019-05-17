@@ -177,7 +177,8 @@ public class LocalMain extends Application {
         String ip = args[ADDITIONAL_ARGS];
         
         playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
-        try {
+        
+        try{
             players.put(id ,new RemotePlayerClient(ip));
         }catch(UncheckedIOException err) {
             printErr("Erreur : adresse ip invalide : "+ip);
