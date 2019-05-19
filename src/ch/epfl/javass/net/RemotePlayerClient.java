@@ -58,112 +58,78 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 		});
 		return StringSerializer.combineString(',', names);
 	}
+	
+    private void sendMessage(String mess) {
+        try {
+            w.write(mess);
+            w.write(Protocol.END_MESSAGE);
+            w.flush();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 	@Override
 	public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-		try {
-		    String m = StringSerializer.combineString(Protocol.SEPARATOR,
-		            JassCommand.PLRS.name(),
-		            Serializer.serializeEnum(ownId),
-		            serializeMap(playerNames));
-		    
-			w.write(m);
-			w.write(Protocol.END_MESSAGE);
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.PLRS.name(),
+                Serializer.serializeEnum(ownId),
+                serializeMap(playerNames)));
+		   
 	}
 
 	@Override
 	public void updateHand(CardSet newHand) {
-		try {
-		    String m = StringSerializer.combineString(Protocol.SEPARATOR,
-		            JassCommand.HAND.name(),
-		            Serializer.serializeCardSet(newHand));
+
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.HAND.name(),
+                Serializer.serializeCardSet(newHand)));
 			
-			w.write(m);
-			w.write(Protocol.END_MESSAGE);
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
 	}
 
 	@Override
 	public void setTrump(Color trump) {
-		try {
-		    String m = StringSerializer.combineString(Protocol.SEPARATOR,
-		            JassCommand.TRMP.name(),
-		            Serializer.serializeEnum(trump));
-			
-			w.write(m);
-			w.write(Protocol.END_MESSAGE);
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.TRMP.name(),
+                Serializer.serializeEnum(trump)));	
 	}
 
 	@Override
 	public void updateTrick(Trick newTrick) {
-		try {
-		    String m = StringSerializer.combineString(Protocol.SEPARATOR,
-		            JassCommand.TRCK.name(),
-		            Serializer.serializeTrick(newTrick));
-		    
-	
-			w.write(m);
-			w.write(Protocol.END_MESSAGE);
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.TRCK.name(),
+                Serializer.serializeTrick(newTrick)));
 	}
 
 	@Override
 	public void updateScore(Score score) {
-		try {
-		    String m = StringSerializer.combineString(Protocol.SEPARATOR,
-		            JassCommand.SCOR.name(),
-		            Serializer.serializeScore(score));
-		   
-			w.write(m);
-			w.write(Protocol.END_MESSAGE);
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.SCOR.name(),
+                Serializer.serializeScore(score)));
+		   	
 	}
 
 	@Override
 	public void setWinningTeam(TeamId winningTeam) {
-		try {
-		    String m = StringSerializer.combineString(Protocol.SEPARATOR,
-		            JassCommand.WINR.name(),
-		            Serializer.serializeEnum(winningTeam));
-		    
-			w.write(m);
-			w.write(Protocol.END_MESSAGE);
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.WINR.name(),
+                Serializer.serializeEnum(winningTeam)));
+        
 	}
 
 	@Override
 	public Card cardToPlay(TurnState state, CardSet hand) {
+	    sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.CARD.name(),
+                Serializer.serializeTurnState(state),
+                Serializer.serializeCardSet(hand)));
 		try {
-		    String m = StringSerializer.combineString(Protocol.SEPARATOR,
-		            JassCommand.CARD.name(),
-		            Serializer.serializeTurnState(state),
-		            Serializer.serializeCardSet(hand));
-		    
-			w.write(m);
-			w.write(Protocol.END_MESSAGE);
-			w.flush();
 			return Serializer.deserializeCard(r.readLine());
-
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

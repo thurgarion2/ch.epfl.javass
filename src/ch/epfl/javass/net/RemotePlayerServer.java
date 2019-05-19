@@ -55,7 +55,7 @@ public final class RemotePlayerServer {
         while(!end) {
 
                 String line = r.readLine();
-                String[] message = StringSerializer.splitString(line, ' ');
+                String[] message = StringSerializer.splitString(line, Protocol.SEPARATOR);
                 JassCommand cmd = JassCommand
                         .valueOf(message[Protocol.COMMAND_INDEX]);
 

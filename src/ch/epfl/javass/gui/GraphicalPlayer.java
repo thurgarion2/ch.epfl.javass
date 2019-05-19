@@ -1,5 +1,9 @@
 package ch.epfl.javass.gui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -34,7 +38,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 /**
- * génère le stage pour représenter un joueur
+ * génère l'interface permettant à un joueur de commuinquer avec le programme
  * 
  * @author erwan serandour (296100)
  *
@@ -64,25 +68,47 @@ public final class GraphicalPlayer {
             "-fx-spacing: 5px;" + 
             "-fx-padding: 5px;";
     
+    private final static int OWN_TEAM=1;
+    private final static int OTHER_TEAM=0;
+    private final static int SIZE_SCORE=5;
+    private final static int TEAM_NAMES=0;
+    private final static int TURN_POINTS=1;
+    private final static int LAST_TRICK_POINTS=2;
+    private final static int TOTAL =3;
+    private final static int GAME_POINTS =4;
+    
+    private final static int BLUR=4;
+    private static final float ENABLE = 1;
+    private static final float DISABLE = 0.2f;
+    
+    private static final int NEXT_TEAM_PLAYER=2;
     private final Pane mainPane;
-       
+    private final String stageName;
+           
     private static PlayerId fromOwn(PlayerId own, int index) {
         return PlayerId.ALL.get((own.ordinal()+index)%PlayerId.COUNT);
     }
     
-    private static Text bindText(ObservableValue<?> prop, TextAlignment al) {
+    private static String teamNames(PlayerId own, TeamId t, Map<PlayerId, String> playersNames) {
+        int start = own.team()==t ? 0 : 1;
+        return playersNames.get(fromOwn(own, start))
+                +" et "
+                +playersNames.get(fromOwn(own, start+NEXT_TEAM_PLAYER));
+    }
+    
+    private static Text bindText(ObservableValue<?> prop, HPos alignement) {
         Text out = new Text();
-        out.setTextAlignment(al);
+        GridPane.setHalignment(out, alignement);
         out.textProperty().bind(Bindings.convert(prop));
         return out;
     }
     
-    private static Node[] scoreTeam(TeamId t, ScoreBean score, String names1, String names2) {
-        Node[] line = new Node[5];
-        
-        Text names = new Text(names1+" et "+names2+" : ");
-        names.setTextAlignment(TextAlignment.RIGHT);
-        
+    private static Node[] scoreTeam(PlayerId own, TeamId t, ScoreBean score, Map<PlayerId, String> plNames) {
+        Node[] line = new Node[SIZE_SCORE];
+       
+        Text names = new Text(teamNames(own, t, plNames)+" : ");
+        GridPane.setHalignment(names, HPos.RIGHT);
+       
         Text lasTrick = new Text();
         score.turnPointsProperty(t).addListener(
                 (o,oV,nV)->{
@@ -90,32 +116,24 @@ public final class GraphicalPlayer {
                     lasTrick.setText(diff>0 ? " (+"+diff+")" : "" );
                 });
         
-        line[0]=names;
-        line[1]=bindText(score.turnPointsProperty(t), TextAlignment.RIGHT);
-        line[2]=(lasTrick);
-        line[3]=new Text(" / Total : ");
-        line[4]=bindText(score.gamePointsProperty(t), TextAlignment.LEFT);
+        line[TEAM_NAMES]=names;
+        line[TURN_POINTS]=bindText(score.turnPointsProperty(t), HPos.RIGHT);
+        line[LAST_TRICK_POINTS]=(lasTrick);
+        line[TOTAL]=new Text(" / Total : ");
+        line[GAME_POINTS]=bindText(score.gamePointsProperty(t), HPos.RIGHT);
         
         return line;
     }
         
-    private static Pane scorePane(PlayerId own, ScoreBean score, Map<PlayerId, String> playersNames) {
+    private static Pane scorePane(PlayerId own, ScoreBean score,  Map<PlayerId, String> plNames) {
         GridPane pane = new GridPane();
        
-        pane.addRow(0, scoreTeam(own.team().other(),
-                score, 
-                playersNames.get(fromOwn(own,1)),
-                playersNames.get(fromOwn(own,3))));
-        pane.addRow(1, scoreTeam( own.team(),
-                score, 
-                playersNames.get(fromOwn(own,0)),
-                playersNames.get(fromOwn(own,2))));
- 
+        pane.addRow(OTHER_TEAM, scoreTeam(own, own.team().other(), score, plNames));
+        pane.addRow(OWN_TEAM, scoreTeam(own, own.team(), score, plNames));
         pane.setStyle(CSS_SCORE_PANE);
         return pane;
         
     }
-    
    
     private static Pane cardImage(PlayerId id, TrickBean trick) {
         StackPane pane = new StackPane();
@@ -127,48 +145,31 @@ public final class GraphicalPlayer {
         rect.setWidth(JassComponent.FIT_WIDTH_CARD_TRICK);
         rect.setHeight(JassComponent.FIT_HEIGHT_CARD_TRICK);
         rect.setStyle(CSS_HALO);
-        rect.setEffect(new GaussianBlur(4));
+        rect.setEffect(new GaussianBlur(BLUR));
         rect.visibleProperty().bind(trick.winningPlayerProperty().isEqualTo(id));
         pane.getChildren().add(rect);
         return pane;
     }
     
-    private static VBox ownCardPlayed(PlayerId id, TrickBean trick, Map<PlayerId, String> playersNames) {
+    private static VBox cardPlayed(PlayerId own, PlayerId id, TrickBean trick, Map<PlayerId, String> playersNames) {
         VBox box = new VBox();
         Text name = new Text(playersNames.get(id));
         name.setStyle(CSS_TEXT_NAMES);
   
-        box.getChildren().add(cardImage(id, trick));
-        box.getChildren().add(name);
-        box.setAlignment(Pos.CENTER);
-        
-        return box;
-    }
-    private static VBox otherCardPlayed(PlayerId id, TrickBean trick, Map<PlayerId, String> playersNames) {
-        VBox box = new VBox();
-        Text name = new Text(playersNames.get(id));
-        name.setStyle(CSS_TEXT_NAMES);
-        
-        box.getChildren().add(name);
-        box.getChildren().add(cardImage(id, trick));
+        box.getChildren().add(id==own? cardImage(id, trick) : name);
+        box.getChildren().add(id==own? name: cardImage(id, trick));
         box.setAlignment(Pos.CENTER);
         
         return box;
     }
    
     private static Pane trickPane(PlayerId own, TrickBean trick, Map<PlayerId, String> playersNames) {
-        GridPane pane = new GridPane();
-       
-        pane.add(otherCardPlayed(fromOwn(own,3),trick,playersNames),0, 0, 1, 3);
-        pane.add(otherCardPlayed(fromOwn(own,1),trick,playersNames),2, 0, 1, 3);
-        pane.add(otherCardPlayed(fromOwn(own,2),trick,playersNames), 1, 0);
-        pane.add(ownCardPlayed(fromOwn(own,0),trick,playersNames), 1, 2);
-        
-        ImageView trump=
-                JassComponent.trumpImages(trick.trumpProperty());
-        GridPane.setHalignment(trump,  HPos.CENTER);
-        pane.add(trump, 1, 1);
-        
+        List<Node> cards = new LinkedList<>();
+        for(int i=0; i<PlayerId.COUNT; i++) {
+            cards.add(cardPlayed(own,fromOwn(own,i),trick,playersNames));
+        }
+        Pane pane = JassComponent.cross(JassComponent.trumpImages(trick.trumpProperty()),
+               cards); 
         pane.setStyle(CSS_TRICK_PANE);
         return pane;
     }
@@ -182,17 +183,24 @@ public final class GraphicalPlayer {
             
             ImageView card = 
                     JassComponent.cardsHandImages(Bindings.valueAt(hand.hand(), index));
-            card.setOnMouseClicked(e->{try {
-                queu.put(hand.hand().get(index));
-            } catch (InterruptedException e1) {
-            }});
+            card.setOnMouseClicked(e -> {
+                    try {
+                        queu.put(hand.hand().get(index));
+                    } catch (InterruptedException e1) {
+                        throw new Error(e1.toString());
+                    }
+            });
             
-            BooleanBinding isPlayable=Bindings.createBooleanBinding(()->{
-                return hand.playableCards().contains(hand.hand().get(index)); },
-                hand.hand(), hand.playableCards());
-            card.opacityProperty().bind(Bindings.when(isPlayable).then(1).otherwise(0.2));
+            BooleanBinding isPlayable=Bindings.createBooleanBinding(
+                ()->hand.playableCards().contains(hand.hand().get(index)),
+                hand.hand(),
+                hand.playableCards());
+            
+            card.opacityProperty().bind(Bindings.when(isPlayable)
+                    .then(ENABLE)
+                    .otherwise(DISABLE));
+            
             card.disableProperty().bind(isPlayable.not());
-            
             box.getChildren().add(card);
         }
         
@@ -200,7 +208,36 @@ public final class GraphicalPlayer {
         return box;
     }
     
+    private static Pane victoryPane(Map<PlayerId, String> plNames,
+            ScoreBean score, PlayerId own, TeamId t) {
+        BorderPane pane = new BorderPane();
+        Text victory = new Text();
+        victory.textProperty().bind(Bindings.format("%1$s ont gagné avec %2$d points contre %3$d.",
+                teamNames(own,t, plNames),
+                score.totalPointsProperty(t),
+                score.totalPointsProperty(t.other())
+                ));
+        pane.setCenter(victory);
+        pane.visibleProperty().bind(score.winningTeamProperty().isEqualTo(t));
+        pane.setStyle(CSS_VICTORY_PANE);
+        return pane;
+    }
     
+    /**
+     * @param own
+     *            l'id du joueur utilisant la fenètre
+     * @param playersNames
+     *            les noms des joueurs en fonctions de leur id
+     * @param trick
+     *            le bean du trick du jeu
+     * @param score
+     *            le bean du score jeu
+     * @param hand
+     *            le bean de la main du joueur
+     * @param queu
+     *            permet à la fénètre de communiqué la carte choisie par le
+     *            joueur
+     */
     public GraphicalPlayer(PlayerId own,
             Map<PlayerId, String> playersNames,
             TrickBean trick,
@@ -208,6 +245,7 @@ public final class GraphicalPlayer {
             HandBean hand,
             ArrayBlockingQueue<Card> queu
             ) {
+          stageName="Javass-"+playersNames.get(own);
           StackPane pane = new StackPane();
         
           BorderPane gamePane = new BorderPane();
@@ -217,39 +255,23 @@ public final class GraphicalPlayer {
           pane.getChildren().add(gamePane);
           pane.setAlignment(Pos.CENTER);
           
-          pane.getChildren().add(
-                  victoryPane(playersNames.get(own),
-                  playersNames.get(fromOwn(own, 2)),
-                  score, own.team()));
-          
-          pane.getChildren().add(
-                  victoryPane(playersNames.get(fromOwn(own, 1)),
-                  playersNames.get(fromOwn(own, 3)),
-                  score, own.team().other()));
-          
-          mainPane=pane;
-
-    }
+          pane.getChildren().add(victoryPane(playersNames, score, own, own.team()));
+          pane.getChildren().add(victoryPane(playersNames, score, own, own.team().other()));
   
-    private static Pane victoryPane(String name1, String name2, ScoreBean score, TeamId team) {
-        BorderPane pane = new BorderPane();
-        Text victory = new Text();
-        victory.textProperty().bind(Bindings.format("%1$s et %2$s ont gagné avec %3$d points contre %4$d.",
-                name1,
-                name2,
-                score.totalPointsProperty(team),
-                score.totalPointsProperty(team.other())
-                ));
-        pane.setCenter(victory);
-        pane.visibleProperty().bind(score.winningTeamProperty().isEqualTo(team));
-        pane.setStyle(CSS_VICTORY_PANE);
-        return pane;
+          mainPane=pane;
     }
     
+  
+    /**
+     * génére la fenètre permettant au joueur d'interagir avec le jeux
+     * 
+     * @return la fenètre permettant au joueur d'interagir avec le jeux
+     */
     public Stage createStage() {
         Scene main = new Scene(mainPane);
         Stage stage = new Stage();
         stage.setScene(main);
+        stage.setTitle(stageName);
         return stage;
 
     }

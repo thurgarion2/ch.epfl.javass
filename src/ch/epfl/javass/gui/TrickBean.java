@@ -25,8 +25,8 @@ public final class TrickBean {
      * 
      */
     public TrickBean() {
-        trumpProperty = new SimpleObjectProperty<>(null);
-        winningPlayerProperty = new SimpleObjectProperty<>(null);
+        trumpProperty = new SimpleObjectProperty<>();
+        winningPlayerProperty = new SimpleObjectProperty<>();
         trickProperty = FXCollections.observableHashMap();
         for (PlayerId id : PlayerId.ALL) {
             trickProperty.put(id, null);

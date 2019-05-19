@@ -21,7 +21,7 @@ public interface Jass {
      * nombre de points nécessaire pour gagner
      *
      */
-    public static final int WINNING_POINTS = 10;
+    public static final int WINNING_POINTS = 100;
     /**
      * nombre de points en plus lors d'un match
      *
