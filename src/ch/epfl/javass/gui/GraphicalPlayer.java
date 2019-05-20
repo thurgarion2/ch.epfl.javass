@@ -9,6 +9,7 @@ import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
+import ch.epfl.javass.net.JassCommand;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableValue;
@@ -180,7 +181,7 @@ public final class GraphicalPlayer {
             int index=i;
             
             ImageView card = 
-                    JassComponent.cardsHandImages(Bindings.valueAt(hand.hand(), index));
+                    JassCommand.cardsHandImages(Bindings.valueAt(hand.hand(), index));
             card.setOnMouseClicked(e->{try {
                 
                 queu.put(hand.hand().get(index));
