@@ -7,11 +7,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
+/**
+ * met en place les prorpiétés JavaFX pour la main du joueur
+ * 
+ * @author  Jean.Daniel Rouveyrol(301480)
+ *
+ */
 public final class HandBean {
 	
 	private ObservableList<Card> handProperty;
 	private ObservableSet<Card> playableCardsProperty;
 	
+	/**
+	 * constructeur, créé les propriétés et initialise 
+	 */
 	public HandBean() {
 		handProperty = FXCollections.observableArrayList();
 		playableCardsProperty = FXCollections.observableSet();
@@ -19,15 +28,29 @@ public final class HandBean {
 		    handProperty.add(null);
         }
 	}
-		
+	
+	/**
+	 * 
+	 * @return une vue non modifiable sur la propriété hand
+	 */
 	public ObservableList<Card> hand(){
 		return FXCollections.unmodifiableObservableList(handProperty);
 	}
 
+	/**
+	 * 
+	 * @return une vue non modifiable sur la propriété playableCards
+	 */
 	public ObservableSet<Card> playableCards(){
 			return FXCollections.unmodifiableObservableSet(playableCardsProperty);
 	}
 	
+	/**
+	 * 
+	 * @param newHand
+	 *
+	 * met à jour hand, en fonction du CardSet passé en argument
+	 */
 	public void setHand(CardSet newHand) {
 	    //handProperty se comporte comme un tableau
 		for(int i=0; i<Jass.HAND_SIZE; i++) {
@@ -37,6 +60,12 @@ public final class HandBean {
 		}
 	}
 
+	/**
+	 * 
+	 * @param newPlayableCards
+	 * 
+	 * met à jour playableCards, en fonction du CardSet passé en argument 
+	 */
 	public void setPlayableCards(CardSet newPlayableCards) {
 	    //l'ordre n'importe pas soit une carte est jouable soit non
 	    playableCardsProperty.clear();
