@@ -10,30 +10,30 @@ public enum JassCommand {
     /**
      * représente la fonction setPlayers de l'interface Player
      */
-    PLRS(),
+    PLRS,
     /**
      * représente la fonction setTrump de l'interface Player
      */
-    TRMP(),
+    TRMP,
     /**
      * représente la fonction updateHand de l'interface Player
      */
-    HAND(),
+    HAND,
     /**
      * représente la fonction updateTrick de l'interface Player
      */
-    TRCK(),
+    TRCK,
     /**
      * représente la fonction cardToPlay de l'interface Player
      */
-    CARD(),
+    CARD,
     /**
      * représente la fonction updateScore de l'interface Player
      */
-    SCOR(),
+    SCOR,
     /**
      * représente la fonction setWinningTeam de l'interface Player
      */
-    WINR();
+    WINR;
     
 }

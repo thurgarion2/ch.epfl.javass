@@ -16,7 +16,7 @@ public final class HandBean {
 		handProperty = FXCollections.observableArrayList();
 		playableCardsProperty = FXCollections.observableSet();
 		for(int i = 0; i<Jass.HAND_SIZE; ++i) {
-		    handProperty.add(i, null);
+		    handProperty.add(null);
         }
 	}
 		

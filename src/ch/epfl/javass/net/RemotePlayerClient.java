@@ -24,15 +24,25 @@ import ch.epfl.javass.jass.Card.Color;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
+/**
+ * le client pour communiquer avec un joueur distant
+ * 
+ * @author Jean-Daniel Rouveyrol(301480)
+ *
+ */
 public final class RemotePlayerClient implements Player, AutoCloseable {
 
-	private Socket s;
-	private BufferedReader r;
-	private BufferedWriter w;
+	private final Socket s;
+	private final BufferedReader r;
+	private final BufferedWriter w;
 
+    /**
+     * @param host
+     *            l'adresse ip du joeur distant
+     */
 	public RemotePlayerClient(String host) {
 		try {
-			s = new Socket(host, 5108);
+		    s = new Socket(host, Protocol.PORT);
 			r = new BufferedReader(new InputStreamReader(s.getInputStream(), US_ASCII));
 			w = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), US_ASCII));
 		} catch (IOException e) {
@@ -42,97 +52,84 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
 	}
 
 	private static String serializeMap(Map<PlayerId, String> playerNames) {
-		String[] names = new String[4];
+		String[] names = new String[PlayerId.COUNT];
 		playerNames.forEach((k, s) -> {
 			names[k.ordinal()] = StringSerializer.serializeString(s);
 		});
 		return StringSerializer.combineString(',', names);
 	}
+	
+    private void sendMessage(String mess) {
+        try {
+            w.write(mess);
+            w.write(Protocol.END_MESSAGE);
+            w.flush();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 	@Override
 	public void setPlayers(PlayerId ownId, Map<PlayerId, String> playerNames) {
-		try {
-			w.write(JassCommand.PLRS.name()); 
-			w.write(" "+Serializer.serializeEnum(ownId));
-			w.write(" "+serializeMap(playerNames));
-			w.write('\n');
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.PLRS.name(),
+                Serializer.serializeEnum(ownId),
+                serializeMap(playerNames)));
+		   
 	}
 
 	@Override
 	public void updateHand(CardSet newHand) {
-		try {
-			w.write(JassCommand.HAND.name()+" ");
-			w.write(Serializer.serializeCardSet(newHand));
-			w.write('\n');
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.HAND.name(),
+                Serializer.serializeCardSet(newHand)));
+			
 	}
 
 	@Override
 	public void setTrump(Color trump) {
-		try {
-			w.write(JassCommand.TRMP.name()+" ");
-			w.write(Serializer.serializeEnum(trump));
-			w.write('\n');
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.TRMP.name(),
+                Serializer.serializeEnum(trump)));	
 	}
 
 	@Override
 	public void updateTrick(Trick newTrick) {
-		try {
-			w.write(JassCommand.TRCK.name()+" ");
-			w.write(Serializer.serializeTrick(newTrick));
-			w.write('\n');
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.TRCK.name(),
+                Serializer.serializeTrick(newTrick)));
 	}
 
 	@Override
 	public void updateScore(Score score) {
-		try {
-			w.write(JassCommand.SCOR.name()+" ");
-			w.write(Serializer.serializeScore(score));
-			w.write('\n');
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.SCOR.name(),
+                Serializer.serializeScore(score)));
+		   	
 	}
 
 	@Override
 	public void setWinningTeam(TeamId winningTeam) {
-		try {
-			w.write(JassCommand.WINR.name()+" ");
-			w.write(Serializer.serializeEnum(winningTeam));
-			w.write('\n');
-			w.flush();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+
+        sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.WINR.name(),
+                Serializer.serializeEnum(winningTeam)));
+        
 	}
 
 	@Override
 	public Card cardToPlay(TurnState state, CardSet hand) {
+	    sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
+                JassCommand.CARD.name(),
+                Serializer.serializeTurnState(state),
+                Serializer.serializeCardSet(hand)));
 		try {
-			w.write(JassCommand.CARD.name()+" ");
-			w.write(Serializer.serializeTurnState(state));
-			w.write(" ");
-			w.write(Serializer.serializeCardSet(hand));
-			w.write('\n');
-			w.flush();
 			return Serializer.deserializeCard(r.readLine());
-
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

@@ -14,6 +14,11 @@ import ch.epfl.javass.jass.TurnState;
  *
  */
 public final class Serializer {
+    private static final int SCORE_INDEX =0;
+    private static final int CARDS_INDEX =1;
+    private static final int TRCIK_INDEX =2;
+    
+    
     /**
      * sérialise un ensemble de cartes
      * 
@@ -60,10 +65,12 @@ public final class Serializer {
      */
     public static TurnState deserializeTurnState(String s) {
         String[] comp = StringSerializer.splitString(s, ',');
-        long score = StringSerializer.deserializeLong(comp[0]);
-        long cards = StringSerializer.deserializeLong(comp[1]);
-        int trick = StringSerializer.deserializeInt(comp[2]);
-        return TurnState.ofPackedComponents(score, cards, trick);
+        Score score = deserializeScore(comp[SCORE_INDEX]);
+        CardSet cards = deserializeCardSet(comp[CARDS_INDEX]);
+        Trick trick = deserializeTrick(comp[TRCIK_INDEX]);
+        return TurnState.ofPackedComponents(score.packed(),
+                cards.packed(),
+                trick.packed());
     }
 
     /**

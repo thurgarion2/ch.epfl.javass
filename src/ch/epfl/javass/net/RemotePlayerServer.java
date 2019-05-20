@@ -28,7 +28,6 @@ import ch.epfl.javass.jass.TurnState;
  */
 public final class RemotePlayerServer {
     private final Player underlyingPlayer;
-    private static final int PORT = 5108;
 
     /**
      * @param underlyingPlayer
@@ -41,9 +40,9 @@ public final class RemotePlayerServer {
     /**
      * met en marche le serveur jusqu'à la fin de la partie
      */
-public void run() {
+    public void run() {
        boolean end=false;
-       try (ServerSocket s0 = new ServerSocket(PORT);
+       try (ServerSocket s0 = new ServerSocket(Protocol.PORT);
                Socket s = s0.accept();
                BufferedReader r =
                  new BufferedReader(
@@ -54,42 +53,58 @@ public void run() {
                    new OutputStreamWriter(s.getOutputStream(),
                            StandardCharsets.US_ASCII))) {
         while(!end) {
-            
-            String line=r.readLine();
-            String[] message=StringSerializer.splitString(line,' ');
-            JassCommand cmd = JassCommand.valueOf(message[0]);
-          
-            switch(cmd) {
-              case PLRS:
-                  PlayerId own = Serializer.deserializeEnum(message[1], PlayerId.values());
-                  Map<PlayerId, String> names=deseralizePlayersNames(message[2]);
-                  underlyingPlayer.setPlayers(own, names);
-                  break;
-              case TRMP:
-                  underlyingPlayer.setTrump(Serializer.deserializeEnum(message[1], Card.Color.values()));
-                  break;
-              case HAND:
-                  underlyingPlayer.updateHand(Serializer.deserializeCardSet(message[1]));
-                  break;
-              case TRCK:
-                  underlyingPlayer.updateTrick(Serializer.deserializeTrick(message[1]));
-                  break;
-              case CARD:
-                  CardSet hand=Serializer.deserializeCardSet(message[2]);
-                  Card c = underlyingPlayer.cardToPlay(Serializer.deserializeTurnState(message[1]),hand);
-                  w.write(Serializer.serializeCard(c));
-                  w.write('\n');
-                  w.flush();
-                  break;
-              case SCOR:
-                  underlyingPlayer.updateScore(Serializer.deserializeScore(message[1]));
-                  break;
-              case WINR:
-                  underlyingPlayer.setWinningTeam(Serializer.deserializeEnum(message[1], TeamId.values()));
-                  end=true;
-                  break;
 
-            }
+                String line = r.readLine();
+                String[] message = StringSerializer.splitString(line, Protocol.SEPARATOR);
+                JassCommand cmd = JassCommand
+                        .valueOf(message[Protocol.COMMAND_INDEX]);
+
+                switch (cmd) {
+                case PLRS:
+                    PlayerId own = Serializer.deserializeEnum(
+                            message[Protocol.ID_INDEX], PlayerId.values());
+                    
+                    Map<PlayerId, String> names = deseralizePlayersNames(
+                            message[Protocol.NAMES_INDEX]);
+                    
+                    underlyingPlayer.setPlayers(own, names);
+                    break;
+                case TRMP:
+                    underlyingPlayer.setTrump(Serializer.deserializeEnum(
+                            message[Protocol.TRUMP_INDEX],
+                            Card.Color.values()));
+                    break;
+                case HAND:
+                    underlyingPlayer.updateHand(Serializer
+                            .deserializeCardSet(message[Protocol.HAND_INDEX]));
+                    break;
+                case TRCK:
+                    underlyingPlayer.updateTrick(Serializer
+                            .deserializeTrick(message[Protocol.TRCIK_INDEX]));
+                    break;
+                case CARD:
+                    CardSet hand = Serializer.deserializeCardSet(
+                            message[Protocol.HAND_WHEN_CARD]);
+                    
+                    Card c = underlyingPlayer.cardToPlay(Serializer
+                            .deserializeTurnState(message[Protocol.TURNSTATE_INDEX]),
+                                    hand);
+                    
+                    w.write(Serializer.serializeCard(c));
+                    w.write(Protocol.END_MESSAGE);
+                    w.flush();
+                    break;
+                case SCOR:
+                    underlyingPlayer.updateScore(Serializer
+                            .deserializeScore(message[Protocol.SCORE_INDEX]));
+                    break;
+                case WINR:
+                    underlyingPlayer.setWinningTeam(Serializer.deserializeEnum(
+                            message[Protocol.TEAM_INDEX], TeamId.values()));
+                    end = true;
+                    break;
+
+                }
         }   
               
        }catch (IOException e) {

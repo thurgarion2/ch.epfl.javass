@@ -16,35 +16,18 @@ import ch.epfl.javass.jass.TeamId;
  */
 public final class ScoreBean {
     
-    private final IntegerProperty turnPointsTeam1Property;
-    private final IntegerProperty turnPointsTeam2Property;
+    private final IntegerProperty turnPointsTeam1Property = new SimpleIntegerProperty();
+    private final IntegerProperty turnPointsTeam2Property = new SimpleIntegerProperty();
     
-    private final IntegerProperty gamePointsTeam1Property;
-    private final IntegerProperty gamePointsTeam2Property;
+    private final IntegerProperty gamePointsTeam1Property = new SimpleIntegerProperty();
+    private final IntegerProperty gamePointsTeam2Property = new SimpleIntegerProperty();
     
-    private final IntegerProperty totalPointsTeam1Property;
-    private final IntegerProperty totalPointsTeam2Property;
+    private final IntegerProperty totalPointsTeam1Property = new SimpleIntegerProperty();
+    private final IntegerProperty totalPointsTeam2Property = new SimpleIntegerProperty();
     
-    private final ObjectProperty<TeamId> winningTeamProperty;
+    private final ObjectProperty<TeamId> winningTeamProperty = new SimpleObjectProperty<>();
 
   
-    /**
-     * 
-     */
-    public ScoreBean() {
-
-        this.turnPointsTeam1Property = new SimpleIntegerProperty(0);
-        this.turnPointsTeam2Property = new SimpleIntegerProperty(0);
-
-        this.gamePointsTeam1Property = new SimpleIntegerProperty(0);
-        this.gamePointsTeam2Property = new SimpleIntegerProperty(0);
-
-        this.totalPointsTeam1Property = new SimpleIntegerProperty(0);
-        this.totalPointsTeam2Property = new SimpleIntegerProperty(0);
-        
-        this.winningTeamProperty = new SimpleObjectProperty<>(null);
-        
-    }
     
     /**
      * retourne la propriété des points du tours de l'équipe donnée
