@@ -25,7 +25,7 @@ import javafx.scene.layout.Pane;
  * @author esera
  *
  */
-public class JassComponent {
+public final class JassComponent {
 
     /**
      * la largeur d'une carte utilisé dans le pli
@@ -143,6 +143,9 @@ public class JassComponent {
      * @param border
      *            les noeuds de bords
      * @return une croix avec au centre le noeud
+     * 
+     * @throws IllegalArgumentException
+     *             si la taille de border est différant de 4
      */
     public static Pane cross(Node center, List<Node> border) {
         

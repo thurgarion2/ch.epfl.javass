@@ -76,13 +76,16 @@ public final class GraphicalPlayer {
     private final static int LAST_TRICK_POINTS=2;
     private final static int TOTAL =3;
     private final static int GAME_POINTS =4;
+    private final static int START_OF_OWN=0;
+    private final static int START_OF_OTHER=1;
+    
     
     private final static int BLUR=4;
     private static final float ENABLE = 1;
     private static final float DISABLE = 0.2f;
     
     private static final int NEXT_TEAM_PLAYER=2;
-    private final Pane mainPane;
+    private final Scene mainScene;
     private final String stageName;
            
     private static PlayerId fromOwn(PlayerId own, int index) {
@@ -90,7 +93,7 @@ public final class GraphicalPlayer {
     }
     
     private static String teamNames(PlayerId own, TeamId t, Map<PlayerId, String> playersNames) {
-        int start = own.team()==t ? 0 : 1;
+        int start = own.team()==t ? START_OF_OWN : START_OF_OTHER;
         return playersNames.get(fromOwn(own, start))
                 +" et "
                 +playersNames.get(fromOwn(own, start+NEXT_TEAM_PLAYER));
@@ -113,9 +116,8 @@ public final class GraphicalPlayer {
         score.turnPointsProperty(t).addListener(
                 (o,oV,nV)->{
                     int diff = nV.intValue()-oV.intValue();
-                    lasTrick.setText(diff>0 ? " (+"+diff+")" : "" );
+                    lasTrick.setText(nV.intValue()>0?" (+"+diff+")" : "" );
                 });
-        
         line[TEAM_NAMES]=names;
         line[TURN_POINTS]=bindText(score.turnPointsProperty(t), HPos.RIGHT);
         line[LAST_TRICK_POINTS]=(lasTrick);
@@ -187,7 +189,7 @@ public final class GraphicalPlayer {
                     try {
                         queu.put(hand.hand().get(index));
                     } catch (InterruptedException e1) {
-                        throw new Error(e1.toString());
+                        throw new Error(e1);
                     }
             });
             
@@ -258,7 +260,7 @@ public final class GraphicalPlayer {
           pane.getChildren().add(victoryPane(playersNames, score, own, own.team()));
           pane.getChildren().add(victoryPane(playersNames, score, own, own.team().other()));
   
-          mainPane=pane;
+          mainScene =new Scene(pane);
     }
     
   
@@ -268,9 +270,8 @@ public final class GraphicalPlayer {
      * @return la fenètre permettant au joueur d'interagir avec le jeux
      */
     public Stage createStage() {
-        Scene main = new Scene(mainPane);
         Stage stage = new Stage();
-        stage.setScene(main);
+        stage.setScene(mainScene);
         stage.setTitle(stageName);
         return stage;
 

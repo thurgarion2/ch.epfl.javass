@@ -39,19 +39,19 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
     /**
      * @param host
      *            l'adresse ip du joeur distant
+     * @throws IOException
+     *             si une erreur arrive lors de la connexion avec le serveur
+     * @throws UnknownHostException
+     *             si il ne reconnait pas l'adresse ip
      */
-	public RemotePlayerClient(String host) {
-		try {
-		    s = new Socket(host, Protocol.PORT);
-			r = new BufferedReader(new InputStreamReader(s.getInputStream(), US_ASCII));
-			w = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), US_ASCII));
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-
+	public RemotePlayerClient(String host) throws UnknownHostException, IOException {
+	    s = new Socket(host, Protocol.PORT);
+	    r = new BufferedReader(new InputStreamReader(s.getInputStream(), Protocol.CHARSET));
+	    w = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), Protocol.CHARSET));
 	}
-
-	private static String serializeMap(Map<PlayerId, String> playerNames) {
+    
+	//ne figure pas dans Serializer car assez spécifiques
+	private static String serializeNames(Map<PlayerId, String> playerNames) {
 		String[] names = new String[PlayerId.COUNT];
 		playerNames.forEach((k, s) -> {
 			names[k.ordinal()] = StringSerializer.serializeString(s);
@@ -75,7 +75,7 @@ public final class RemotePlayerClient implements Player, AutoCloseable {
         sendMessage(StringSerializer.combineString(Protocol.SEPARATOR,
                 JassCommand.PLRS.name(),
                 Serializer.serializeEnum(ownId),
-                serializeMap(playerNames)));
+                serializeNames(playerNames)));
 		   
 	}
 

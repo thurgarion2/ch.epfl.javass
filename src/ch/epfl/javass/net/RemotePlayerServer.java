@@ -47,15 +47,16 @@ public final class RemotePlayerServer {
                BufferedReader r =
                  new BufferedReader(
                    new InputStreamReader(s.getInputStream(),
-                             StandardCharsets.US_ASCII));
+                           Protocol.CHARSET));
                BufferedWriter w =
                  new BufferedWriter(
                    new OutputStreamWriter(s.getOutputStream(),
-                           StandardCharsets.US_ASCII))) {
+                           Protocol.CHARSET))) {
         while(!end) {
 
                 String line = r.readLine();
                 String[] message = StringSerializer.splitString(line, Protocol.SEPARATOR);
+                
                 JassCommand cmd = JassCommand
                         .valueOf(message[Protocol.COMMAND_INDEX]);
 

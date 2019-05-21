@@ -1,5 +1,8 @@
 package ch.epfl.javass.net;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
  * contient la plupart des constantes necessaires à la communication du client
  * avec le joueur distant
@@ -10,11 +13,21 @@ package ch.epfl.javass.net;
 // necessaire de connaitre le protocol pour pouvoir interpreter la plupart des
 // messages
 public interface Protocol {
-
+   
     /**
      * le port sur lequel le client et le serveur communique
      */
     public static final int PORT = 5108;
+    
+    /**
+     * la base dans la quelle sont sérialisé les entiers
+     */
+    public static final int BASE = 16;
+    
+    /**
+     * le jeu de caractère utilisé pour la communication
+     */
+    public static final Charset CHARSET = StandardCharsets.US_ASCII;
     /**
      * l'index de la commande dans un message
      */

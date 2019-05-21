@@ -11,7 +11,7 @@ import javafx.stage.Stage;
  * @author erwan serandour (296100)
  *
  */
-public class RemoteMain extends Application{
+public final class RemoteMain extends Application{
     
     public static void main(String[] args) {
         launch(args);

@@ -2,13 +2,7 @@ package ch.epfl.javass.net;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 
-import ch.epfl.javass.jass.Card;
-import ch.epfl.javass.jass.CardSet;
-import ch.epfl.javass.jass.Score;
-import ch.epfl.javass.jass.Trick;
-import ch.epfl.javass.jass.TurnState;
 
 /**
  * plusieurs méthodes utiles pour serialiser et déserialiser des stirng et des int sous forme de
@@ -34,7 +28,7 @@ public final class StringSerializer {
      *         en base 16
      */
     public static String serializeInt(int i) {
-        return Integer.toUnsignedString(i, 16);
+        return Integer.toUnsignedString(i, Protocol.BASE);
     }
 
     /**
@@ -45,7 +39,7 @@ public final class StringSerializer {
      * @return l'entier désérialisé
      */
     public static int deserializeInt(String s) {
-        return Integer.parseUnsignedInt(s, 16);
+        return Integer.parseUnsignedInt(s, Protocol.BASE);
     }
 
     /**
@@ -57,7 +51,7 @@ public final class StringSerializer {
      *         en base 16
      */
     public static String serializeLong(Long i) {
-        return Long.toUnsignedString(i, 16);
+        return Long.toUnsignedString(i, Protocol.BASE);
     }
 
     /**
@@ -68,7 +62,7 @@ public final class StringSerializer {
      * @return l'entier désérialisé
      */
     public static Long deserializeLong(String s) {
-        return Long.parseUnsignedLong(s, 16);
+        return Long.parseUnsignedLong(s, Protocol.BASE);
     }
 
     /**

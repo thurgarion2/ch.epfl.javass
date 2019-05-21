@@ -1,6 +1,7 @@
 package ch.epfl.javass;
 
 import java.io.IOError;
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,12 +30,12 @@ import javafx.stage.Stage;
  *
  */
 
-public class LocalMain extends Application {
+public final class LocalMain extends Application {
     private static final Map<PlayerId, String> DEFAULT_PLAYERS=Collections.unmodifiableMap(new HashMap() {{
         put(PlayerId.PLAYER_1, "Aline");
         put(PlayerId.PLAYER_2, "Bastien");
-        put(PlayerId.PLAYER_3, "Collette");
-        put(PlayerId.PLAYER_4, "Davide");
+        put(PlayerId.PLAYER_3, "Colette");
+        put(PlayerId.PLAYER_4, "David");
     }});
     
 
@@ -57,6 +58,7 @@ public class LocalMain extends Application {
     private static final int MAX_SIZE_SIMU = 3;
     
     private static final int SIZE_DISTANT=3;
+    private static final int MIN_ITERATIONS =10;
     
     private static final String HUMAN="h", DISTANT="r", SIMULATED="s";
     private static final String DESC_ARGS= "Utilisation: java ch.epfl.javass.LocalMain <j1>…<j4> [<graine>] \n"
@@ -116,9 +118,7 @@ public class LocalMain extends Application {
      *            les paramètres de la parties
      */
     public static void main(String[] args) {
-        
         launch(args);
-       
     }
 
     @Override
@@ -129,13 +129,12 @@ public class LocalMain extends Application {
         game(args);
         Thread gameThread = new Thread(() -> {
             JassGame game = new JassGame(gameSeed, players, playerNames);
-
             while (!game.isGameOver()) {
                 game.advanceToEndOfNextTrick();
                 try {
                     Thread.sleep(WAITING_TIME_END_ROUD);
                 } catch (InterruptedException e) {
-                    throw new Error(e.toString());
+                    throw new Error(e);
                 }
             }
         });
@@ -190,13 +189,9 @@ public class LocalMain extends Application {
         
         playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
         int iterations= (!itera.isEmpty() ? readInt(itera): DEFAULT_ITERATIONS);
-      
-        try {
-            players.put(id, new PacedPlayer(new MctsPlayer(id,seed, iterations ),WAITING_TO_PLAY));
-        }catch(IllegalArgumentException exception) {
-            printErr("Erreur : nombre d'iterations inferieur à 10 : "+iterations);  
-        }
-
+        //le mcts player ne pourra jamais lancer une illegalArgumentException si on teste avant
+        printErr(iterations>=MIN_ITERATIONS,"Erreur : nombre d'iterations inferieur à 10 : "+iterations);  
+        players.put(id, new PacedPlayer(new MctsPlayer(id,seed, iterations ),WAITING_TO_PLAY));
     }
     
     private void distant(String[] args, PlayerId id) {
@@ -210,8 +205,8 @@ public class LocalMain extends Application {
         
         try{
             players.put(id ,new RemotePlayerClient(ip));
-        }catch(UncheckedIOException err) {
-            printErr("Erreur : adresse ip invalide : "+ip);
+        }catch(IOException err) {
+            printErr("Erreur : impossible de se connecter à "+ip);
         }
     }
 
