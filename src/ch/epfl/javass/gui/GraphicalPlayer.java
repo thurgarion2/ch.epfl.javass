@@ -13,6 +13,7 @@ import ch.epfl.javass.jass.Card;
 import ch.epfl.javass.jass.CardSet;
 import ch.epfl.javass.jass.PlayerId;
 import ch.epfl.javass.jass.TeamId;
+import ch.epfl.javass.net.JassCommand;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleObjectProperty;
@@ -184,6 +185,7 @@ public final class GraphicalPlayer {
             int index=i;
             
             ImageView card = 
+
                     JassComponent.cardsHandImages(Bindings.valueAt(hand.hand(), index));
             card.setOnMouseClicked(e -> {
                     try {
@@ -192,6 +194,7 @@ public final class GraphicalPlayer {
                         throw new Error(e1);
                     }
             });
+
             
             BooleanBinding isPlayable=Bindings.createBooleanBinding(
                 ()->hand.playableCards().contains(hand.hand().get(index)),
