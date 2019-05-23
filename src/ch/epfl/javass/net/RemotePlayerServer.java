@@ -28,6 +28,15 @@ import ch.epfl.javass.jass.TurnState;
  */
 public final class RemotePlayerServer {
     private final Player underlyingPlayer;
+    
+    private static Map<PlayerId, String> deseralizePlayersNames(String map){
+        Map<PlayerId, String> playersNames = new HashMap<>();
+        String[] names =StringSerializer.splitString(map,',');
+        for(PlayerId id : PlayerId.ALL) {
+            playersNames.put(id, StringSerializer.deserializeString(names[id.ordinal()]));
+        }
+        return playersNames;
+    }
 
     /**
      * @param underlyingPlayer
@@ -113,14 +122,6 @@ public final class RemotePlayerServer {
        }
    }
    
-   private static Map<PlayerId, String> deseralizePlayersNames(String map){
-       Map<PlayerId, String> playersNames = new HashMap<>();
-       String[] names =StringSerializer.splitString(map,',');
-       for(PlayerId id : PlayerId.ALL) {
-           playersNames.put(id, StringSerializer.deserializeString(names[id.ordinal()]));
-       }
-       return playersNames;
-   }
    
 
 }

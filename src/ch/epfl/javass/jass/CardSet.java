@@ -130,6 +130,9 @@ public final class CardSet {
 	 *         sinon
 	 */
 	public boolean contains(Card card) {
+	    if(card==null) {
+	        return false;
+	    }
 		return PackedCardSet.contains(cardSet, card.packed());
 	}
 

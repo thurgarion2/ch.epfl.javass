@@ -54,7 +54,7 @@ public final class GraphicalPlayerAdapter implements Player {
             });
             return played;
         } catch (InterruptedException e) {
-            throw new Error(e.toString());
+            throw new Error(e);
         }
     }
     

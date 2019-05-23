@@ -88,7 +88,8 @@ public final class GraphicalPlayer {
     private static final int NEXT_TEAM_PLAYER=2;
     private final Scene mainScene;
     private final String stageName;
-           
+    
+    //retourne le joueurs à index de l'id passé en argument 
     private static PlayerId fromOwn(PlayerId own, int index) {
         return PlayerId.ALL.get((own.ordinal()+index)%PlayerId.COUNT);
     }
@@ -117,6 +118,9 @@ public final class GraphicalPlayer {
         score.turnPointsProperty(t).addListener(
                 (o,oV,nV)->{
                     int diff = nV.intValue()-oV.intValue();
+                    //nous affichons les points que si l'équipe à déjà remoprté un plis
+                    //si le prmier plis remporté est égal à 0, il n'est pas considéré comme 
+                    //un pli
                     lasTrick.setText(nV.intValue()>0?" (+"+diff+")" : "" );
                 });
         line[TEAM_NAMES]=names;

@@ -13,6 +13,10 @@ import javafx.stage.Stage;
  */
 public final class RemoteMain extends Application{
     
+    /**
+     * @param args
+     *            n'influence rien du tout
+     */
     public static void main(String[] args) {
         launch(args);
     }

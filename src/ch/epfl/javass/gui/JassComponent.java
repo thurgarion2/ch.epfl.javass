@@ -65,6 +65,7 @@ public final class JassComponent {
 
     private static ObservableMap<Card, Image> allCardsImage(int size) {
         ObservableMap<Card, Image> images = FXCollections.observableHashMap();
+        //n'existe pas d'itérateurs
         for (int i = 0; i < CardSet.ALL_CARDS.size(); i++) {
             Card card = CardSet.ALL_CARDS.get(i);
             images.put(card, new Image("/card_" + card.color().ordinal() + "_"

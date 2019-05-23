@@ -64,8 +64,8 @@ public final class LocalMain extends Application {
     private static final String DESC_ARGS= "Utilisation: java ch.epfl.javass.LocalMain <j1>…<j4> [<graine>] \n"
             + "où : \n"
             + "<jn> spécifie le joueur n, ainsi: \n"
-            + "   h:[<nom>  un joueur humain nommé <nom>]\n"
-            + "   s:[<nom>  un joueur simulé nommé <nom>], [<graine>], [<iterations>] \n"
+            + "   h:[<nom> un joueur humain nommé <nom>]\n"
+            + "   s:[<nom> un joueur simulé nommé <nom>], [<graine>], [<iterations>] \n"
             + "   r:[<nom> un joueur distant nommé <nom>], <ip> l'adrresse ip du joueur <ip>\n"
             + "<jn>";
    
@@ -175,6 +175,7 @@ public final class LocalMain extends Application {
                   "Erreur : nombre d'arguments invalide (1 ou 2 nécessaire) : "+ Arrays.toString(args));
         args=resize(args, MAX_SIZE_HUMAN);
         String name = args[PLAYERS_NAME];
+        //le nom vide "" n'existe pas
         playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
         players.put(id, new GraphicalPlayerAdapter());
     }
@@ -186,10 +187,11 @@ public final class LocalMain extends Application {
         
         String name = args[PLAYERS_NAME];
         String itera = args[ADDITIONAL_ARGS];
-        
+        //le nom vide "" n'existe pas
         playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
         int iterations= (!itera.isEmpty() ? readInt(itera): DEFAULT_ITERATIONS);
-        //le mcts player ne pourra jamais lancer une illegalArgumentException si on teste avant
+        //le mcts player ne pourra jamais lancer une illegalArgumentException si on teste avant le nombre
+        //d'itérations
         printErr(iterations>=MIN_ITERATIONS,"Erreur : nombre d'iterations inferieur à 10 : "+iterations);  
         players.put(id, new PacedPlayer(new MctsPlayer(id,seed, iterations ),WAITING_TO_PLAY));
     }
@@ -200,7 +202,7 @@ public final class LocalMain extends Application {
         
         String name = args[PLAYERS_NAME];
         String ip = args[ADDITIONAL_ARGS];
-        
+        //le nom vide "" n'existe pas
         playerNames.put(id, !name.isEmpty() ? name : DEFAULT_PLAYERS.get(id));
         
         try{

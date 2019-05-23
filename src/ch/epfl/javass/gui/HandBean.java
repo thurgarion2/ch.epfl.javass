@@ -19,7 +19,7 @@ public final class HandBean {
 	private ObservableSet<Card> playableCardsProperty;
 	
 	/**
-	 * constructeur, créé les propriétés et initialise 
+	 * 
 	 */
 	public HandBean() {
 		handProperty = FXCollections.observableArrayList();
@@ -28,44 +28,47 @@ public final class HandBean {
 		    handProperty.add(null);
         }
 	}
-	
-	/**
-	 * 
-	 * @return une vue non modifiable sur la propriété hand
-	 */
-	public ObservableList<Card> hand(){
-		return FXCollections.unmodifiableObservableList(handProperty);
-	}
 
-	/**
-	 * 
-	 * @return une vue non modifiable sur la propriété playableCards
-	 */
+    /**
+     * retourne une vue non modifiable sur la propriété playableCards
+     * 
+     * @return une vue non modifiable sur la propriété hand
+     */
+    public ObservableList<Card> hand() {
+        return FXCollections.unmodifiableObservableList(handProperty);
+    }
+
+    /**
+     * retourne une vue non modifiable sur la propriété playableCards
+     * 
+     * @return une vue non modifiable sur la propriété playableCards
+     */
 	public ObservableSet<Card> playableCards(){
 			return FXCollections.unmodifiableObservableSet(playableCardsProperty);
 	}
-	
-	/**
-	 * 
-	 * @param newHand
-	 *
-	 * met à jour hand, en fonction du CardSet passé en argument
-	 */
+
+    /**
+     * met à jour hand, en fonction du CardSet passé en argument
+     * 
+     * @param newHand
+     *            met à jour hand, en fonction du CardSet passé en argument
+     */
 	public void setHand(CardSet newHand) {
 	    //handProperty se comporte comme un tableau
 		for(int i=0; i<Jass.HAND_SIZE; i++) {
 	        Card current=handProperty.get(i);
-		    Card isIn = current!=null ? (newHand.contains(current) ? current : null) : null;
+		    Card isIn =  newHand.contains(current) ? current : null;
 		    handProperty.set(i, newHand.size()==Jass.HAND_SIZE ? newHand.get(i) : isIn);
 		}
 	}
 
-	/**
-	 * 
-	 * @param newPlayableCards
-	 * 
-	 * met à jour playableCards, en fonction du CardSet passé en argument 
-	 */
+    /**
+     * met à jour playableCards, en fonction du CardSet passé en argument
+     * 
+     * @param newPlayableCards
+     *            met à jour playableCards, en fonction du CardSet passé en
+     *            argument
+     */
 	public void setPlayableCards(CardSet newPlayableCards) {
 	    //l'ordre n'importe pas soit une carte est jouable soit non
 	    playableCardsProperty.clear();
