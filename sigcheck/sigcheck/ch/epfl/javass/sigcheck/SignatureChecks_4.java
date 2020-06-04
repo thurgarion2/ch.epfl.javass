@@ -14,6 +14,7 @@ public final class SignatureChecks_4 {
 
     @SuppressWarnings("unused")
     void checkPackedTrick() {
+
         int i;
         boolean b;
         long l = 0;
